@@ -1,0 +1,11 @@
+import {
+  "Yjh4899/moonpdf/pdf",
+  "moonbitlang/core/buffer",
+  "moonbitlang/core/compress/zlib",
+  "moonbitlang/core/encoding/utf8",
+  "moonbitlang/core/math",
+}
+
+options(
+  "allow-experimental-packages": [ "moonbitlang/core/compress/zlib" ],
+)
