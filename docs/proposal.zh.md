@@ -6,6 +6,7 @@
 - **参赛者**：Yjh4899
 - **联系方式**：<待填写>
 - **GitHub 仓库**：https://github.com/Yjh4899/moonpdf
+- **mooncakes 包**：https://mooncakes.io/docs/Yjh4899/moonpdf
 - **项目方向**：文档处理引擎 / 图形与渲染基础设施
 - **项目类型**：原创实现（参考 PDF 规范与成熟渲染器的行为，不复制代码）
 
@@ -46,4 +47,4 @@ MoonPDF 补的就是这最后一公里：用纯 MoonBit 完成 **PDF 对象解�
 
 ## 当前进度
 
-仓库已有可运行的端到端垂直切片：3 个 fixture 可渲染为 PNG，13 个单元测试通过，CI 覆盖格式化、检查、测试与渲染；README、架构、范围、兼容性矩阵、路线图与决策记录齐全。后续里程碑按 `docs/roadmap.md` 推进。
+仓库已有可运行的端到端垂直切片：3 个 fixture 可渲染为 PNG，13 个单元测试通过，CI 覆盖格式化、检查、测试与渲染；README、架构、范围、兼容性矩阵、路线图与决策记录齐全。已完成 16 次有意义提交，并已发布 `Yjh4899/moonpdf@0.1.0` 到 mooncakes.io。后续里程碑按 `docs/roadmap.md` 推进。

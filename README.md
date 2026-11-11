@@ -1,10 +1,16 @@
 # MoonPDF
 
 [![CI](https://github.com/Yjh4899/moonpdf/actions/workflows/ci.yml/badge.svg)](https://github.com/Yjh4899/moonpdf/actions/workflows/ci.yml)
+[![mooncakes](https://img.shields.io/badge/mooncakes-Yjh4899%2Fmoonpdf-blue)](https://mooncakes.io/docs/Yjh4899/moonpdf)
+
+[简体中文](README.zh.md)
 
 **A pure-MoonBit PDF page rendering engine.** Parse a PDF, interpret its content
 stream, rasterize the page, and write a PNG — without a JavaScript VM, a C
 library, or a browser.
+
+Published as [`Yjh4899/moonpdf@0.1.0`](https://mooncakes.io/docs/Yjh4899/moonpdf)
+on mooncakes.io.
 
 MoonPDF is an original implementation built for the MoonBit ecosystem. It is not
 a binding and not a port of an existing renderer: the parser, graphics state,
@@ -57,6 +63,10 @@ moon check
 moon test
 moon run cmd/moonpdf -- fixtures/shapes.pdf out.png --scale 2
 ```
+
+The default target is `wasm-gc`, so the CLI runs on any machine with the MoonBit
+toolchain. Add `--target native` for maximum throughput; on Windows the native
+backend requires MSVC Build Tools.
 
 The CLI:
 
