@@ -1,0 +1,58 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+jobs:
+  build-and-test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup MoonBit
+        uses: hustcer/setup-moonbit@v1
+        with:
+          version: latest
+
+      - name: Format check
+        run: moon fmt --check
+
+      - name: Type check (warnings are errors)
+        run: moon check --deny-warn
+
+      - name: Unit tests
+        run: moon test --target native
+
+      - name: Render fixtures
+        run: |
+          mkdir -p out
+          moon run --target native cmd/moonpdf -- fixtures/shapes.pdf out/shapes.png --scale 2
+          moon run --target native cmd/moonpdf -- fixtures/text.pdf out/text.png --scale 2
+          moon run --target native cmd/moonpdf -- fixtures/demo.pdf out/demo.png --scale 2
+
+      - name: Verify PNG output
+        run: |
+          python3 - <<'PY'
+          import struct
+          from pathlib import Path
+
+          expected = {
+              "shapes.png": (600, 400),
+              "text.png": (800, 600),
+              "demo.png": (1200, 720),
+          }
+          for name, size in expected.items():
+              data = (Path("out") / name).read_bytes()
+              assert data[:8] == b"\x89PNG\r\n\x1a\n", name
+              width, height = struct.unpack(">II", data[16:24])
+              assert (width, height) == size, (name, width, height)
+              print(f"{name}: {width}x{height}, {len(data)} bytes")
+          PY
+
+      - name: Upload rendered pages
+        uses: actions/upload-artifact@v4
+        with:
+          name: rendered-pages
+          path: out/*.png
