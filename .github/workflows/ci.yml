@@ -1,4 +1,4 @@
-name: CI
+﻿name: CI
 
 on:
   push:
@@ -15,6 +15,9 @@ jobs:
         uses: hustcer/setup-moonbit@v1
         with:
           version: latest
+
+      - name: Update registry index
+        run: moon update
 
       - name: Format check
         run: moon fmt --check
