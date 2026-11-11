@@ -1,5 +1,0 @@
-// import {
-//   "Yjh4899/moonpdf" @lib,
-// }
-
-pkgtype(kind: "executable")

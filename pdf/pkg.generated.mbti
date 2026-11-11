@@ -1,0 +1,69 @@
+// Generated using `moon info`, DON'T EDIT IT
+package "Yjh4899/moonpdf/pdf"
+
+// Values
+pub fn dict_get(Array[(String, PdfValue)], String) -> PdfValue?
+
+pub fn parse_content_stream(Bytes) -> Array[ContentOp] raise PdfError
+
+pub fn parse_document(Bytes) -> PdfDocument raise PdfError
+
+pub fn parse_indirect_object(Bytes, Int32) -> (Int32, Int32, PdfValue) raise PdfError
+
+pub fn parse_value_from_bytes(Bytes) -> PdfValue raise PdfError
+
+// Errors
+pub suberror PdfError {
+  PdfError(String)
+}
+
+// Types and methods
+pub struct ContentOp {
+  operands : Array[PdfValue]
+  op : String
+}
+
+pub struct PdfDocument {
+  version : String
+  objects : Array[PdfValue?]
+  pages : Array[PdfPage]
+}
+pub fn PdfDocument::page(Self, Int32) -> PdfPage?
+pub fn PdfDocument::page_count(Self) -> Int32
+pub fn PdfDocument::resolve(Self, PdfValue) -> PdfValue
+pub fn PdfDocument::resolve_dict(Self, PdfValue) -> Array[(String, PdfValue)]
+
+pub struct PdfPage {
+  width : Double
+  height : Double
+  contents : Array[Bytes]
+  resources : Array[(String, PdfValue)]
+}
+
+pub struct PdfStream {
+  dict : Array[(String, PdfValue)]
+  data : Bytes
+}
+
+pub enum PdfValue {
+  Null
+  Bool(Bool)
+  Int(Int32)
+  Real(Double)
+  Str(Bytes)
+  Name(String)
+  Array(Array[PdfValue])
+  Dict(Array[(String, PdfValue)])
+  Ref(Int32, Int32)
+  Stream(PdfStream)
+}
+pub fn PdfValue::as_array(Self) -> Array[Self]?
+pub fn PdfValue::as_dict(Self) -> Array[(String, Self)]?
+pub fn PdfValue::as_int(Self) -> Int32?
+pub fn PdfValue::as_name(Self) -> String?
+pub fn PdfValue::as_number(Self) -> Double?
+pub fn PdfValue::type_name(Self) -> String
+
+// Type aliases
+
+// Traits

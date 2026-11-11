@@ -1,0 +1,18 @@
+// Generated using `moon info`, DON'T EDIT IT
+package "Yjh4899/moonpdf"
+
+// Values
+pub fn page_count(Bytes) -> Int32 raise MoonPdfError
+
+pub fn render_page_png(Bytes, Int32, Double) -> Bytes raise MoonPdfError
+
+// Errors
+pub suberror MoonPdfError {
+  MoonPdfError(String)
+}
+
+// Types and methods
+
+// Type aliases
+
+// Traits

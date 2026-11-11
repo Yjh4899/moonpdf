@@ -1,0 +1,92 @@
+// Generated using `moon info`, DON'T EDIT IT
+package "Yjh4899/moonpdf/render"
+
+import {
+  "Yjh4899/moonpdf/pdf",
+}
+
+// Values
+pub fn draw_text(Canvas, Bytes, Matrix, Double, Int32, Int32, Int32) -> Double
+
+pub fn encode_png(RenderedPage) -> Bytes
+
+pub fn point(Double, Double) -> Point
+
+pub fn render_page(@pdf.PdfPage, RenderOptions) -> RenderedPage raise RenderError
+
+// Errors
+pub suberror RenderError {
+  RenderError(String)
+}
+
+// Types and methods
+pub struct Canvas {
+  width : Int32
+  height : Int32
+  data : Array[Byte]
+}
+pub fn Canvas::downsample(Self, Int32) -> Self
+pub fn Canvas::fill_polygons(Self, Array[Array[Point]], Bool, Int32, Int32, Int32) -> Unit
+pub fn Canvas::height(Self) -> Int32
+pub fn Canvas::new(Int32, Int32, Int32, Int32, Int32) -> Self
+pub fn Canvas::set(Self, Int32, Int32, Int32, Int32, Int32) -> Unit
+pub fn Canvas::stroke_polyline(Self, Array[Point], Bool, Double, Bool, Int32, Int32, Int32) -> Unit
+pub fn Canvas::to_rgb_bytes(Self) -> Bytes
+pub fn Canvas::width(Self) -> Int32
+
+pub struct Matrix {
+  a : Double
+  b : Double
+  c : Double
+  d : Double
+  e : Double
+  f : Double
+}
+pub fn Matrix::apply(Self, Double, Double) -> Point
+pub fn Matrix::identity() -> Self
+pub fn Matrix::new(Double, Double, Double, Double, Double, Double) -> Self
+pub fn Matrix::rotate(Double) -> Self
+pub fn Matrix::scale(Double, Double) -> Self
+pub fn Matrix::scale_factor(Self) -> Double
+pub fn Matrix::then(Self, Self) -> Self
+pub fn Matrix::translate(Double, Double) -> Self
+
+pub struct Path {
+  subpaths : Array[Array[Point]]
+  closed_flags : Array[Bool]
+  mut current : Array[Point]
+  mut current_closed : Bool
+}
+pub fn Path::close(Self) -> Unit
+pub fn Path::curve_to(Self, Point, Point, Point) -> Unit
+pub fn Path::finish(Self) -> (Array[Array[Point]], Array[Bool])
+pub fn Path::line_to(Self, Point) -> Unit
+pub fn Path::move_to(Self, Point) -> Unit
+pub fn Path::new() -> Self
+pub fn Path::quad_to(Self, Point, Point) -> Unit
+pub fn Path::rect(Self, Double, Double, Double, Double) -> Unit
+
+pub struct Point {
+  x : Double
+  y : Double
+}
+
+pub struct RenderOptions {
+  scale : Double
+  supersample : Int32
+  bg_r : Int32
+  bg_g : Int32
+  bg_b : Int32
+}
+pub fn RenderOptions::default() -> Self
+pub fn RenderOptions::with_scale(Double) -> Self
+
+pub struct RenderedPage {
+  width : Int32
+  height : Int32
+  pixels : Bytes
+}
+
+// Type aliases
+
+// Traits
