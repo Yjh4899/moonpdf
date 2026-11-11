@@ -1,5 +1,5 @@
-// Learn more about moon.mod configuration:
-// https://docs.moonbitlang.com/en/latest/toolchain/moon/module.html
+// MoonPDF module manifest.
+// Toolchain docs: https://docs.moonbitlang.com/en/latest/toolchain/moon/module.html
 
 name = "Yjh4899/moonpdf"
 
@@ -13,7 +13,7 @@ license = "Apache-2.0"
 
 keywords = [ "pdf", "renderer", "graphics", "rasterizer", "document" ]
 
-preferred_target = "native"
+preferred_target = "wasm-gc"
 
 description = "A pure-MoonBit PDF page rendering engine."
 
