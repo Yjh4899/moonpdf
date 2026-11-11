@@ -1,5 +1,7 @@
 # MoonPDF
 
+[![CI](https://github.com/Yjh4899/moonpdf/actions/workflows/ci.yml/badge.svg)](https://github.com/Yjh4899/moonpdf/actions/workflows/ci.yml)
+
 **A pure-MoonBit PDF page rendering engine.** Parse a PDF, interpret its content
 stream, rasterize the page, and write a PNG — without a JavaScript VM, a C
 library, or a browser.
