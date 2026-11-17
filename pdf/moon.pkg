@@ -2,4 +2,9 @@ import {
   "moonbitlang/core/buffer",
   "moonbitlang/core/string",
   "moonbitlang/core/encoding/utf8",
+  "moonbitlang/core/compress/zlib",
 }
+
+options(
+  "allow-experimental-packages": [ "moonbitlang/core/compress/zlib" ],
+)
