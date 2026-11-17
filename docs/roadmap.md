@@ -2,45 +2,47 @@
 
 The milestones are ordered by user value per unit of risk. Each milestone ends
 with an observable acceptance check, so progress is visible without reading the
-source.
+source. The final target is ISO 32000-1:2008 page rendering; see
+[`standard-coverage.md`](standard-coverage.md).
 
-## M0 — Vertical slice (current)
+## M0 — File structure and vector slice (current)
 
-**Deliverables**
+**Delivered**
 
-- classic xref, indirect objects, page tree;
+- classic xref, xref streams, object streams, hybrid `/XRefStm`;
+- incremental updates: `/Prev` chain, revision overlay, free entries;
+- Flate/ASCIIHex/ASCII85/RunLength/LZW filters and predictors;
+- page tree with inherited `MediaBox` / `Resources`;
 - content stream interpreter for paths, fill/stroke, color and text;
-- supersampled scanline rasterizer;
-- fallback bitmap glyphs;
+- Form XObjects with `/Matrix` and nested resources;
+- supersampled scanline rasterizer and fallback bitmap glyphs;
 - PNG encoder and CLI;
-- unit tests, fixtures, CI, compatibility matrix.
+- unit/integration tests, fixtures, CI and compatibility matrix;
+- incremental fixture reusing an old Form XObject and old resources.
 
 **Acceptance**
 
 ```sh
 moon check --deny-warn
 moon test
-moon run cmd/moonpdf -- fixtures/demo.pdf out/demo.png --scale 2
+moon run cmd/moonpdf -- fixtures/incremental.pdf out/incremental.png --scale 2
 ```
 
-The output is a valid PNG with the page's declared dimensions.
+The incremental page must show the reused blue header and the new green body.
 
-## M1 — Real-world documents
+## M1 — Images and page geometry
 
 **Deliverables**
 
-- FlateDecode via `moonbitlang/core/compress/zlib`;
-- xref streams and object streams;
-- inline images and image XObjects (JPEG/PNG);
-- `/Rotate` and `/CropBox`;
-- rectangular clipping for `W` / `W*`;
-- page content from real-world fixtures.
+- image XObjects and inline images: DCTDecode (JPEG), Flate/PNG predictors;
+- `/Rotate`, `/CropBox`, `BBox` clipping and rectangular `W`/`W*`;
+- more real-world fixtures, including camera/scanner output.
 
 **Acceptance**
 
-- Render a declared corpus of at least 20 real PDFs.
-- Every unsupported feature in the corpus is counted and reported.
-- No crash on malformed input; errors are typed.
+- A declared image corpus renders with correct dimensions and visible content.
+- Rotation and crop boxes match the reference layout.
+- Unsupported image codecs fail with a specific diagnostic.
 
 ## M2 — Fonts and text fidelity
 
@@ -50,41 +52,40 @@ The output is a valid PNG with the page's declared dimensions.
 - CFF/Type1 subset;
 - standard-14 metrics fallback;
 - correct text advance and simple kerning;
-- text extraction smoke test to cross-check positions.
+- CID/CJK fonts and encodings.
 
 **Acceptance**
 
 - Text-only pages match reference layout within 1% of page width.
-- Emoji/CJK unsupported characters produce an explicit diagnostic, not silent
-  boxes.
+- Unsupported characters produce an explicit diagnostic, not silent boxes.
 
-## M3 — Compositing and vector output
+## M3 — Compositing and interactive appearance
 
 **Deliverables**
 
 - clipping paths;
 - transparency groups and blend modes;
 - shadings and patterns;
-- SVG output for embedding;
-- wasm demo that renders in the browser without PDF.js.
+- annotation appearance streams;
+- optional content visibility;
+- SVG output and a wasm demo.
 
 **Acceptance**
 
 - A visual diff suite with SSIM thresholds per feature class.
 - The wasm demo produces the same raster as native for the fixture corpus.
 
-## M4 — Performance and differential quality
+## M4 — Corpus quality and performance
 
 **Deliverables**
 
-- tile-based rendering and a glyph cache;
-- adaptive curve flattening;
-- differential test harness against MuPDF;
+- differential harness against MuPDF on the public corpus;
+- tile-based rendering, glyph cache, adaptive curve flattening;
 - benchmark report (pages/second, memory) on a fixed machine class.
 
 **Acceptance**
 
-- No regression in the visual suite.
+- 100% no-crash/no-hang; 98% of pages SSIM ≥ 0.95.
 - Documented performance numbers and a reproducible benchmark command.
 
 ## Explicit non-goals

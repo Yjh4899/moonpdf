@@ -20,10 +20,11 @@ The architecture optimizes for four properties:
 
 | Package | Responsibility | Key files |
 | --- | --- | --- |
-| `pdf/` | PDF syntax, object model, classic xref, page tree, content operators | `types.mbt`, `parse.mbt`, `document.mbt`, `content.mbt` |
-| `render/` | graphics state, path flattening, scanline raster, fallback text, PNG | `geometry.mbt`, `path.mbt`, `canvas.mbt`, `font.mbt`, `render.mbt`, `png.mbt` |
+| `pdf/` | syntax, object model, xref chain, filters, page tree, content operators | `types.mbt`, `parse.mbt`, `document.mbt`, `content.mbt`, `filter.mbt` |
+| `render/` | graphics state, path flattening, scanline raster, fallback text, forms, PNG | `geometry.mbt`, `path.mbt`, `canvas.mbt`, `font.mbt`, `render.mbt`, `png.mbt` |
 | root | small facade: `page_count`, `render_page_png` | `moonpdf.mbt` |
 | `cmd/moonpdf/` | argument parsing and file I/O | `main.mbt` |
+| `tests/integration/` | end-to-end fixtures: incremental update, xref stream, pixel probes | `lib.mbt`, `integration_test.mbt` |
 
 The parser and renderer are separate packages on purpose. A future document
 indexer, text extractor or accessibility checker should be able to depend on
@@ -34,17 +35,22 @@ indexer, text extractor or accessibility checker should be able to depend on
 ```text
 Bytes
   └─ parse_document
-       ├─ header / startxref
-       ├─ classic xref table
-       ├─ indirect objects (numbers, names, strings, arrays, dicts, streams)
+       ├─ header / last startxref
+       ├─ xref chain: classic table or xref stream, linked by /Prev
+       ├─ hybrid /XRefStm supplement
+       ├─ revision overlay (oldest -> newest; free entries delete objects)
+       ├─ objects at byte offsets + objects inside /ObjStm streams
+       ├─ stream filters: Flate, ASCIIHex, ASCII85, RunLength, LZW + predictors
        ├─ page tree walk (inherits MediaBox and Resources)
-       └─ PdfDocument { pages: [PdfPage { width, height, contents, resources }] }
+       └─ PdfDocument { pages: [PdfPage { width, height, contents, resources, objects }] }
 
 PdfPage
+  ├─ contents: decoded content streams
   └─ parse_content_stream
        └─ [ContentOp { operands, operator }]
 
 ContentOp[]
+  ├─ expand_forms: inline Form XObjects with /Matrix and nested resources
   └─ interpreter
        ├─ GState stack (CTM, colors, line width, cap)
        ├─ TextState (text matrix, line matrix, font size, spacing)
@@ -62,6 +68,34 @@ RenderedPage
        ├─ zlib stream from moonbitlang/core/compress/zlib
        └─ CRC32 over chunk type + data
 ```
+
+## Cross-reference chain and revisions
+
+The document loader follows the same structure as a conforming reader:
+
+1. Read the last `startxref` offset.
+2. Parse that section. It may be a classic `xref` table or an xref stream with
+   `/W` and `/Index`.
+3. Follow `/Prev` to older sections. A hybrid classic section may also carry
+   `/XRefStm`, whose entries supplement the table; classic entries win.
+4. Merge entries **oldest → newest**. A later entry for the same object number
+   replaces the older one; a free entry removes the object.
+5. Load type-1 objects at their offsets, then type-2 objects from `/ObjStm`
+   containers. Object streams must not be nested.
+6. Take `/Root` from the newest trailer that provides it.
+
+The parser never concatenates revisions into a fake single table: it keeps the
+revision order so overwrite and deletion semantics stay explicit. See
+[`incremental-updates.md`](incremental-updates.md) for the fixture.
+
+## Form XObjects
+
+A `Do` operator can reference a Form XObject. The renderer expands the form's
+content stream into the current operation list with `q`, the form `/Matrix`, the
+expanded content, and `Q`. Nested forms use their own `/Resources` dictionary;
+plain Form XObject resources inherit from the parent when absent. `BBox`
+clipping is the remaining gap and is tracked in the compatibility matrix.
+
 
 ## Coordinates
 

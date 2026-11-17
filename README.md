@@ -3,13 +3,13 @@
 [![CI](https://github.com/Yjh4899/moonpdf/actions/workflows/ci.yml/badge.svg)](https://github.com/Yjh4899/moonpdf/actions/workflows/ci.yml)
 [![mooncakes](https://img.shields.io/badge/mooncakes-Yjh4899%2Fmoonpdf-blue)](https://mooncakes.io/docs/Yjh4899/moonpdf)
 
-[简体中文](README.zh.md)
+[绠€浣撲腑鏂嘳(README.zh.md)
 
 **A pure-MoonBit PDF page rendering engine.** Parse a PDF, interpret its content
-stream, rasterize the page, and write a PNG — without a JavaScript VM, a C
+stream, rasterize the page, and write a PNG 鈥?without a JavaScript VM, a C
 library, or a browser.
 
-Published as [`Yjh4899/moonpdf@0.1.1`](https://mooncakes.io/docs/Yjh4899/moonpdf)
+Published as [`Yjh4899/moonpdf@0.2.0`](https://mooncakes.io/docs/Yjh4899/moonpdf)
 on mooncakes.io.
 
 MoonPDF is an original implementation built for the MoonBit ecosystem. It is not
@@ -35,23 +35,34 @@ multi-target rendering core.
 
 ## Status
 
-This repository is at the **initial-review vertical slice** stage. It already
-renders real pages end to end:
+This repository is at the **file-structure and vector-graphics milestone**. It
+already renders real pages end to end, including incrementally saved files:
 
 | Area | Current support |
 | --- | --- |
-| PDF syntax | classic xref tables, indirect objects, dictionaries, arrays, names, strings, streams |
+| File structure | classic xref, xref streams, object streams, hybrid `/XRefStm`, incremental updates (`/Prev`) |
+| Filters | Flate, ASCIIHex, ASCII85, RunLength, LZW; TIFF/PNG predictors |
 | Page tree | inherited `MediaBox` / `Resources`, multiple pages |
 | Content | `q/Q/cm`, path construction (`m l c v y re h`), fill/stroke (`S s f F f* B B* b b* n`), RGB/gray/CMYK, line width/cap |
+| Forms | Form XObjects with `/Matrix` and nested resources |
 | Text | text state, `Td/TD/Tm/T*`, `Tj/TJ/'/"`, fallback bitmap glyphs |
 | Output | RGB PNG with zlib compression |
 
-The renderer is deliberately explicit about what it does **not** support yet:
-Flate-compressed content streams, xref streams, object streams, embedded font
-outlines, images, clipping, transparency and shadings. See
+The target is ISO 32000-1:2008 page rendering. See
+[`docs/standard-coverage.md`](docs/standard-coverage.md) for the clause-level
+target and corpus gate, and [`docs/incremental-updates.md`](docs/incremental-updates.md)
+for the `/Prev` algorithm and the reused-resource fixture.
+
+Still missing, and tracked as milestones: embedded font outlines, images,
+clipping, transparency, shadings and annotation appearance streams. See
 [`docs/compatibility.md`](docs/compatibility.md).
 
 ![MoonPDF rendering a fixture](docs/images/demo.png)
+
+An incremental revision reusing the old Form XObject header and the old
+font/resources, with a newly appended body stream:
+
+![Incremental update: reused header, new body](docs/images/incremental.png)
 
 ## Quick start
 
@@ -80,16 +91,13 @@ moonpdf <input.pdf> [output.png] [--page N] [--scale S]
 
 ```text
 bytes
-  │
-  ├─ pdf/        lexer, object parser, classic xref, page tree
-  │
-  ├─ render/     content-stream interpreter, graphics state, text state
-  │    ├─ path    Bézier flattening
-  │    ├─ canvas  supersampled scanline fill / stroke
-  │    ├─ font    3×5 fallback glyphs
-  │    └─ png     zlib + PNG chunks + CRC32
-  │
-  └─ cmd/moonpdf CLI
+  鈹?  鈹溾攢 pdf/        lexer, object parser, classic xref, page tree
+  鈹?  鈹溾攢 render/     content-stream interpreter, graphics state, text state
+  鈹?   鈹溾攢 path    B茅zier flattening
+  鈹?   鈹溾攢 canvas  supersampled scanline fill / stroke
+  鈹?   鈹溾攢 font    3脳5 fallback glyphs
+  鈹?   鈹斺攢 png     zlib + PNG chunks + CRC32
+  鈹?  鈹斺攢 cmd/moonpdf CLI
 ```
 
 The parser and the renderer are separate packages so that document inspection
@@ -110,7 +118,7 @@ Design rules:
 ## Testing
 
 ```sh
-moon test                 # 13 unit tests across parser, content, raster, PNG
+moon test                 # 19 unit and integration tests
 moon run cmd/moonpdf -- fixtures/text.pdf out/text.png --scale 2
 ```
 
@@ -136,7 +144,7 @@ The full plan, scope boundaries and acceptance criteria are in
 
 ## References and license
 
-- PDF 32000-1:2008, *Document management — Portable Document Format*.
+- PDF 32000-1:2008, *Document management 鈥?Portable Document Format*.
 - Behavioral reference implementations: MuPDF, PDFium and Poppler. No source
   code from those projects is copied; MoonPDF is implemented from the
   specification and from black-box output comparisons.
