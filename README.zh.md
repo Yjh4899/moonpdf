@@ -1,30 +1,45 @@
-﻿# MoonPDF
+# MoonPDF
 
-[English](README.md) | 绠€浣撲腑鏂?
-**绾?MoonBit 鐨?PDF 椤甸潰娓叉煋寮曟搸**锛氳В鏋?PDF銆佽В閲婂唴瀹规祦銆佸厜鏍呭寲椤甸潰骞惰緭鍑?PNG锛屼笉渚濊禆 JavaScript 铏氭嫙鏈恒€丆 搴撴垨娴忚鍣ㄣ€?
-宸插彂甯冨埌 mooncakes.io锛歔`Yjh4899/moonpdf@0.2.0`](https://mooncakes.io/docs/Yjh4899/moonpdf)銆?
-## 涓轰粈涔堥渶瑕?
-MoonBit 鐢熸€佸凡缁忚兘鈥滆鍐?PDF鈥濓細`pdflite`/`mbtpdf` 璐熻矗瀵硅薄瑙ｆ瀽涓庢敼鍐欙紝`pagelayout` 璐熻矗鐢熸垚锛屽畼鏂?office-viewer 鐨?PDF 棰勮鍒欑洿鎺ュ祵鍏?PDF.js銆傜己鐨勬槸鈥滄妸鏌愪竴椤靛彉鎴愬儚绱犫€濈殑鏈€鍚庝竴鍏噷銆侻oonPDF 鐢ㄧ函 MoonBit 琛ラ綈杩欎竴灞傦紝鍙敤浜庣缉鐣ュ浘銆丱CR 鍓嶇疆銆佹闈㈤瑙堝拰鏂囨。瑙嗚鍥炲綊銆?
-## 褰撳墠鐘舵€?
-宸叉墦閫氱鍒扮鍨傜洿鍒囩墖锛氱粡鍏?xref銆侀棿鎺ュ璞°€侀〉闈㈡爲銆佸唴瀹规祦瑙ｉ噴銆佽矾寰勫～鍏?鎻忚竟銆丷GB/鐏板害/CMYK銆佹枃鏈姸鎬佷笌鍥為€€瀛楀舰銆?脳 瓒呴噰鏍锋壂鎻忕嚎鍏夋爡鍖栥€丳NG 杈撳嚭銆丆LI銆?3 涓崟鍏冩祴璇曚笌 CI銆?
-![MoonPDF 娓叉煋绀轰緥](docs/images/demo.png)
+[English](README.md) | 简体中文
 
-## 蹇€熷紑濮?
+**纯 MoonBit 的 PDF 页面渲染引擎**：解析 PDF、解释内容流、光栅化页面并输出 PNG，不依赖 JavaScript 虚拟机、C 库或浏览器。
+
+已发布到 mooncakes.io：[`Yjh4899/moonpdf@0.2.0`](https://mooncakes.io/docs/Yjh4899/moonpdf)。
+
+## 为什么需要
+
+MoonBit 生态已经能“读写 PDF”：`pdflite`/`mbtpdf` 负责对象解析与改写，`pagelayout` 负责生成，官方 office-viewer 的 PDF 预览则直接嵌入 PDF.js。缺的是“把某一页变成像素”的最后一公里。MoonPDF 用纯 MoonBit 补齐这一层，可用于缩略图、OCR 前置、桌面预览和文档视觉回归。
+
+## 当前状态
+
+已完成文件结构与矢量图形里程碑：经典 xref、xref stream、object stream、混合 `/XRefStm`、增量更新（`/Prev`）、Flate/ASCIIHex/ASCII85/RunLength/LZW、Form XObject、页面树、内容流解释、路径填充/描边、RGB/灰度/CMYK、文本状态与回退字形、2× 超采样扫描线光栅化、PNG 输出、CLI、20 个单元/集成测试与 CI。
+
+![MoonPDF 渲染示例](docs/images/demo.png)
+
+增量修订复用旧 Form XObject 页眉并追加新主体：
+
+![增量更新：复用旧页眉，追加新主体](docs/images/incremental.png)
+
+## 快速开始
+
 ```sh
 moon check
 moon test
 moon run cmd/moonpdf -- fixtures/demo.pdf out.png --scale 2
 ```
 
-榛樿鐩爣鏄?`wasm-gc`锛涘姞 `--target native` 鍙幏寰楁洿楂樺悶鍚愶紙Windows 鍘熺敓鍚庣闇€瑕?MSVC Build Tools锛夈€?
-## 鏂囨。
+默认目标是 `wasm-gc`；加 `--target native` 可获得更高吞吐（Windows 原生后端需要 MSVC Build Tools）。
 
-- [鏋舵瀯](docs/architecture.md)
-- [鑼冨洿涓庨獙鏀禲(docs/scope.md)
-- [鍏煎鎬х煩闃礭(docs/compatibility.md)
-- [璺嚎鍥綸(docs/roadmap.md)
-- [椤圭洰鐢虫姤涔(<docs/鐢虫姤涔?md>)
+## 文档
 
-## 璁稿彲
+- [标准覆盖目标](docs/standard-coverage.md)
+- [增量更新解析](docs/incremental-updates.md)
+- [架构](docs/architecture.md)
+- [范围与验收](docs/scope.md)
+- [兼容性矩阵](docs/compatibility.md)
+- [路线图](docs/roadmap.md)
+- [项目申报书](<docs/申报书.md>)
 
-Apache-2.0銆傚弬鑰?PDF 32000-1:2008 瑙勮寖涓?MuPDF/PDFium/Poppler 鐨勫叕寮€琛屼负锛屼笉澶嶅埗鍏舵簮鐮併€?
+## 许可
+
+Apache-2.0。参考 PDF 32000-1:2008 规范与 MuPDF/PDFium/Poppler 的公开行为，不复制其源码。

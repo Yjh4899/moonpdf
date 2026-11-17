@@ -118,7 +118,7 @@ Design rules:
 ## Testing
 
 ```sh
-moon test                 # 19 unit and integration tests
+moon test                 # 20 unit and integration tests
 moon run cmd/moonpdf -- fixtures/text.pdf out/text.png --scale 2
 ```
 

@@ -77,7 +77,7 @@ The concrete reuse fixture is documented in
 | Metric | Current | Target |
 | --- | --- | --- |
 | Fixture pages rendered end to end | 5/5 | public corpus |
-| Unit + integration tests | 19 | 100+ |
+| Unit + integration tests | 20 | 100+ |
 | Unsupported-feature errors with a typed message | 100% | 100% |
 | Incremental-update fixtures | 1 | every `/Prev` document in corpus |
 | Visual diff vs reference renderer | pixel probes on fixtures | SSIM ≥ 0.95 on 98% of corpus |

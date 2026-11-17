@@ -73,6 +73,12 @@ ignores `/Prev` cannot find object 7 and fails the body assertion; a reader that
 ignores object inheritance cannot resolve the old `/Resources` and loses the
 header.
 
+`fixtures/incremental-full.pdf` is a full rewrite of the same logical revision
+(every object in one xref section). The integration test and CI assert that the
+incremental file and the full rewrite produce **byte-identical PNGs**, which is
+the strongest available proof that revision overlay and old-resource reuse agree
+with a normal save.
+
 ## Related modern layout
 
 `fixtures/xref-stream.pdf` covers the other common modern layout: the xref is a
