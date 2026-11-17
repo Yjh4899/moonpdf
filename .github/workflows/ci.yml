@@ -1,4 +1,4 @@
-﻿name: CI
+name: CI
 
 on:
   push:
@@ -25,7 +25,7 @@ jobs:
       - name: Type check (warnings are errors)
         run: moon check --deny-warn
 
-      - name: Unit tests
+      - name: Unit and integration tests
         run: moon test --target native
 
       - name: Render fixtures
@@ -34,24 +34,67 @@ jobs:
           moon run --target native cmd/moonpdf -- fixtures/shapes.pdf out/shapes.png --scale 2
           moon run --target native cmd/moonpdf -- fixtures/text.pdf out/text.png --scale 2
           moon run --target native cmd/moonpdf -- fixtures/demo.pdf out/demo.png --scale 2
+          moon run --target native cmd/moonpdf -- fixtures/incremental.pdf out/incremental.png --scale 2
+          moon run --target native cmd/moonpdf -- fixtures/xref-stream.pdf out/xref-stream.png --scale 2
 
-      - name: Verify PNG output
+      - name: Verify PNG output and reused-resource pixels
         run: |
           python3 - <<'PY'
           import struct
+          import zlib
           from pathlib import Path
+
+          def read_png(path):
+              data = path.read_bytes()
+              assert data[:8] == b"\x89PNG\r\n\x1a\n", path
+              pos = 8
+              idat = bytearray()
+              width = height = 0
+              depth = color = 0
+              while pos < len(data):
+                  length = struct.unpack(">I", data[pos:pos + 4])[0]
+                  kind = data[pos + 4:pos + 8]
+                  chunk = data[pos + 8:pos + 8 + length]
+                  if kind == b"IHDR":
+                      width, height = struct.unpack(">II", chunk[:8])
+                      depth, color = chunk[8], chunk[9]
+                  elif kind == b"IDAT":
+                      idat += chunk
+                  pos += 12 + length
+              assert depth == 8 and color == 2, (path, depth, color)
+              raw = zlib.decompress(bytes(idat))
+              return width, height, raw, width * 3 + 1
+
+          def pixel(raw, stride, x, y):
+              offset = y * stride + 1 + x * 3
+              return tuple(raw[offset:offset + 3])
 
           expected = {
               "shapes.png": (600, 400),
               "text.png": (800, 600),
               "demo.png": (1200, 720),
+              "incremental.png": (600, 400),
+              "xref-stream.png": (640, 400),
           }
           for name, size in expected.items():
-              data = (Path("out") / name).read_bytes()
-              assert data[:8] == b"\x89PNG\r\n\x1a\n", name
-              width, height = struct.unpack(">II", data[16:24])
+              width, height, raw, stride = read_png(Path("out") / name)
               assert (width, height) == size, (name, width, height)
-              print(f"{name}: {width}x{height}, {len(data)} bytes")
+              print(f"{name}: {width}x{height}")
+
+          # Incremental update: old Form XObject header (blue) is reused, and the
+          # appended body stream (green) is rendered below it.
+          width, height, raw, stride = read_png(Path("out/incremental.png"))
+          blue = pixel(raw, stride, 500, 40)
+          green = pixel(raw, stride, 500, 250)
+          assert blue[2] > 150 and blue[0] < 100, blue
+          assert green[1] > 120 and green[2] < 120, green
+          print("incremental: reused header", blue, "new body", green)
+
+          # Xref-stream/object-stream/Flate fixture: blue rectangle from the page.
+          width, height, raw, stride = read_png(Path("out/xref-stream.png"))
+          blue = pixel(raw, stride, 100, 100)
+          assert blue[2] > 150 and blue[0] < 100, blue
+          print("xref-stream: page content", blue)
           PY
 
       - name: Upload rendered pages
