@@ -3,7 +3,7 @@
 
 name = "Yjh4899/moonpdf"
 
-version = "0.1.1"
+version = "0.2.0"
 
 readme = "README.mbt.md"
 
@@ -15,7 +15,7 @@ keywords = [ "pdf", "renderer", "graphics", "rasterizer", "document" ]
 
 preferred_target = "wasm-gc"
 
-description = "A pure-MoonBit PDF page rendering engine."
+description = "A pure-MoonBit PDF 1.7 page rendering engine."
 
 import {
   "moonbitlang/x@0.5.7",
