@@ -1,4 +1,4 @@
-name: CI
+﻿name: CI
 
 on:
   push:
@@ -35,6 +35,7 @@ jobs:
           moon run --target native cmd/moonpdf -- fixtures/text.pdf out/text.png --scale 2
           moon run --target native cmd/moonpdf -- fixtures/demo.pdf out/demo.png --scale 2
           moon run --target native cmd/moonpdf -- fixtures/incremental.pdf out/incremental.png --scale 2
+          moon run --target native cmd/moonpdf -- fixtures/incremental-full.pdf out/incremental-full.png --scale 2
           moon run --target native cmd/moonpdf -- fixtures/xref-stream.pdf out/xref-stream.png --scale 2
 
       - name: Verify PNG output and reused-resource pixels
@@ -74,6 +75,7 @@ jobs:
               "text.png": (800, 600),
               "demo.png": (1200, 720),
               "incremental.png": (600, 400),
+              "incremental-full.png": (600, 400),
               "xref-stream.png": (640, 400),
           }
           for name, size in expected.items():
@@ -89,6 +91,8 @@ jobs:
           assert blue[2] > 150 and blue[0] < 100, blue
           assert green[1] > 120 and green[2] < 120, green
           print("incremental: reused header", blue, "new body", green)
+          assert (Path("out/incremental.png").read_bytes()
+                  == Path("out/incremental-full.png").read_bytes()), "incremental != full rewrite"
 
           # Xref-stream/object-stream/Flate fixture: blue rectangle from the page.
           width, height, raw, stride = read_png(Path("out/xref-stream.png"))
