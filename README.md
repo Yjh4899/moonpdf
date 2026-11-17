@@ -9,7 +9,7 @@
 stream, rasterize the page, and write a PNG — without a JavaScript VM, a C
 library, or a browser.
 
-Published as [`Yjh4899/moonpdf@0.1.0`](https://mooncakes.io/docs/Yjh4899/moonpdf)
+Published as [`Yjh4899/moonpdf@0.1.1`](https://mooncakes.io/docs/Yjh4899/moonpdf)
 on mooncakes.io.
 
 MoonPDF is an original implementation built for the MoonBit ecosystem. It is not

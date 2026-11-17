@@ -4,7 +4,7 @@
 
 **纯 MoonBit 的 PDF 页面渲染引擎**：解析 PDF、解释内容流、光栅化页面并输出 PNG，不依赖 JavaScript 虚拟机、C 库或浏览器。
 
-已发布到 mooncakes.io：[`Yjh4899/moonpdf@0.1.0`](https://mooncakes.io/docs/Yjh4899/moonpdf)。
+已发布到 mooncakes.io：[`Yjh4899/moonpdf@0.1.1`](https://mooncakes.io/docs/Yjh4899/moonpdf)。
 
 ## 为什么需要
 
@@ -32,7 +32,7 @@ moon run cmd/moonpdf -- fixtures/demo.pdf out.png --scale 2
 - [范围与验收](docs/scope.md)
 - [兼容性矩阵](docs/compatibility.md)
 - [路线图](docs/roadmap.md)
-- [项目申报书](docs/proposal.zh.md)
+- [项目申报书](<docs/申报书.md>)
 
 ## 许可
 
