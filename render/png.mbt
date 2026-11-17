@@ -67,6 +67,6 @@ pub fn encode_png(page : RenderedPage) -> Bytes {
   }
   let compressed = @zlib.compress(raw.to_bytes())
   write_chunk(out, "IDAT", compressed)
-  write_chunk(out, "IEND", Bytes::new(0))
+  write_chunk(out, "IEND", Bytes::make(0, u8(0)))
   out.to_bytes()
 }
