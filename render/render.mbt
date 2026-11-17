@@ -284,6 +284,135 @@ fn show_text_array(
 }
 
 ///|
+fn lookup_resource(
+  page : @pdf.PdfPage,
+  resources : Array[(String, @pdf.PdfValue)],
+  category : String,
+  name : String,
+) -> @pdf.PdfValue? {
+  let dict = match @pdf.dict_get(resources, category) {
+    Some(value) => page.resolve_dict(value)
+    None => return None
+  }
+  match @pdf.dict_get(dict, name) {
+    Some(value) => Some(page.resolve(value))
+    None => None
+  }
+}
+
+///|
+fn form_matrix(
+  page : @pdf.PdfPage,
+  dict : Array[(String, @pdf.PdfValue)],
+) -> Matrix {
+  match @pdf.dict_get(dict, "Matrix") {
+    Some(value) =>
+      match page.resolve(value).as_array() {
+        Some(items) =>
+          if items.length() >= 6 {
+            match
+              (
+                items[0].as_number(),
+                items[1].as_number(),
+                items[2].as_number(),
+                items[3].as_number(),
+                items[4].as_number(),
+                items[5].as_number(),
+              ) {
+              (Some(a), Some(b), Some(c), Some(d), Some(e), Some(f)) =>
+                Matrix::new(a, b, c, d, e, f)
+              _ => Matrix::identity()
+            }
+          } else {
+            Matrix::identity()
+          }
+        None => Matrix::identity()
+      }
+    None => Matrix::identity()
+  }
+}
+
+///|
+/// Expand Form XObjects into the page operation stream. This keeps the
+/// graphics-state interpreter flat while still reusing the form's content and
+/// matrix. Nested forms are expanded recursively with their own resources.
+fn expand_forms(
+  page : @pdf.PdfPage,
+  resources : Array[(String, @pdf.PdfValue)],
+  ops : Array[@pdf.ContentOp],
+  depth : Int32,
+) -> Array[@pdf.ContentOp] raise RenderError {
+  if depth > 8 {
+    raise RenderError("Form XObject nesting is too deep")
+  }
+  let out : Array[@pdf.ContentOp] = Array(capacity=ops.length())
+  for op in ops {
+    if op.op == "Do" {
+      let name = match op.operands.get(0) {
+        Some(@pdf.Name(name)) => name
+        _ => ""
+      }
+      if name == "" {
+        continue
+      }
+      let value = match lookup_resource(page, resources, "XObject", name) {
+        Some(value) => value
+        None => continue
+      }
+      match value {
+        @pdf.Stream(stream) => {
+          let subtype = match @pdf.dict_get(stream.dict, "Subtype") {
+            Some(value) => value.as_name()
+            None => None
+          }
+          if subtype == Some("Form") {
+            let data = @pdf.decode_stream(stream) catch {
+              _ => raise RenderError("failed to decode Form XObject \{name}")
+            }
+            let sub_ops = @pdf.parse_content_stream(data) catch {
+              _ => raise RenderError("failed to parse Form XObject \{name}")
+            }
+            let form_resources = match @pdf.dict_get(stream.dict, "Resources") {
+              Some(value) => page.resolve_dict(value)
+              None => resources
+            }
+            let expanded = expand_forms(
+              page,
+              form_resources,
+              sub_ops,
+              depth + 1,
+            )
+            let matrix = form_matrix(page, stream.dict)
+            out.push(@pdf.content_op([], "q"))
+            out.push(
+              @pdf.content_op(
+                [
+                  @pdf.pdf_real(matrix.a),
+                  @pdf.pdf_real(matrix.b),
+                  @pdf.pdf_real(matrix.c),
+                  @pdf.pdf_real(matrix.d),
+                  @pdf.pdf_real(matrix.e),
+                  @pdf.pdf_real(matrix.f),
+                ],
+                "cm",
+              ),
+            )
+            for sub in expanded {
+              out.push(sub)
+            }
+            out.push(@pdf.content_op([], "Q"))
+          }
+        }
+        _ => ()
+      }
+    } else {
+      out.push(op)
+    }
+  }
+  out
+}
+
+///|
 /// Render one PDF page to an RGB raster.
 pub fn render_page(
   page : @pdf.PdfPage,
@@ -324,11 +453,12 @@ pub fn render_page(
     0.0,
     page.height * device_scale,
   )
+  let expanded = expand_forms(page, page.resources, ops, 0)
   let mut state = GState::initial(base)
   let stack : Array[GState] = Array(capacity=8)
   let mut text = TextState::initial()
   let mut path = Path::new()
-  for op in ops {
+  for op in expanded {
     match op.op {
       "q" => stack.push(state)
       "Q" =>
