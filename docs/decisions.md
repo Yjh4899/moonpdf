@@ -1,4 +1,4 @@
-# Decision log
+﻿# Decision log
 
 Short architecture decision records. Each entry states the decision, the
 alternatives and the consequence.
@@ -20,7 +20,7 @@ review surface.
 
 ## ADR-002: supersampling instead of analytic coverage
 
-**Decision.** Render at 2× and box-filter down.
+**Decision.** Render at 2脳 and box-filter down.
 
 **Alternatives.** Analytic area coverage per pixel; A-buffer.
 
@@ -28,12 +28,12 @@ review surface.
 cells with a small amount of code. It also makes the scanline fill independent
 of antialiasing, which keeps the first slice testable.
 
-**Consequence.** 4× the pixel work at 2× supersampling. The parameter is already
+**Consequence.** 4脳 the pixel work at 2脳 supersampling. The parameter is already
 in `RenderOptions`; a tiled renderer can change the policy later.
 
 ## ADR-003: bitmap fallback font first
 
-**Decision.** Ship a hand-written 3×5 bitmap font for the first slice.
+**Decision.** Ship a hand-written 3脳5 bitmap font for the first slice.
 
 **Alternatives.** Wait for a TrueType engine; embed a C font library.
 
@@ -83,3 +83,34 @@ reproduction simple.
 
 **Consequence.** A future JPEG decoder or font engine must be pure MoonBit or
 carefully isolated behind an optional package.
+
+## ADR-007: overlay revisions instead of rewriting a single object table
+
+**Decision.** Parse every xref section in the `/Prev` chain and merge entries
+oldest → newest, preserving free-entry deletions.
+
+**Alternatives.** Concatenate all xref tables into one map while parsing; follow
+only the newest table.
+
+**Why.** Incremental saves are a normal, legal PDF layout. The newest table may
+contain only the changed objects, so following only it loses the page tree and
+resources from older revisions. Merging in revision order also makes overwrite
+and delete semantics explicit and testable.
+
+**Consequence.** The loader must keep revision order and resolve objects after
+the merge; object streams add a second pass for type-2 entries.
+
+## ADR-008: expand Form XObjects at the operation level
+
+**Decision.** Inline Form XObject content into the page operation list with a
+`q` / `/Matrix` `cm` / content / `Q` wrapper before interpretation.
+
+**Alternatives.** Recursively call the interpreter with a separate graphics
+state; implement a full form execution context.
+
+**Why.** The graphics-state interpreter is already the largest stateful loop.
+Expanding forms keeps it flat, makes nested resources explicit, and lets the
+existing path/text/paint operators handle form content unchanged.
+
+**Consequence.** `BBox` clipping and form-level transparency groups are not
+applied yet; both are tracked in the compatibility matrix.

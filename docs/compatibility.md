@@ -1,9 +1,10 @@
 # Compatibility matrix
 
-The matrix is part of the contract. "Implemented" means the declared subset of
-the feature works and is tested; "partial" means only the listed portion is
-implemented; "next" means it is on the roadmap and currently fails with a
-diagnostic or is ignored where the PDF specification permits skipping.
+The matrix records the implementation status of each feature. "Implemented"
+means the feature works for the listed cases and is tested; "partial" means only
+the listed portion is implemented; "next" means it is on the roadmap and
+currently fails with a diagnostic or is ignored where the PDF specification
+permits skipping.
 
 The target is ISO 32000-1:2008 page rendering, not this table. See
 [`standard-coverage.md`](standard-coverage.md) for the clause-level target and
