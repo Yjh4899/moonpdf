@@ -2,6 +2,12 @@
 package "Yjh4899/moonpdf/pdf"
 
 // Values
+pub fn content_op(Array[PdfValue], String) -> ContentOp
+
+pub fn decode_stream(PdfStream) -> Bytes raise PdfError
+
+pub fn decode_stream_lossy(PdfStream) -> Bytes
+
 pub fn dict_get(Array[(String, PdfValue)], String) -> PdfValue?
 
 pub fn parse_content_stream(Bytes) -> Array[ContentOp] raise PdfError
@@ -11,6 +17,8 @@ pub fn parse_document(Bytes) -> PdfDocument raise PdfError
 pub fn parse_indirect_object(Bytes, Int32) -> (Int32, Int32, PdfValue) raise PdfError
 
 pub fn parse_value_from_bytes(Bytes) -> PdfValue raise PdfError
+
+pub fn pdf_real(Double) -> PdfValue
 
 // Errors
 pub suberror PdfError {
@@ -38,7 +46,10 @@ pub struct PdfPage {
   height : Double
   contents : Array[Bytes]
   resources : Array[(String, PdfValue)]
+  objects : Array[PdfValue?]
 }
+pub fn PdfPage::resolve(Self, PdfValue) -> PdfValue
+pub fn PdfPage::resolve_dict(Self, PdfValue) -> Array[(String, PdfValue)]
 
 pub struct PdfStream {
   dict : Array[(String, PdfValue)]

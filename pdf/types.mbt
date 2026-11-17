@@ -111,6 +111,31 @@ pub struct PdfPage {
   height : Double
   contents : Array[Bytes]
   resources : Array[(String, PdfValue)]
+  objects : Array[PdfValue?]
+}
+
+///|
+/// Resolve an indirect reference in the context of the page's document.
+pub fn PdfPage::resolve(self : PdfPage, value : PdfValue) -> PdfValue {
+  match value {
+    Ref(num, _) =>
+      match self.objects.get(num) {
+        Some(Some(v)) => v
+        _ => Null
+      }
+    _ => value
+  }
+}
+
+///|
+pub fn PdfPage::resolve_dict(
+  self : PdfPage,
+  value : PdfValue,
+) -> Array[(String, PdfValue)] {
+  match self.resolve(value).as_dict() {
+    Some(d) => d
+    None => []
+  }
 }
 
 ///|
@@ -152,4 +177,10 @@ pub fn PdfDocument::resolve_dict(
     Some(d) => d
     None => []
   }
+}
+
+///|
+/// Construct a real number object for synthesized operands.
+pub fn pdf_real(value : Double) -> PdfValue {
+  Real(value)
 }

@@ -54,3 +54,10 @@ pub fn parse_content_stream(data : Bytes) -> Array[ContentOp] raise PdfError {
   }
   ops
 }
+
+///|
+/// Construct a content operation for a synthesized operator (used by form
+/// expansion in the renderer).
+pub fn content_op(operands : Array[PdfValue], op : String) -> ContentOp {
+  { operands, op, }
+}

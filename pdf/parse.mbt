@@ -436,34 +436,49 @@ pub fn parse_indirect_object(
       p.pos = p.pos + 1
     }
     let start = p.pos
-    let needle = @utf8.encode("endstream")
-    let mut found = -1
-    let mut i = start
-    while i + 9 <= data.length() {
-      let mut same = true
-      let mut j = 0
-      while j < 9 {
-        if data.at(i + j) != needle.at(j) {
-          same = false
+    let declared = match dict_get(dict, "Length") {
+      Some(Int(n)) => n
+      _ => -1
+    }
+    let mut stop = -1
+    if declared >= 0 && start + declared <= data.length() {
+      let probe = Parser::new(data)
+      probe.pos = start + declared
+      probe.skip_ws()
+      if probe.consume("endstream") {
+        stop = start + declared
+      }
+    }
+    if stop < 0 {
+      let needle = @utf8.encode("endstream")
+      let mut found = -1
+      let mut i = start
+      while i + 9 <= data.length() {
+        let mut same = true
+        let mut j = 0
+        while j < 9 {
+          if data.at(i + j) != needle.at(j) {
+            same = false
+            break
+          }
+          j = j + 1
+        }
+        if same {
+          found = i
           break
         }
-        j = j + 1
+        i = i + 1
       }
-      if same {
-        found = i
-        break
+      if found < 0 {
+        raise PdfError("missing endstream")
       }
-      i = i + 1
-    }
-    if found < 0 {
-      raise PdfError("missing endstream")
-    }
-    let mut stop = found
-    if stop > start && data.at(stop - 1).to_int() == 10 {
-      stop = stop - 1
-    }
-    if stop > start && data.at(stop - 1).to_int() == 13 {
-      stop = stop - 1
+      stop = found
+      if stop > start && data.at(stop - 1).to_int() == 10 {
+        stop = stop - 1
+      }
+      if stop > start && data.at(stop - 1).to_int() == 13 {
+        stop = stop - 1
+      }
     }
     let bytes = Bytes::from_array(data.exact_view(start~, end=stop).to_array())
     (num, gen, Stream({ dict, data: bytes, }))
