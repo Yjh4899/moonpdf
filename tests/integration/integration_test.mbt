@@ -32,6 +32,40 @@ test "incremental update reuses old form resource" {
 }
 
 ///|
+test "incremental render equals full rewrite" {
+  let incremental = match
+    @integration.rasterize(
+      @integration.fixture_bytes("fixtures/incremental.pdf"),
+      1.0,
+    ) {
+    Some(raster) => raster
+    None => {
+      assert_true(false)
+      return
+    }
+  }
+  let full = match
+    @integration.rasterize(
+      @integration.fixture_bytes("fixtures/incremental-full.pdf"),
+      1.0,
+    ) {
+    Some(raster) => raster
+    None => {
+      assert_true(false)
+      return
+    }
+  }
+  assert_eq(incremental.width, full.width)
+  assert_eq(incremental.height, full.height)
+  assert_eq(incremental.pixels.length(), full.pixels.length())
+  let mut i = 0
+  while i < incremental.pixels.length() {
+    assert_eq(incremental.pixels.at(i).to_int(), full.pixels.at(i).to_int())
+    i = i + 1
+  }
+}
+
+///|
 test "xref stream and object stream fixture" {
   let data = @integration.fixture_bytes("fixtures/xref-stream.pdf")
   let document = try! @pdf.parse_document(data)

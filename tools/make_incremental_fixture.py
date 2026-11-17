@@ -99,5 +99,32 @@ incremental += (
 ).encode("ascii")
 
 (FIXTURES / "incremental.pdf").write_bytes(bytes(incremental))
+
+# A full rewrite of the same logical revision: everything in one xref section.
+# Rendering this file must be pixel-identical to the incremental file.
+full_objects = {num: body for num, body in base_items}
+full_objects[3] = new_page
+full_objects[7] = new_content
+full = bytearray(b"%PDF-1.7\n%\xe2\xe3\xcf\xd3\n")
+full_offsets = {}
+for num in range(1, size):
+    if num in full_objects:
+        full_offsets[num] = len(full)
+        full += f"{num} 0 obj\n".encode("ascii") + full_objects[num] + b"\nendobj\n"
+full_xref = len(full)
+full += f"xref\n0 {size}\n".encode("ascii")
+full += b"0000000000 65535 f \n"
+for num in range(1, size):
+    if num in full_offsets:
+        full += f"{full_offsets[num]:010d} 00000 n \n".encode("ascii")
+    else:
+        full += b"0000000000 00000 f \n"
+full += (
+    f"trailer\n<< /Size {size} /Root 1 0 R >>\n"
+    f"startxref\n{full_xref}\n%%EOF\n"
+).encode("ascii")
+(FIXTURES / "incremental-full.pdf").write_bytes(bytes(full))
+
 print("wrote", FIXTURES / "incremental-base.pdf")
 print("wrote", FIXTURES / "incremental.pdf")
+print("wrote", FIXTURES / "incremental-full.pdf")
