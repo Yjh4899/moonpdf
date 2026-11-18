@@ -179,3 +179,21 @@ rasterization path for TrueType, CFF and vector art.
 
 **Consequence.** Non-CID CFF fonts render without conversion. CID-keyed CFF,
 Type1 (`FontFile`) and standard-14 metrics still fall back to the bitmap font.
+
+## ADR-013: standard-14 AFM widths with scaled bitmap glyphs
+
+**Decision.** Embed the Adobe Core 14 AFM advance widths for Helvetica, Times
+and Courier at codes 32..126. For a non-embedded standard font, use those widths
+and horizontally scale the bitmap fallback glyph to the measured advance.
+
+**Alternatives.** Keep a fixed advance; require an embedded font; ship a
+built-in Helvetica clone.
+
+**Why.** Many PDFs use the standard 14 fonts without embedding anything. Their
+advances determine line layout, so a fixed 0.8 em advance makes text lines drift.
+The AFM width tables are compact, freely redistributable, and give correct
+positions without adding an external font.
+
+**Consequence.** Standard-14 text lines now have correct advances. Glyphs remain
+the 3×5 fallback and are squeezed for narrow characters; Symbol and ZapfDingbats
+are not covered.

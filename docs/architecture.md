@@ -150,9 +150,10 @@ The text path implements:
 - per-glyph advance in text space, composed with the CTM
 
 A hand-written 3×5 bitmap fallback remains for fonts without supported outlines
-(Type1, CID without a cmap, standard-14 without widths). Type1, CID/CJK and
-standard-14 metrics are the remaining M2 work; the interpreter interface does
-not change.
+(Type1, CID without a cmap). Standard-14 Helvetica/Times/Courier fonts use the
+Adobe Core 14 AFM widths, with bitmap glyphs scaled to the measured advance.
+Type1 and CID/CJK are the remaining M2 work; the interpreter interface does not
+change.
 
 ## Error model
 

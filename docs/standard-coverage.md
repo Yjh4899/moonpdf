@@ -53,7 +53,7 @@ The public acceptance corpus is:
    unknown content operators follow the PDF rule for unknown operators and are
    counted in the compatibility report.
 
-## Current status (release 0.6.0)
+## Current status (release 0.7.0)
 
 | Area | Current | Gap to target |
 | --- | --- | --- |
@@ -64,7 +64,8 @@ The public acceptance corpus is:
 | paths, fill/stroke, RGB/gray/CMYK | implemented | exact path clipping, dash/miter details |
 | Form XObjects | implemented (expansion, matrix, nested resources, `BBox` clip) | — |
 | images: Flate/gray/RGB/CMYK, baseline DCT, inline images | implemented | progressive DCT, soft masks, 1/2/4-bit samples |
-| embedded TrueType (`FontFile2`), cmap/hmtx/simple+composite glyf outlines | implemented | Type1, standard-14 metrics |
+| embedded TrueType (`FontFile2`), cmap/hmtx/simple+composite glyf outlines | implemented | Type1 |
+| standard-14 metrics (Helvetica/Times/Courier AFM widths) | implemented | Symbol/ZapfDingbats |
 | embedded CFF (`FontFile3` Type1C, non-CID) Type 2 charstrings | implemented | CID-keyed CFF |
 | embedded Type1 (`FontFile`) | not yet | M2 |
 | CID/CJK fonts | not yet | M2 |

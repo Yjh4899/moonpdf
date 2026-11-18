@@ -82,7 +82,7 @@ samples. Image-specific color transforms are part of the image milestone.
 | embedded TrueType (`FontFile2`) | yes | `glyf` simple and composite outlines, cmap 4/12, hmtx advances |
 | embedded CFF (`FontFile3` Type1C, non-CID) | yes | CFF INDEX/DICT and Type 2 charstrings |
 | embedded Type1 (`FontFile`) | next | falls back to the bitmap font |
-| standard 14 font metrics | next | fallback bitmap advance currently |
+| standard 14 font metrics | yes | AFM widths for Helvetica/Times/Courier; bitmap glyphs |
 | CID / CJK fonts | next | milestone M2 |
 | vertical writing mode | next | ignored |
 
