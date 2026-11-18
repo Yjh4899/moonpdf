@@ -59,7 +59,7 @@ samples. Image-specific color transforms are part of the image milestone.
 | `w`, `J`, `j`, `M`, `d` | partial | width and cap; join/miter/dash stored but not applied |
 | `m`, `l`, `c`, `v`, `y`, `re`, `h` | yes | curves flattened at 16 segments |
 | `S`, `s`, `f`, `F`, `f*`, `B`, `B*`, `b`, `b*`, `n` | yes | nonzero and even-odd |
-| `W`, `W*` (clip) | partial | rectangular path bounds; exact path clipping is next |
+| `W`, `W*` (clip) | yes | per-pixel mask from the path; exact fill-rule clipping |
 | `g`, `G`, `rg`, `RG`, `k`, `K` | yes | gray, RGB, CMYK → RGB |
 | `cs`, `CS`, `sc`, `scn`, `SC`, `SCN` | partial | 1/3/4 numeric components; named spaces ignored |
 | `Do` (Form XObject) | yes | content expanded with `/Matrix`, nested resources and `BBox` clip |

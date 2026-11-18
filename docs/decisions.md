@@ -337,3 +337,21 @@ isolation is a separate problem and can reuse the same functions later.
 **Consequence.** Multiply/Screen/Overlay/Darken/Lighten/Dodge/Burn/HardLight/
 SoftLight/Difference/Exclusion work on the main canvas. Non-separable modes and
 isolated groups remain M3 work.
+
+## ADR-022: exact clipping as a per-pixel mask
+
+**Decision.** On `W`/`W*`, rasterize the current path into a byte mask at the
+supersampled canvas resolution and intersect it with the existing clip mask.
+`Canvas::set` rejects pixels outside the mask; `q`/`Q` save and restore the mask.
+
+**Alternatives.** Intersect polygons analytically; keep the rectangular bbox
+approximation; render clipping through a stencil buffer.
+
+**Why.** A mask reuses the scanline fill logic, handles non-rectangular and
+self-intersecting paths, and works for fills, strokes, text and images without
+changing each painter. Supersampling gives antialiased clip edges after
+downsampling.
+
+**Consequence.** Exact `W`/`W*` clipping works and composes with alpha/blend.
+Each clip allocation is `width * height` bytes at supersampled resolution;
+deep clip stacks trade memory for simplicity.

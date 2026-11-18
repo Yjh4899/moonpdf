@@ -53,7 +53,7 @@ The public acceptance corpus is:
    unknown content operators follow the PDF rule for unknown operators and are
    counted in the compatibility report.
 
-## Current status (release 0.16.0)
+## Current status (release 0.17.0)
 
 | Area | Current | Gap to target |
 | --- | --- | --- |
@@ -61,7 +61,8 @@ The public acceptance corpus is:
 | incremental updates (`/Prev`, free entries, revision overlay) | implemented | — |
 | Flate, ASCIIHex, ASCII85, RunLength, LZW filters | implemented | image-specific codecs |
 | page tree, inherited `MediaBox`/`Resources`, `/Rotate`, `/CropBox` | implemented | `BBox`/`CropBox` edge cases |
-| paths, fill/stroke, RGB/gray/CMYK | implemented | exact path clipping, dash/miter details |
+| paths, fill/stroke, RGB/gray/CMYK | implemented | dash/miter details |
+| exact path clipping (`W`/`W*`) | implemented | clip stack depth is bounded by memory |
 | Form XObjects | implemented (expansion, matrix, nested resources, `BBox` clip) | — |
 | images: Flate/gray/RGB/CMYK, baseline DCT, inline images | implemented | progressive DCT, soft masks, 1/2/4-bit samples |
 | embedded TrueType (`FontFile2`), cmap/hmtx/simple+composite glyf outlines | implemented | — |
