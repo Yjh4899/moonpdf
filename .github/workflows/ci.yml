@@ -37,6 +37,11 @@ jobs:
           moon run --target native cmd/moonpdf -- fixtures/incremental.pdf out/incremental.png --scale 2
           moon run --target native cmd/moonpdf -- fixtures/incremental-full.pdf out/incremental-full.png --scale 2
           moon run --target native cmd/moonpdf -- fixtures/xref-stream.pdf out/xref-stream.png --scale 2
+          moon run --target native cmd/moonpdf -- fixtures/image-flate.pdf out/image-flate.png --scale 2
+          moon run --target native cmd/moonpdf -- fixtures/image-jpeg.pdf out/image-jpeg.png --scale 2
+          moon run --target native cmd/moonpdf -- fixtures/inline-image.pdf out/inline-image.png --scale 2
+          moon run --target native cmd/moonpdf -- fixtures/rotate-crop.pdf out/rotate-crop.png --scale 2
+          moon run --target native cmd/moonpdf -- fixtures/clip.pdf out/clip.png --scale 2
 
       - name: Verify PNG output and reused-resource pixels
         run: |
@@ -77,6 +82,11 @@ jobs:
               "incremental.png": (600, 400),
               "incremental-full.png": (600, 400),
               "xref-stream.png": (640, 400),
+              "image-flate.png": (400, 400),
+              "image-jpeg.png": (400, 400),
+              "inline-image.png": (400, 400),
+              "rotate-crop.png": (320, 600),
+              "clip.png": (400, 400),
           }
           for name, size in expected.items():
               width, height, raw, stride = read_png(Path("out") / name)
@@ -99,6 +109,41 @@ jobs:
           blue = pixel(raw, stride, 100, 100)
           assert blue[2] > 150 and blue[0] < 100, blue
           print("xref-stream: page content", blue)
+
+          # JPEG quadrants (red/blue/green/yellow).
+          width, height, raw, stride = read_png(Path("out/image-jpeg.png"))
+          red = pixel(raw, stride, 140, 140)
+          blue = pixel(raw, stride, 260, 140)
+          green = pixel(raw, stride, 140, 260)
+          yellow = pixel(raw, stride, 260, 260)
+          assert red[0] > 150 and red[1] < 90, red
+          assert blue[2] > 150 and blue[0] < 90, blue
+          assert green[1] > 150 and green[0] < 90, green
+          assert yellow[0] > 180 and yellow[2] < 120, yellow
+          print("jpeg quadrants", red, blue, green, yellow)
+
+          # Rotate 90 + CropBox: red top half, blue bottom half.
+          width, height, raw, stride = read_png(Path("out/rotate-crop.png"))
+          assert (width, height) == (320, 600)
+          top = pixel(raw, stride, 40, 100)
+          bottom = pixel(raw, stride, 40, 500)
+          assert top[0] > 180 and top[1] < 80, top
+          assert bottom[2] > 150, bottom
+          print("rotate/crop", top, bottom)
+
+          # Clip: red page, blue clipped square.
+          width, height, raw, stride = read_png(Path("out/clip.png"))
+          corner = pixel(raw, stride, 20, 20)
+          center = pixel(raw, stride, 200, 200)
+          assert corner[0] > 180 and corner[1] < 80, corner
+          assert center[2] > 180, center
+          print("clip", corner, center)
+
+          # Inline image: red square in the page.
+          width, height, raw, stride = read_png(Path("out/inline-image.png"))
+          inline = pixel(raw, stride, 200, 200)
+          assert inline[0] > 180 and inline[1] < 80, inline
+          print("inline image", inline)
           PY
 
       - name: Upload rendered pages
