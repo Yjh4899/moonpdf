@@ -43,11 +43,16 @@ priv struct GState {
   mut fill_alpha : Double
   mut stroke_alpha : Double
   mut blend_mode : Int32
-  mut clip : (Int32, Int32, Int32, Int32)
+  mut clip_mask : Array[Byte]?
+  clip : (Int32, Int32, Int32, Int32)
 }
 
 ///|
-fn GState::initial(ctm : Matrix, clip : (Int32, Int32, Int32, Int32)) -> GState {
+fn GState::initial(
+  ctm : Matrix,
+  clip : (Int32, Int32, Int32, Int32),
+  clip_mask : Array[Byte]?,
+) -> GState {
   {
     ctm,
     fill_r: 0,
@@ -61,6 +66,7 @@ fn GState::initial(ctm : Matrix, clip : (Int32, Int32, Int32, Int32)) -> GState 
     fill_alpha: 1.0,
     stroke_alpha: 1.0,
     blend_mode: 0,
+    clip_mask,
     clip,
   }
 }
@@ -721,7 +727,7 @@ pub fn render_page(
       )
   }
   let expanded = expand_forms(page, page.resources, ops, 0)
-  let mut state = GState::initial(base, canvas.clip_rect())
+  let mut state = GState::initial(base, canvas.clip_rect(), canvas.clip_mask())
   let stack : Array[GState] = Array(capacity=8)
   let mut text = TextState::initial()
   let mut path = Path::new()
@@ -734,6 +740,7 @@ pub fn render_page(
             state = previous
             let (cx0, cy0, cx1, cy1) = previous.clip
             canvas.reset_clip(cx0, cy0, cx1, cy1)
+            canvas.set_clip_mask(previous.clip_mask)
           }
           None => ()
         }
@@ -933,31 +940,11 @@ pub fn render_page(
           _ => ()
         }
       "h" => path.close()
-      "W" | "W*" =>
-        match path.bbox() {
-          Some((bx0, by0, bx1, by1)) => {
-            let mut nx0 = bx0.to_int()
-            let mut ny0 = by0.to_int()
-            let mut nx1 = bx1.to_int() + 1
-            let mut ny1 = by1.to_int() + 1
-            let (cx0, cy0, cx1, cy1) = state.clip
-            if nx0 < cx0 {
-              nx0 = cx0
-            }
-            if ny0 < cy0 {
-              ny0 = cy0
-            }
-            if nx1 > cx1 {
-              nx1 = cx1
-            }
-            if ny1 > cy1 {
-              ny1 = cy1
-            }
-            state.clip = (nx0, ny0, nx1, ny1)
-            canvas.set_clip(nx0, ny0, nx1, ny1)
-          }
-          None => ()
-        }
+      "W" | "W*" => {
+        let (subpaths, _) = path.finish()
+        canvas.clip_polygons(subpaths, op.op == "W*")
+        state.clip_mask = canvas.clip_mask()
+      }
       "S" => {
         paint(canvas, state, path, false, true, false, false)
         path = Path::new()

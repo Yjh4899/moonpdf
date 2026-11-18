@@ -12,6 +12,7 @@ pub struct Canvas {
   mut clip_y1 : Int32
   mut alpha : Int32
   mut blend_mode : Int32
+  mut clip_mask : Array[Byte]?
 }
 
 ///|
@@ -49,6 +50,7 @@ pub fn Canvas::new(
     clip_y1: height,
     alpha: 255,
     blend_mode: 0,
+    clip_mask: None,
   }
   let mut i = 0
   while i < width * height {
@@ -160,6 +162,10 @@ pub fn Canvas::set(
   if x < 0 || y < 0 || x >= self.width || y >= self.height {
     return
   }
+  match self.clip_mask {
+    Some(mask) => if mask[y * self.width + x].to_int() == 0 { return }
+    None => ()
+  }
   let idx = (y * self.width + x) * 3
   let dr = self.data[idx].to_int()
   let dg = self.data[idx + 1].to_int()
@@ -206,6 +212,33 @@ pub fn Canvas::to_rgb_bytes(self : Canvas) -> Bytes {
 priv struct Crossing {
   x : Double
   wind : Int32
+}
+
+///|
+fn mask_span(
+  mask : Array[Byte],
+  width : Int32,
+  height : Int32,
+  y : Int32,
+  x0 : Double,
+  x1 : Double,
+) -> Unit {
+  if y < 0 || y >= height || x1 <= x0 {
+    return
+  }
+  let mut start = x0.to_int()
+  let mut stop = x1.to_int()
+  if start < 0 {
+    start = 0
+  }
+  if stop >= width {
+    stop = width - 1
+  }
+  let mut x = start
+  while x <= stop {
+    mask[y * width + x] = u8(1)
+    x = x + 1
+  }
 }
 
 ///|
@@ -478,4 +511,117 @@ pub fn Canvas::reset_clip(
 ///|
 pub fn Canvas::clip_rect(self : Canvas) -> (Int32, Int32, Int32, Int32) {
   (self.clip_x0, self.clip_y0, self.clip_x1, self.clip_y1)
+}
+
+///|
+fn rasterize_mask(
+  width : Int32,
+  height : Int32,
+  polygons : Array[Array[Point]],
+  even_odd : Bool,
+) -> Array[Byte] {
+  let mask : Array[Byte] = Array::make(width * height, u8(0))
+  let mut ymin = 1.0e30
+  let mut ymax = -1.0e30
+  for poly in polygons {
+    for p in poly {
+      if p.y < ymin {
+        ymin = p.y
+      }
+      if p.y > ymax {
+        ymax = p.y
+      }
+    }
+  }
+  if ymin > ymax {
+    return mask
+  }
+  let mut y0 = ymin.to_int()
+  if y0 < 0 {
+    y0 = 0
+  }
+  let mut y1 = ymax.to_int() + 1
+  if y1 > height {
+    y1 = height
+  }
+  let mut y = y0
+  while y < y1 {
+    let scan = y.to_double() + 0.5
+    let items : Array[Crossing] = Array(capacity=16)
+    for poly in polygons {
+      let n = poly.length()
+      if n < 3 {
+        continue
+      }
+      let mut i = 0
+      while i < n {
+        let p1 = poly[i]
+        let p2 = poly[(i + 1) % n]
+        let y1f = p1.y
+        let y2f = p2.y
+        if (y1f <= scan && y2f > scan) || (y2f <= scan && y1f > scan) {
+          let t = (scan - y1f) / (y2f - y1f)
+          let x = p1.x + t * (p2.x - p1.x)
+          let wind = if y2f > y1f { 1 } else { -1 }
+          items.push({ x, wind, })
+        }
+        i = i + 1
+      }
+    }
+    if items.length() > 0 {
+      sort_crossings(items)
+      if even_odd {
+        let mut i = 0
+        while i + 1 < items.length() {
+          mask_span(mask, width, height, y, items[i].x, items[i + 1].x)
+          i = i + 2
+        }
+      } else {
+        let mut winding = 0
+        let mut i = 0
+        while i + 1 < items.length() {
+          winding = winding + items[i].wind
+          if winding != 0 {
+            mask_span(mask, width, height, y, items[i].x, items[i + 1].x)
+          }
+          i = i + 1
+        }
+      }
+    }
+    y = y + 1
+  }
+  mask
+}
+
+///|
+/// Intersect the current clip with a filled path, using a per-pixel mask.
+pub fn Canvas::clip_polygons(
+  self : Canvas,
+  polygons : Array[Array[Point]],
+  even_odd : Bool,
+) -> Unit {
+  let next = rasterize_mask(self.width, self.height, polygons, even_odd)
+  match self.clip_mask {
+    Some(previous) => {
+      let mut i = 0
+      while i < next.length() {
+        if previous[i].to_int() == 0 {
+          next[i] = u8(0)
+        }
+        i = i + 1
+      }
+    }
+    None => ()
+  }
+  self.clip_mask = Some(next)
+}
+
+///|
+pub fn Canvas::clip_mask(self : Canvas) -> Array[Byte]? {
+  self.clip_mask
+}
+
+///|
+pub fn Canvas::set_clip_mask(self : Canvas, mask : Array[Byte]?) -> Unit {
+  self.clip_mask = mask
 }
