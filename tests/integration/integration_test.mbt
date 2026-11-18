@@ -26,8 +26,8 @@ test "incremental update reuses old form resource" {
   // Blue header from the reused Form XObject, around y=40.
   let header = (40 * raster.width + 150) * 3
   assert_true(raster.pixels.at(header + 2).to_int() > 150)
-  // Green body from the appended content stream, around y=120.
-  let body = (120 * raster.width + 150) * 3
+  // Green body from the appended content stream, clear of the black text.
+  let body = (120 * raster.width + 250) * 3
   assert_true(raster.pixels.at(body + 1).to_int() > 120)
 }
 
@@ -236,6 +236,27 @@ test "embedded CFF font renders charstrings" {
     i = i + 1
   }
   assert_true(dark > 500)
+}
+
+///|
+test "standard 14 font metrics" {
+  let helvetica = match @render.standard14_widths("Helvetica") {
+    Some(widths) => widths
+    None => {
+      assert_true(false)
+      return
+    }
+  }
+  assert_eq(helvetica[0], 278) // space
+  assert_eq(helvetica[33], 667) // 'A'
+  let courier = match @render.standard14_widths("Courier-Bold") {
+    Some(widths) => widths
+    None => {
+      assert_true(false)
+      return
+    }
+  }
+  assert_eq(courier[33], 600) // monospaced
 }
 
 ///|
