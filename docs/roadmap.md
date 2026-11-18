@@ -61,12 +61,13 @@ The incremental page must show the reused blue header and the new green body.
 - Type0 / CIDFontType2 with Identity-H, `/W` widths and `/CIDToGIDMap`;
 - Type1 (`FontFile`): PFB/PFA eexec, Type 1 charstrings and `seac` accents;
 - CID-keyed CFF (`CIDFontType0`): charset, FDArray/FDSelect, per-FD subrs;
+- embedded Type0 encoding CMaps (`begincidrange`/`begincidchar`);
 - per-code PDF `/Widths`, glyph placement through text and CTM matrices;
 - embedded-font fixtures with pixel assertions.
 
 **Remaining**
 
-- named CJK encoding CMaps;
+- named predefined CJK CMaps (`UniGB-UCS2-H`, etc.);
 - kerning.
 
 **Acceptance**

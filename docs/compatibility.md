@@ -85,7 +85,8 @@ samples. Image-specific color transforms are part of the image milestone.
 | standard 14 font metrics | yes | AFM widths for Helvetica/Times/Courier; bitmap glyphs |
 | Type0 / CIDFontType2 (`Identity-H`, `/CIDToGIDMap`) | yes | two-byte codes, `/W` and `/DW` widths |
 | CID-keyed CFF (`CIDFontType0`) | yes | CFF charset, FDArray/FDSelect, per-FD subrs |
-| CJK encoding CMaps | next | Identity-H works; named CMaps are next |
+| embedded Type0 encoding CMap (`begincidrange`/`begincidchar`) | yes | 1/2/4-byte codes; named predefined CMaps are next |
+| named predefined CJK CMaps (`UniGB-UCS2-H`, …) | next | Identity-H and embedded CMaps work |
 | vertical writing mode | next | ignored |
 
 ## Output

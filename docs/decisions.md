@@ -250,3 +250,20 @@ and avoids importing a second font stack.
 
 **Consequence.** CID-keyed CFF renders through Identity-H CIDs. Named CJK
 encoding CMaps (`UniGB-UCS2-H`, etc.) remain open.
+
+## ADR-017: embedded Type0 CMaps before predefined ones
+
+**Decision.** When `/Encoding` is a stream, parse its codespace and
+`begincidrange`/`begincidchar` entries into a code-to-CID table and use the
+codespace width to split text bytes.
+
+**Alternatives.** Hardcode `UniGB-UCS2-H`/`UniJIS-UCS2-H` tables first; require
+Identity-H; convert embedded CMaps to Identity-H in the fixture.
+
+**Why.** The stream form exercises the same code-width and CID-mapping machinery
+that named CMaps need, without importing large Adobe CMap resources. It also
+covers documents that embed a custom subset CMap, which is common in generated
+PDFs.
+
+**Consequence.** Embedded CMaps of 1/2/4-byte codes work. Named predefined CMaps
+still fall back to a two-byte code-as-CID interpretation and are the next step.
