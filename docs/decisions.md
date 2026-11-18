@@ -266,7 +266,7 @@ covers documents that embed a custom subset CMap, which is common in generated
 PDFs.
 
 **Consequence.** Embedded CMaps of 1/2/4-byte codes work. Named predefined CMaps
-still fall back to a two-byte code-as-CID interpretation and are the next step.
+are covered by the range tables in ADR-019.
 
 ## ADR-018: standard-14 kerning from AFM KernPairs
 
@@ -283,3 +283,22 @@ the same: kerning is one more text-space translation.
 
 **Consequence.** Standard-14 Latin text gets correct pair spacing. Embedded
 TrueType/CFF kerning and non-ASCII AFM pairs remain out of scope.
+
+## ADR-019: named Adobe CJK CMaps as range tables
+
+**Decision.** Embed the code-to-CID ranges of `UniGB-UCS2-H`,
+`UniJIS-UCS2-H`, `UniKS-UCS2-H` and `UniCNS-UCS2-H` (plus their `-V` aliases)
+as sorted `(lo, hi, startCid)` tables. Expand them into the same code-to-CID map
+used by embedded CMaps.
+
+**Alternatives.** Ship the original CMap files and parse them at runtime; use
+`Identity-H` only; convert named CMaps to embedded ones in fixtures.
+
+**Why.** The named CMaps are standard Adobe resources with stable mappings. Their
+range form is compact, and the renderer already has the code-to-CID and
+CID-to-GID layers. Shipping range tables avoids a runtime file dependency while
+keeping the fixture's Adobe-GB1 CIDs honest.
+
+**Consequence.** Named horizontal UCS2 CMaps work without external files.
+Vertical writing (`-V`) currently uses horizontal layout; true vertical metrics
+are a later item. UTF-8/UTF-16/UTF-32 named CMaps remain out of scope.

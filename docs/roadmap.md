@@ -51,7 +51,7 @@ The incremental page must show the reused blue header and the new green body.
 - Rotation and crop boxes match the expected layout.
 - Unsupported codecs fail with a specific diagnostic.
 
-## M2 — Fonts and text fidelity (current)
+## M2 — Fonts and text fidelity (delivered)
 
 **Delivered**
 
@@ -62,20 +62,21 @@ The incremental page must show the reused blue header and the new green body.
 - Type1 (`FontFile`): PFB/PFA eexec, Type 1 charstrings and `seac` accents;
 - CID-keyed CFF (`CIDFontType0`): charset, FDArray/FDSelect, per-FD subrs;
 - embedded Type0 encoding CMaps (`begincidrange`/`begincidchar`);
+- named Adobe CJK CMaps (`UniGB/UCS2`, `UniJIS/UCS2`, `UniKS/UCS2`, `UniCNS/UCS2`);
 - standard-14 ASCII kerning from AFM KernPairs;
 - per-code PDF `/Widths`, glyph placement through text and CTM matrices;
 - embedded-font fixtures with pixel assertions.
 
 **Remaining**
 
-- named predefined CJK CMaps (`UniGB-UCS2-H`, etc.).
+- vertical writing mode (`-V` CMaps currently use horizontal layout).
 
 **Acceptance**
 
 - Text-only pages match reference layout within 1% of page width.
 - Unsupported characters produce an explicit diagnostic, not silent boxes.
 
-## M3 — Compositing and interactive appearance
+## M3 — Compositing and interactive appearance (current)
 
 **Deliverables**
 

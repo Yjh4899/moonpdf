@@ -142,7 +142,9 @@ Type1C stream goes through the CFF reader (INDEX/DICT and Type 2 charstrings)
 and joins the same path pipeline. CID-keyed CFF additionally resolves the
 charset (CID to GID), `FDArray`/`FDSelect`, and per-FD local Subrs. An embedded
 Type0 encoding CMap contributes the code width and code-to-CID ranges
-(`begincidrange`/`begincidchar`). A `/FontFile`
+(`begincidrange`/`begincidchar`). Named Adobe CJK CMaps use the same range shape,
+mapping Unicode codes to Adobe-GB1/Japan1/Korea1/CNS1 CIDs; the CID font's CFF
+charset then resolves the CID to a glyph. A `/FontFile`
 Type 1 program goes through the PFB/PFA eexec and charstring decryptors, then the
 Type 1 operator interpreter, including `seac` base/accent composition.
 A Type0 font resolves its `DescendantFonts` CIDFontType2 dictionary, decodes

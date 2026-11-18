@@ -87,7 +87,7 @@ samples. Image-specific color transforms are part of the image milestone.
 | Type0 / CIDFontType2 (`Identity-H`, `/CIDToGIDMap`) | yes | two-byte codes, `/W` and `/DW` widths |
 | CID-keyed CFF (`CIDFontType0`) | yes | CFF charset, FDArray/FDSelect, per-FD subrs |
 | embedded Type0 encoding CMap (`begincidrange`/`begincidchar`) | yes | 1/2/4-byte codes; named predefined CMaps are next |
-| named predefined CJK CMaps (`UniGB-UCS2-H`, …) | next | Identity-H and embedded CMaps work |
+| named predefined CJK CMaps (`UniGB/UCS2`, `UniJIS/UCS2`, `UniKS/UCS2`, `UniCNS/UCS2`) | yes | horizontal and `-V` aliases; vertical layout is next |
 | vertical writing mode | next | ignored |
 
 ## Output
