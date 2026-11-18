@@ -126,6 +126,9 @@ pub struct PdfFont {
   tt : TrueTypeFont?
   cff : CffFont?
   widths : Array[Int32]
+  cid_widths : Array[(Int32, Int32)]
+  cid_to_gid : Array[Int32]?
+  two_byte : Bool
   first_char : Int32
   missing_width : Int32
   ascent : Double
@@ -134,6 +137,7 @@ pub struct PdfFont {
 }
 pub fn PdfFont::ascent(Self) -> Double
 pub fn PdfFont::descent(Self) -> Double
+pub fn PdfFont::glyph_for_code(Self, Int32) -> Int32
 pub fn PdfFont::width_for(Self, Int32) -> Int32
 
 pub struct Point {

@@ -244,13 +244,25 @@ fn show_text_font(
   bytes : Bytes,
   font : PdfFont,
 ) -> Unit {
-  for b in bytes.to_array() {
-    let code = b.to_int()
+  let codes : Array[Int32] = []
+  let raw = bytes.to_array()
+  if font.two_byte {
+    let mut i = 0
+    while i + 1 < raw.length() {
+      codes.push((raw[i].to_int() << 8) | raw[i + 1].to_int())
+      i = i + 2
+    }
+  } else {
+    for b in raw {
+      codes.push(b.to_int())
+    }
+  }
+  for code in codes {
     let full = text.matrix.then(state.ctm)
-    let drawn = match font.tt {
-      Some(tt) => {
-        let glyph = tt.glyph_id(code)
-        if glyph > 0 {
+    let glyph = font.glyph_for_code(code)
+    let drawn = if glyph > 0 {
+      match font.tt {
+        Some(tt) => {
           draw_glyph(
             canvas,
             tt,
@@ -262,15 +274,10 @@ fn show_text_font(
             state.fill_b,
           )
           true
-        } else {
-          false
         }
-      }
-      None =>
-        match font.cff {
-          Some(cff) => {
-            let glyph = cff.glyph_id(code)
-            if glyph > 0 {
+        None =>
+          match font.cff {
+            Some(cff) => {
               draw_cff_glyph(
                 canvas,
                 cff,
@@ -282,12 +289,12 @@ fn show_text_font(
                 state.fill_b,
               )
               true
-            } else {
-              false
             }
+            None => false
           }
-          None => false
-        }
+      }
+    } else {
+      false
     }
     if !drawn {
       let bitmap_advance = text.font_size * 0.8
@@ -309,7 +316,7 @@ fn show_text_font(
       ignore(
         draw_text(
           canvas,
-          Bytes::make(1, b),
+          Bytes::make(1, u8(code & 0xFF)),
           glyph_matrix,
           text.font_size,
           state.fill_r,

@@ -6,6 +6,9 @@ pub struct PdfFont {
   tt : TrueTypeFont?
   cff : CffFont?
   widths : Array[Int32]
+  cid_widths : Array[(Int32, Int32)]
+  cid_to_gid : Array[Int32]?
+  two_byte : Bool
   first_char : Int32
   missing_width : Int32
   ascent : Double
@@ -84,10 +87,174 @@ fn derived_widths(tt : TrueTypeFont) -> Array[Int32] {
 }
 
 ///|
+fn parse_cid_widths(
+  page : @pdf.PdfPage,
+  dict : Array[(String, @pdf.PdfValue)],
+  default_width : Int32,
+) -> Array[(Int32, Int32)] {
+  let out : Array[(Int32, Int32)] = []
+  match @pdf.dict_get(dict, "W") {
+    Some(value) =>
+      match page.resolve(value).as_array() {
+        Some(items) => {
+          let mut i = 0
+          while i < items.length() {
+            let first = match items[i].as_int() {
+              Some(n) => n
+              None => -1
+            }
+            if first >= 0 && i + 1 < items.length() {
+              match page.resolve(items[i + 1]) {
+                @pdf.Array(values) => {
+                  let mut j = 0
+                  while j < values.length() {
+                    let width = match page.resolve(values[j]).as_number() {
+                      Some(n) => n.to_int()
+                      None => default_width
+                    }
+                    out.push((first + j, width))
+                    j = j + 1
+                  }
+                  i = i + 2
+                }
+                _ =>
+                  if i + 2 < items.length() {
+                    let last = match items[i + 1].as_int() {
+                      Some(n) => n
+                      None => first
+                    }
+                    let width = match page.resolve(items[i + 2]).as_number() {
+                      Some(n) => n.to_int()
+                      None => default_width
+                    }
+                    let mut cid = first
+                    while cid <= last {
+                      out.push((cid, width))
+                      cid = cid + 1
+                    }
+                    i = i + 3
+                  } else {
+                    i = i + 1
+                  }
+              }
+            } else {
+              i = i + 1
+            }
+          }
+        }
+        None => ()
+      }
+    None => ()
+  }
+  out
+}
+
+///|
+fn parse_cid_to_gid(
+  page : @pdf.PdfPage,
+  dict : Array[(String, @pdf.PdfValue)],
+) -> Array[Int32]? {
+  match @pdf.dict_get(dict, "CIDToGIDMap") {
+    Some(@pdf.Name("Identity")) => None
+    Some(value) =>
+      match page.resolve(value) {
+        @pdf.Stream(stream) => {
+          let data = @pdf.decode_stream(stream) catch { _ => return None }
+          let count = data.length() / 2
+          let map : Array[Int32] = Array::make(count, 0)
+          let mut i = 0
+          while i < count {
+            map[i] = u16(data, i * 2) catch { _ => 0 }
+            i = i + 1
+          }
+          Some(map)
+        }
+        _ => None
+      }
+    None => None
+  }
+}
+
+///|
+fn load_type0_font(
+  page : @pdf.PdfPage,
+  dict : Array[(String, @pdf.PdfValue)],
+) -> PdfFont? {
+  let descendant = match @pdf.dict_get(dict, "DescendantFonts") {
+    Some(value) =>
+      match page.resolve(value).as_array() {
+        Some(items) =>
+          if items.length() > 0 {
+            page.resolve_dict(items[0])
+          } else {
+            []
+          }
+        None => []
+      }
+    None => []
+  }
+  if descendant.length() == 0 {
+    return None
+  }
+  let descriptor = match @pdf.dict_get(descendant, "FontDescriptor") {
+    Some(value) => page.resolve_dict(value)
+    None => []
+  }
+  let tt = load_truetype(page, descriptor, "FontFile2")
+  match tt {
+    None => return None
+    Some(_) => ()
+  }
+  let base_name = match @pdf.dict_get(dict, "BaseFont") {
+    Some(value) =>
+      match value.as_name() {
+        Some(name) => name
+        None => ""
+      }
+    None => ""
+  }
+  let default_width = match font_dict_int(page, descendant, "DW") {
+    Some(n) => n
+    None => 1000
+  }
+  let cid_widths = parse_cid_widths(page, descendant, default_width)
+  let cid_to_gid = parse_cid_to_gid(page, descendant)
+  let (ascent, descent) = match tt {
+    Some(font) =>
+      (
+        font.ascent().to_double() / font.units_per_em().to_double() * 1000.0,
+        font.descent().to_double() / font.units_per_em().to_double() * 1000.0,
+      )
+    None => (800.0, -200.0)
+  }
+  Some({
+    base_name,
+    tt,
+    cff: None,
+    widths: [],
+    cid_widths,
+    cid_to_gid,
+    two_byte: true,
+    first_char: 0,
+    missing_width: default_width,
+    ascent,
+    descent,
+    standard: false,
+  })
+}
+
+///|
 pub fn load_pdf_font(page : @pdf.PdfPage, value : @pdf.PdfValue) -> PdfFont? {
   let dict = page.resolve_dict(value)
   if dict.length() == 0 {
     return None
+  }
+  let subtype = match @pdf.dict_get(dict, "Subtype") {
+    Some(value) => value.as_name()
+    None => None
+  }
+  if subtype == Some("Type0") {
+    return load_type0_font(page, dict)
   }
   let base_name = match @pdf.dict_get(dict, "BaseFont") {
     Some(value) =>
@@ -173,6 +340,9 @@ pub fn load_pdf_font(page : @pdf.PdfPage, value : @pdf.PdfValue) -> PdfFont? {
     tt,
     cff,
     widths,
+    cid_widths: [],
+    cid_to_gid: None,
+    two_byte: false,
     first_char,
     missing_width,
     ascent,
@@ -183,6 +353,14 @@ pub fn load_pdf_font(page : @pdf.PdfPage, value : @pdf.PdfValue) -> PdfFont? {
 
 ///|
 pub fn PdfFont::width_for(self : PdfFont, code : Int32) -> Int32 {
+  if self.two_byte {
+    for entry in self.cid_widths {
+      if entry.0 == code {
+        return entry.1
+      }
+    }
+    return self.missing_width
+  }
   let index = code - self.first_char
   if index >= 0 && index < self.widths.length() {
     let width = self.widths[index]
@@ -193,6 +371,25 @@ pub fn PdfFont::width_for(self : PdfFont, code : Int32) -> Int32 {
     }
   } else {
     self.missing_width
+  }
+}
+
+///|
+pub fn PdfFont::glyph_for_code(self : PdfFont, code : Int32) -> Int32 {
+  if self.two_byte {
+    match self.cid_to_gid {
+      Some(map) => if code >= 0 && code < map.length() { map[code] } else { 0 }
+      None => code
+    }
+  } else {
+    match self.tt {
+      Some(tt) => tt.glyph_id(code)
+      None =>
+        match self.cff {
+          Some(cff) => cff.glyph_id(code)
+          None => 0
+        }
+    }
   }
 }
 
