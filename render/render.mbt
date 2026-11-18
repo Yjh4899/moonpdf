@@ -290,11 +290,27 @@ fn show_text_font(
         }
     }
     if !drawn {
+      let bitmap_advance = text.font_size * 0.8
+      let target = font.width_for(code).to_double() / 1000.0 * text.font_size
+      let mut sx = 1.0
+      if font.standard && bitmap_advance > 0.0 {
+        sx = target / bitmap_advance
+        if sx < 0.35 {
+          sx = 0.35
+        } else if sx > 1.8 {
+          sx = 1.8
+        }
+      }
+      let glyph_matrix = if sx != 1.0 {
+        Matrix::scale(sx, 1.0).then(full)
+      } else {
+        full
+      }
       ignore(
         draw_text(
           canvas,
           Bytes::make(1, b),
-          full,
+          glyph_matrix,
           text.font_size,
           state.fill_r,
           state.fill_g,

@@ -10,6 +10,7 @@ pub struct PdfFont {
   missing_width : Int32
   ascent : Double
   descent : Double
+  standard : Bool
 }
 
 ///|
@@ -105,10 +106,11 @@ pub fn load_pdf_font(page : @pdf.PdfPage, value : @pdf.PdfValue) -> PdfFont? {
     Some(_) => None
     None => load_cff(page, descriptor, "FontFile3")
   }
-  let first_char = match font_dict_int(page, dict, "FirstChar") {
+  let mut first_char = match font_dict_int(page, dict, "FirstChar") {
     Some(n) => n
     None => 0
   }
+  let mut standard = false
   let mut widths : Array[Int32] = []
   match @pdf.dict_get(dict, "Widths") {
     Some(value) =>
@@ -128,16 +130,35 @@ pub fn load_pdf_font(page : @pdf.PdfPage, value : @pdf.PdfValue) -> PdfFont? {
   if widths.length() == 0 {
     match tt {
       Some(font) => widths = derived_widths(font)
-      None => ()
+      None =>
+        match cff {
+          Some(_) => ()
+          None =>
+            match standard14_widths(base_name) {
+              Some(table) => {
+                widths = table
+                first_char = 32
+                standard = true
+              }
+              None => ()
+            }
+        }
     }
+  }
+  match tt {
+    None =>
+      match cff {
+        None => standard = true
+        Some(_) => ()
+      }
+    Some(_) => ()
   }
   let missing_width = match font_dict_int(page, dict, "MissingWidth") {
     Some(n) => n
     None => 500
   }
-  match tt {
-    None => if widths.length() == 0 { return None }
-    Some(_) => ()
+  if widths.length() == 0 {
+    return None
   }
   let (ascent, descent) = match tt {
     Some(font) =>
@@ -156,6 +177,7 @@ pub fn load_pdf_font(page : @pdf.PdfPage, value : @pdf.PdfValue) -> PdfFont? {
     missing_width,
     ascent,
     descent,
+    standard,
   })
 }
 

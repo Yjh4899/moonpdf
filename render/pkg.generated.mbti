@@ -28,6 +28,8 @@ pub fn point(Double, Double) -> Point
 
 pub fn render_page(@pdf.PdfPage, RenderOptions) -> RenderedPage raise RenderError
 
+pub fn standard14_widths(String) -> Array[Int32]?
+
 // Errors
 pub suberror RenderError {
   RenderError(String)
@@ -128,6 +130,7 @@ pub struct PdfFont {
   missing_width : Int32
   ascent : Double
   descent : Double
+  standard : Bool
 }
 pub fn PdfFont::ascent(Self) -> Double
 pub fn PdfFont::descent(Self) -> Double
