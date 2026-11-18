@@ -266,7 +266,28 @@ fn show_text_font(
           false
         }
       }
-      None => false
+      None =>
+        match font.cff {
+          Some(cff) => {
+            let glyph = cff.glyph_id(code)
+            if glyph > 0 {
+              draw_cff_glyph(
+                canvas,
+                cff,
+                glyph,
+                full,
+                text.font_size,
+                state.fill_r,
+                state.fill_g,
+                state.fill_b,
+              )
+              true
+            } else {
+              false
+            }
+          }
+          None => false
+        }
     }
     if !drawn {
       ignore(

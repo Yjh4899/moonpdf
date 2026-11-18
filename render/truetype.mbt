@@ -230,30 +230,37 @@ pub fn parse_truetype(data : Bytes) -> TrueTypeFont raise RenderError {
 }
 
 ///|
-pub fn TrueTypeFont::glyph_id(self : TrueTypeFont, code : Int32) -> Int32 {
-  if self.cmap_format == 4 {
+fn cmap_glyph_id(
+  data : Bytes,
+  format : Int32,
+  _sub : Int32,
+  seg_end : Array[Int32],
+  seg_start : Array[Int32],
+  seg_delta : Array[Int32],
+  seg_range_pos : Array[Int32],
+  groups : Array[(Int32, Int32, Int32)],
+  code : Int32,
+) -> Int32 {
+  if format == 4 {
     let mut i = 0
-    while i < self.seg_end.length() {
-      if code <= self.seg_end[i] && code >= self.seg_start[i] {
-        if self.seg_range_pos[i] == 0 {
-          return (code + self.seg_delta[i]) & 0xFFFF
+    while i < seg_end.length() {
+      if code <= seg_end[i] && code >= seg_start[i] {
+        if seg_range_pos[i] == 0 {
+          return (code + seg_delta[i]) & 0xFFFF
         }
-        let glyph = u16(
-          self.data,
-          self.seg_range_pos[i] + (code - self.seg_start[i]) * 2,
-        ) catch {
+        let glyph = u16(data, seg_range_pos[i] + (code - seg_start[i]) * 2) catch {
           _ => 0
         }
         if glyph == 0 {
           return 0
         }
-        return (glyph + self.seg_delta[i]) & 0xFFFF
+        return (glyph + seg_delta[i]) & 0xFFFF
       }
       i = i + 1
     }
     0
-  } else if self.cmap_format == 12 {
-    for group in self.groups {
+  } else if format == 12 {
+    for group in groups {
       let (start, end, glyph) = group
       if code >= start && code <= end {
         return glyph + (code - start)
@@ -263,6 +270,21 @@ pub fn TrueTypeFont::glyph_id(self : TrueTypeFont, code : Int32) -> Int32 {
   } else {
     0
   }
+}
+
+///|
+pub fn TrueTypeFont::glyph_id(self : TrueTypeFont, code : Int32) -> Int32 {
+  cmap_glyph_id(
+    self.data,
+    self.cmap_format,
+    self.cmap_sub,
+    self.seg_end,
+    self.seg_start,
+    self.seg_delta,
+    self.seg_range_pos,
+    self.groups,
+    code,
+  )
 }
 
 ///|

@@ -10,6 +10,8 @@ pub fn decode_image(@pdf.PdfPage, @pdf.PdfStream) -> ImageData raise RenderError
 
 pub fn decode_jpeg(Bytes) -> ImageData raise RenderError
 
+pub fn draw_cff_glyph(Canvas, CffFont, Int32, Matrix, Double, Int32, Int32, Int32) -> Unit
+
 pub fn draw_glyph(Canvas, TrueTypeFont, Int32, Matrix, Double, Int32, Int32, Int32) -> Unit
 
 pub fn draw_text(Canvas, Bytes, Matrix, Double, Int32, Int32, Int32) -> Double
@@ -17,6 +19,8 @@ pub fn draw_text(Canvas, Bytes, Matrix, Double, Int32, Int32, Int32) -> Double
 pub fn encode_png(RenderedPage) -> Bytes
 
 pub fn load_pdf_font(@pdf.PdfPage, @pdf.PdfValue) -> PdfFont?
+
+pub fn parse_cff(Bytes) -> CffFont raise RenderError
 
 pub fn parse_truetype(Bytes) -> TrueTypeFont raise RenderError
 
@@ -50,6 +54,23 @@ pub fn Canvas::set_clip(Self, Int32, Int32, Int32, Int32) -> Unit
 pub fn Canvas::stroke_polyline(Self, Array[Point], Bool, Double, Bool, Int32, Int32, Int32) -> Unit
 pub fn Canvas::to_rgb_bytes(Self) -> Bytes
 pub fn Canvas::width(Self) -> Int32
+
+pub struct CffFont {
+  data : Bytes
+  charstrings : Array[Bytes]
+  gsubrs : Array[Bytes]
+  lsubrs : Array[Bytes]
+  units : Int32
+  cmap_format : Int32
+  cmap_sub : Int32
+  seg_end : Array[Int32]
+  seg_start : Array[Int32]
+  seg_delta : Array[Int32]
+  seg_range_pos : Array[Int32]
+  groups : Array[(Int32, Int32, Int32)]
+}
+pub fn CffFont::glyph_id(Self, Int32) -> Int32
+pub fn CffFont::glyph_path(Self, Int32, Matrix, Double) -> Path? raise RenderError
 
 pub struct FontPoint {
   x : Double
@@ -101,6 +122,7 @@ pub fn Path::rect(Self, Double, Double, Double, Double) -> Unit
 pub struct PdfFont {
   base_name : String
   tt : TrueTypeFont?
+  cff : CffFont?
   widths : Array[Int32]
   first_char : Int32
   missing_width : Int32

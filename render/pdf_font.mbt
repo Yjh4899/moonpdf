@@ -4,6 +4,7 @@
 pub struct PdfFont {
   base_name : String
   tt : TrueTypeFont?
+  cff : CffFont?
   widths : Array[Int32]
   first_char : Int32
   missing_width : Int32
@@ -48,6 +49,26 @@ fn load_truetype(
 }
 
 ///|
+fn load_cff(
+  page : @pdf.PdfPage,
+  descriptor : Array[(String, @pdf.PdfValue)],
+  key : String,
+) -> CffFont? {
+  match @pdf.dict_get(descriptor, key) {
+    Some(value) =>
+      match page.resolve(value) {
+        @pdf.Stream(stream) => {
+          let data = @pdf.decode_stream(stream) catch { _ => return None }
+          let font = parse_cff(data) catch { _ => return None }
+          Some(font)
+        }
+        _ => None
+      }
+    None => None
+  }
+}
+
+///|
 fn derived_widths(tt : TrueTypeFont) -> Array[Int32] {
   let widths : Array[Int32] = Array::make(95, 500)
   let units = if tt.units_per_em() > 0 { tt.units_per_em() } else { 1000 }
@@ -79,9 +100,10 @@ pub fn load_pdf_font(page : @pdf.PdfPage, value : @pdf.PdfValue) -> PdfFont? {
     Some(value) => page.resolve_dict(value)
     None => []
   }
-  let tt = match load_truetype(page, descriptor, "FontFile2") {
-    Some(font) => Some(font)
-    None => load_truetype(page, descriptor, "FontFile3")
+  let tt = load_truetype(page, descriptor, "FontFile2")
+  let cff = match tt {
+    Some(_) => None
+    None => load_cff(page, descriptor, "FontFile3")
   }
   let first_char = match font_dict_int(page, dict, "FirstChar") {
     Some(n) => n
@@ -125,7 +147,16 @@ pub fn load_pdf_font(page : @pdf.PdfPage, value : @pdf.PdfValue) -> PdfFont? {
       )
     None => (800.0, -200.0)
   }
-  Some({ base_name, tt, widths, first_char, missing_width, ascent, descent, })
+  Some({
+    base_name,
+    tt,
+    cff,
+    widths,
+    first_char,
+    missing_width,
+    ascent,
+    descent,
+  })
 }
 
 ///|
@@ -255,4 +286,25 @@ pub fn draw_glyph(
   }
   let (subpaths, _) = path.finish()
   canvas.fill_polygons(subpaths, false, r, g, b)
+}
+
+///|
+pub fn draw_cff_glyph(
+  canvas : Canvas,
+  font : CffFont,
+  glyph : Int32,
+  matrix : Matrix,
+  size : Double,
+  r : Int32,
+  g : Int32,
+  b : Int32,
+) -> Unit {
+  let path = font.glyph_path(glyph, matrix, size) catch { _ => return }
+  match path {
+    Some(path) => {
+      let (subpaths, _) = path.finish()
+      canvas.fill_polygons(subpaths, false, r, g, b)
+    }
+    None => ()
+  }
 }

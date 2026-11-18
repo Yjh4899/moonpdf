@@ -3,6 +3,7 @@ import {
   "moonbitlang/core/buffer",
   "moonbitlang/core/compress/zlib",
   "moonbitlang/core/encoding/utf8",
+  "moonbitlang/core/string",
   "moonbitlang/core/math",
 }
 
