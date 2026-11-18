@@ -329,6 +329,8 @@ priv struct T1State {
   path : Path
   mut x : Double
   mut y : Double
+  mut origin_x : Double
+  mut origin_y : Double
   stack : Array[Double]
   mut open : Bool
 }
@@ -402,19 +404,37 @@ fn t1_run(cs : Bytes, state : T1State, depth : Int32) -> Unit raise RenderError 
           stack[base + 11],
         )
       } else if op == 6 && stack.length() >= 5 {
-        // seac: draw the base glyph; the accent is a later refinement.
-        let base_code = stack[stack.length() - 2].to_int()
-        let (name, _) = t1_glyph_name(base_code)
+        let n = stack.length()
+        let asb = stack[n - 5]
+        let adx = stack[n - 4]
+        let ady = stack[n - 3]
+        let base_code = stack[n - 2].to_int()
+        let accent_code = stack[n - 1].to_int()
+        stack.clear()
+        let (base_name, _) = t1_glyph_name(base_code)
+        let (accent_name, _) = t1_glyph_name(accent_code)
+        state.origin_x = 0.0
+        state.origin_y = 0.0
         for entry in state.font.charstrings {
-          if entry.0 == name {
+          if entry.0 == base_name {
             t1_run(entry.1, state, depth + 1)
             break
           }
         }
+        state.origin_x = adx - asb
+        state.origin_y = ady
+        for entry in state.font.charstrings {
+          if entry.0 == accent_name {
+            t1_run(entry.1, state, depth + 1)
+            break
+          }
+        }
+        state.origin_x = 0.0
+        state.origin_y = 0.0
         return
       } else if op == 7 && stack.length() >= 4 {
-        state.x = stack[0]
-        state.y = stack[1]
+        state.x = state.origin_x + stack[0]
+        state.y = state.origin_y + stack[1]
       }
       stack.clear()
       continue
@@ -422,8 +442,8 @@ fn t1_run(cs : Bytes, state : T1State, depth : Int32) -> Unit raise RenderError 
     match b {
       13 => {
         if stack.length() >= 2 {
-          state.x = stack[0]
-          state.y = 0.0
+          state.x = state.origin_x + stack[0]
+          state.y = state.origin_y
         }
         stack.clear()
       }
@@ -547,67 +567,126 @@ fn t1_run(cs : Bytes, state : T1State, depth : Int32) -> Unit raise RenderError 
 
 ///|
 fn t1_glyph_name(code : Int32) -> (String, Bool) {
-  if code >= 65 && code <= 90 {
-    (@utf8.decode_lossy(Bytes::make(1, u8(code))), true)
+  let name = if code >= 65 && code <= 90 {
+    @utf8.decode_lossy(Bytes::make(1, u8(code)))
   } else if code >= 97 && code <= 122 {
-    (@utf8.decode_lossy(Bytes::make(1, u8(code))), true)
+    @utf8.decode_lossy(Bytes::make(1, u8(code)))
   } else if code >= 48 && code <= 57 {
-    (
-      match code {
-        48 => "zero"
-        49 => "one"
-        50 => "two"
-        51 => "three"
-        52 => "four"
-        53 => "five"
-        54 => "six"
-        55 => "seven"
-        56 => "eight"
-        _ => "nine"
-      },
-      true,
-    )
+    match code {
+      48 => "zero"
+      49 => "one"
+      50 => "two"
+      51 => "three"
+      52 => "four"
+      53 => "five"
+      54 => "six"
+      55 => "seven"
+      56 => "eight"
+      _ => "nine"
+    }
   } else {
-    (
-      match code {
-        32 => "space"
-        33 => "exclam"
-        34 => "quotedbl"
-        35 => "numbersign"
-        36 => "dollar"
-        37 => "percent"
-        38 => "ampersand"
-        39 => "quoteright"
-        40 => "parenleft"
-        41 => "parenright"
-        42 => "asterisk"
-        43 => "plus"
-        44 => "comma"
-        45 => "hyphen"
-        46 => "period"
-        47 => "slash"
-        58 => "colon"
-        59 => "semicolon"
-        60 => "less"
-        61 => "equal"
-        62 => "greater"
-        63 => "question"
-        64 => "at"
-        91 => "bracketleft"
-        92 => "backslash"
-        93 => "bracketright"
-        94 => "asciicircum"
-        95 => "underscore"
-        96 => "quoteleft"
-        123 => "braceleft"
-        124 => "bar"
-        125 => "braceright"
-        126 => "asciitilde"
-        _ => ""
-      },
-      false,
-    )
+    match code {
+      32 => "space"
+      33 => "exclam"
+      34 => "quotedbl"
+      35 => "numbersign"
+      36 => "dollar"
+      37 => "percent"
+      38 => "ampersand"
+      39 => "quoteright"
+      40 => "parenleft"
+      41 => "parenright"
+      42 => "asterisk"
+      43 => "plus"
+      44 => "comma"
+      45 => "hyphen"
+      46 => "period"
+      47 => "slash"
+      58 => "colon"
+      59 => "semicolon"
+      60 => "less"
+      61 => "equal"
+      62 => "greater"
+      63 => "question"
+      64 => "at"
+      91 => "bracketleft"
+      92 => "backslash"
+      93 => "bracketright"
+      94 => "asciicircum"
+      95 => "underscore"
+      96 => "quoteleft"
+      123 => "braceleft"
+      124 => "bar"
+      125 => "braceright"
+      126 => "asciitilde"
+      192 => "Agrave"
+      193 => "Aacute"
+      194 => "Acircumflex"
+      195 => "Atilde"
+      196 => "Adieresis"
+      197 => "Aring"
+      198 => "AE"
+      199 => "Ccedilla"
+      200 => "Egrave"
+      201 => "Eacute"
+      202 => "Ecircumflex"
+      203 => "Edieresis"
+      204 => "Igrave"
+      205 => "Iacute"
+      206 => "Icircumflex"
+      207 => "Idieresis"
+      208 => "Eth"
+      209 => "Ntilde"
+      210 => "Ograve"
+      211 => "Oacute"
+      212 => "Ocircumflex"
+      213 => "Otilde"
+      214 => "Odieresis"
+      215 => "multiply"
+      216 => "Oslash"
+      217 => "Ugrave"
+      218 => "Uacute"
+      219 => "Ucircumflex"
+      220 => "Udieresis"
+      221 => "Yacute"
+      222 => "Thorn"
+      223 => "germandbls"
+      224 => "agrave"
+      225 => "aacute"
+      226 => "acircumflex"
+      227 => "atilde"
+      228 => "adieresis"
+      229 => "aring"
+      230 => "ae"
+      231 => "ccedilla"
+      232 => "egrave"
+      233 => "eacute"
+      234 => "ecircumflex"
+      235 => "edieresis"
+      236 => "igrave"
+      237 => "iacute"
+      238 => "icircumflex"
+      239 => "idieresis"
+      240 => "eth"
+      241 => "ntilde"
+      242 => "ograve"
+      243 => "oacute"
+      244 => "ocircumflex"
+      245 => "otilde"
+      246 => "odieresis"
+      247 => "divide"
+      248 => "oslash"
+      249 => "ugrave"
+      250 => "uacute"
+      251 => "ucircumflex"
+      252 => "udieresis"
+      253 => "yacute"
+      254 => "thorn"
+      255 => "ydieresis"
+      _ => ""
+    }
   }
+  (name, name != "")
 }
 
 ///|
@@ -633,6 +712,8 @@ pub fn Type1Font::glyph_path(
     path: Path::new(),
     x: 0.0,
     y: 0.0,
+    origin_x: 0.0,
+    origin_y: 0.0,
     stack: [],
     open: false,
   }
