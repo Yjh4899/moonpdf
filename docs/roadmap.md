@@ -60,12 +60,13 @@ The incremental page must show the reused blue header and the new green body.
 - standard-14 Helvetica/Times/Courier metrics from the Adobe Core 14 AFMs;
 - Type0 / CIDFontType2 with Identity-H, `/W` widths and `/CIDToGIDMap`;
 - Type1 (`FontFile`): PFB/PFA eexec and Type 1 charstrings;
+- CID-keyed CFF (`CIDFontType0`): charset, FDArray/FDSelect, per-FD subrs;
 - per-code PDF `/Widths`, glyph placement through text and CTM matrices;
 - embedded-font fixtures with pixel assertions.
 
 **Remaining**
 
-- CID-keyed CFF and CJK encoding CMaps;
+- named CJK encoding CMaps;
 - `seac` accent composition;
 - kerning.
 

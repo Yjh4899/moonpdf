@@ -84,7 +84,8 @@ samples. Image-specific color transforms are part of the image milestone.
 | embedded Type1 (`FontFile`) | yes | PFB/PFA eexec, charstring decrypt, Type 1 drawing ops; `seac` base glyph |
 | standard 14 font metrics | yes | AFM widths for Helvetica/Times/Courier; bitmap glyphs |
 | Type0 / CIDFontType2 (`Identity-H`, `/CIDToGIDMap`) | yes | two-byte codes, `/W` and `/DW` widths |
-| CID-keyed CFF / CJK encodings | next | milestone M2 |
+| CID-keyed CFF (`CIDFontType0`) | yes | CFF charset, FDArray/FDSelect, per-FD subrs |
+| CJK encoding CMaps | next | Identity-H works; named CMaps are next |
 | vertical writing mode | next | ignored |
 
 ## Output

@@ -233,3 +233,20 @@ font matrix. PFB/PFA parsing is self-contained and does not add a dependency.
 **Consequence.** Type 1 PFB/PFA fonts render with their own outlines. Charstring
 encodings other than StandardEncoding (via `/Encoding` Differences) and `seac`
 accents remain next, along with CID-keyed CFF/CJK.
+
+## ADR-016: CID-keyed CFF reuses the Type 2 interpreter
+
+**Decision.** Extend the CFF reader with CID-keyed structures: Top DICT ROS,
+`charset` (CID to GID), `FDArray`/`FDSelect`, and per-FD local Subrs. Keep the
+same Type 2 interpreter and select the FD's subrs before running a glyph.
+
+**Alternatives.** Convert CID CFF to a non-CID CFF at build time; use a separate
+CJK font library; start with named CJK encoding CMaps.
+
+**Why.** The charstring bytecode is identical between name-keyed and CID-keyed
+CFF. The only differences are lookup tables (CID to GID) and which local subrs
+apply. Reusing the interpreter keeps CJK CFF rendering on the same path pipeline
+and avoids importing a second font stack.
+
+**Consequence.** CID-keyed CFF renders through Identity-H CIDs. Named CJK
+encoding CMaps (`UniGB-UCS2-H`, etc.) and `seac` accents remain open.

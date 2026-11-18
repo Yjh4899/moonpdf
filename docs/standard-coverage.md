@@ -53,7 +53,7 @@ The public acceptance corpus is:
    unknown content operators follow the PDF rule for unknown operators and are
    counted in the compatibility report.
 
-## Current status (release 0.9.0)
+## Current status (release 0.10.0)
 
 | Area | Current | Gap to target |
 | --- | --- | --- |
@@ -66,8 +66,9 @@ The public acceptance corpus is:
 | images: Flate/gray/RGB/CMYK, baseline DCT, inline images | implemented | progressive DCT, soft masks, 1/2/4-bit samples |
 | embedded TrueType (`FontFile2`), cmap/hmtx/simple+composite glyf outlines | implemented | — |
 | standard-14 metrics (Helvetica/Times/Courier AFM widths) | implemented | Symbol/ZapfDingbats |
-| embedded CFF (`FontFile3` Type1C, non-CID) Type 2 charstrings | implemented | CID-keyed CFF |
-| Type0 / CIDFontType2, Identity-H, `/CIDToGIDMap` | implemented | CID-keyed CFF, CJK encodings |
+| embedded CFF (`FontFile3` Type1C, non-CID) Type 2 charstrings | implemented | — |
+| CID-keyed CFF (`CIDFontType0`), charset/FDArray/FDSelect | implemented | CJK encoding CMaps |
+| Type0 / CIDFontType2, Identity-H, `/CIDToGIDMap` | implemented | CJK encodings |
 | embedded Type1 (`FontFile`) PFB/PFA charstrings | implemented | `seac` accents, CID-keyed CFF |
 | CID/CJK fonts | not yet | M2 |
 | transparency, soft masks, shadings, patterns | not yet | M3 |
