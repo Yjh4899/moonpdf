@@ -202,9 +202,13 @@ fn load_type0_font(
     None => []
   }
   let tt = load_truetype(page, descriptor, "FontFile2")
-  match tt {
-    None => return None
-    Some(_) => ()
+  let cff = match tt {
+    Some(_) => None
+    None => load_cff(page, descriptor, "FontFile3")
+  }
+  match (tt, cff) {
+    (None, None) => return None
+    _ => ()
   }
   let base_name = match @pdf.dict_get(dict, "BaseFont") {
     Some(value) =>
@@ -231,7 +235,7 @@ fn load_type0_font(
   Some({
     base_name,
     tt,
-    cff: None,
+    cff,
     type1: None,
     widths: [],
     cid_widths,
@@ -394,7 +398,11 @@ pub fn PdfFont::glyph_for_code(self : PdfFont, code : Int32) -> Int32 {
   if self.two_byte {
     match self.cid_to_gid {
       Some(map) => if code >= 0 && code < map.length() { map[code] } else { 0 }
-      None => code
+      None =>
+        match self.cff {
+          Some(cff) => cff.glyph_for_cid(code)
+          None => code
+        }
     }
   } else {
     match self.tt {

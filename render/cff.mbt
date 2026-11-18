@@ -7,6 +7,10 @@ pub struct CffFont {
   charstrings : Array[Bytes]
   gsubrs : Array[Bytes]
   lsubrs : Array[Bytes]
+  fd_subrs : Array[Array[Bytes]]
+  fd_select : Array[Int32]
+  cid_by_gid : Array[Int32]
+  is_cid : Bool
   units : Int32
   cmap_format : Int32
   cmap_sub : Int32
@@ -157,9 +161,162 @@ fn cff_dict_get(
 }
 
 ///|
+fn cff_charset(
+  data : Bytes,
+  base : Int32,
+  offset : Int32,
+  num_glyphs : Int32,
+) -> Array[Int32] raise RenderError {
+  let cids : Array[Int32] = Array::make(num_glyphs, 0)
+  let mut pos = base + offset
+  let format = data.at(pos).to_int()
+  pos = pos + 1
+  if format == 0 {
+    let mut gid = 1
+    while gid < num_glyphs {
+      cids[gid] = u16(data, pos)
+      pos = pos + 2
+      gid = gid + 1
+    }
+  } else if format == 1 || format == 2 {
+    let mut gid = 1
+    while gid < num_glyphs {
+      let first = u16(data, pos)
+      pos = pos + 2
+      let left = if format == 1 {
+        let value = data.at(pos).to_int()
+        pos = pos + 1
+        value
+      } else {
+        let value = u16(data, pos)
+        pos = pos + 2
+        value
+      }
+      let mut i = 0
+      while i <= left && gid < num_glyphs {
+        cids[gid] = first + i
+        gid = gid + 1
+        i = i + 1
+      }
+    }
+  } else {
+    raise RenderError("unsupported CFF charset format")
+  }
+  cids
+}
+
+///|
+fn cff_fd_select(
+  data : Bytes,
+  base : Int32,
+  offset : Int32,
+  num_glyphs : Int32,
+) -> Array[Int32] raise RenderError {
+  let select : Array[Int32] = Array::make(num_glyphs, 0)
+  let mut pos = base + offset
+  let format = data.at(pos).to_int()
+  pos = pos + 1
+  if format == 0 {
+    let mut gid = 0
+    while gid < num_glyphs {
+      select[gid] = data.at(pos).to_int()
+      pos = pos + 1
+      gid = gid + 1
+    }
+  } else if format == 3 {
+    let ranges = u16(data, pos)
+    pos = pos + 2
+    let mut i = 0
+    while i < ranges {
+      let first = u16(data, pos)
+      let fd = data.at(pos + 2).to_int()
+      let next = if i + 1 < ranges {
+        u16(data, pos + 3)
+      } else {
+        u16(data, pos + 3)
+      }
+      let mut gid = first
+      while gid < next && gid < num_glyphs {
+        select[gid] = fd
+        gid = gid + 1
+      }
+      pos = pos + 3
+      i = i + 1
+    }
+  } else {
+    raise RenderError("unsupported CFF FDSelect format")
+  }
+  select
+}
+
+///|
+fn cff_private_subrs(
+  data : Bytes,
+  base : Int32,
+  private_offset : Int32,
+  private_size : Int32,
+) -> Array[Bytes] raise RenderError {
+  let start = base + private_offset
+  let end = start + private_size
+  if end > data.length() {
+    return []
+  }
+  let dict = cff_dict(data, start, end)
+  match cff_dict_get(dict, 19) {
+    Some(values) =>
+      if values.length() > 0 {
+        let (subrs, _) = cff_index(
+          data,
+          start + values[values.length() - 1].to_int(),
+        )
+        subrs
+      } else {
+        []
+      }
+    None => []
+  }
+}
+
+///|
+fn cff_fd_subrs(
+  data : Bytes,
+  base : Int32,
+  offset : Int32,
+  num_glyphs : Int32,
+  select : Array[Int32],
+) -> Array[Array[Bytes]] raise RenderError {
+  let (dicts, _) = cff_index(data, base + offset)
+  let out : Array[Array[Bytes]] = Array(capacity=dicts.length())
+  for dict_bytes in dicts {
+    let dict = cff_dict(dict_bytes, 0, dict_bytes.length())
+    match cff_dict_get(dict, 18) {
+      Some(values) =>
+        if values.length() >= 2 {
+          let size = values[values.length() - 2].to_int()
+          let private_offset = values[values.length() - 1].to_int()
+          out.push(cff_private_subrs(data, base, private_offset, size))
+        } else {
+          out.push([])
+        }
+      None => out.push([])
+    }
+  }
+  let _ = num_glyphs
+  let _ = select
+  out
+}
+
+///|
 pub fn parse_cff(data : Bytes) -> CffFont raise RenderError {
-  let cff = table_offset(data, "CFF ")
-  let base = cff.0
+  let is_raw = data.length() > 4 &&
+    data.at(0).to_int() == 1 &&
+    data.at(1).to_int() == 0
+  let base = if is_raw {
+    0
+  } else {
+    let cff = table_offset(data, "CFF ")
+    cff.0
+  }
   if base + 4 > data.length() {
     raise RenderError("CFF table is truncated")
   }
@@ -208,23 +365,83 @@ pub fn parse_cff(data : Bytes) -> CffFont raise RenderError {
       }
     None => ()
   }
-  let head = table_offset(data, "head")
-  let units = u16(data, head.0 + 18)
-  let cmap = table_offset(data, "cmap")
-  let (
-    cmap_format,
-    cmap_sub,
-    seg_end,
-    seg_start,
-    seg_delta,
-    seg_range_pos,
-    groups,
-  ) = parse_cmap(data, cmap.0)
+  let num_glyphs = charstrings.length()
+  let is_cid = cff_dict_get(top_dict, 1230) != None
+  let mut cid_by_gid : Array[Int32] = Array::make(num_glyphs, 0)
+  let mut fd_select : Array[Int32] = Array::make(num_glyphs, 0)
+  let mut fd_subrs : Array[Array[Bytes]] = []
+  if is_cid {
+    match cff_dict_get(top_dict, 15) {
+      Some(values) =>
+        if values.length() > 0 {
+          cid_by_gid = cff_charset(
+            data,
+            base,
+            values[values.length() - 1].to_int(),
+            num_glyphs,
+          )
+        }
+      None => ()
+    }
+    match cff_dict_get(top_dict, 1237) {
+      Some(values) =>
+        if values.length() > 0 {
+          fd_select = cff_fd_select(
+            data,
+            base,
+            values[values.length() - 1].to_int(),
+            num_glyphs,
+          )
+        }
+      None => ()
+    }
+    match cff_dict_get(top_dict, 1236) {
+      Some(values) =>
+        if values.length() > 0 {
+          fd_subrs = cff_fd_subrs(
+            data,
+            base,
+            values[values.length() - 1].to_int(),
+            num_glyphs,
+            fd_select,
+          )
+        }
+      None => ()
+    }
+    if fd_subrs.length() == 0 {
+      fd_subrs.push(lsubrs)
+    }
+  }
+  let mut units = 1000
+  let mut cmap_format = 0
+  let mut cmap_sub = 0
+  let mut seg_end : Array[Int32] = []
+  let mut seg_start : Array[Int32] = []
+  let mut seg_delta : Array[Int32] = []
+  let mut seg_range_pos : Array[Int32] = []
+  let mut groups : Array[(Int32, Int32, Int32)] = []
+  if !is_raw {
+    let head = table_offset(data, "head")
+    units = u16(data, head.0 + 18)
+    let cmap = table_offset(data, "cmap")
+    let parsed = parse_cmap(data, cmap.0)
+    cmap_format = parsed.0
+    cmap_sub = parsed.1
+    seg_end = parsed.2
+    seg_start = parsed.3
+    seg_delta = parsed.4
+    seg_range_pos = parsed.5
+    groups = parsed.6
+  }
   {
     data,
     charstrings,
     gsubrs,
     lsubrs,
+    fd_subrs,
+    fd_select,
+    cid_by_gid,
+    is_cid,
     units,
     cmap_format,
     cmap_sub,
@@ -234,6 +451,18 @@ pub fn parse_cff(data : Bytes) -> CffFont raise RenderError {
     seg_range_pos,
     groups,
   }
+}
+
+///|
+pub fn CffFont::glyph_for_cid(self : CffFont, cid : Int32) -> Int32 {
+  let mut gid = 0
+  while gid < self.cid_by_gid.length() {
+    if self.cid_by_gid[gid] == cid {
+      return gid
+    }
+    gid = gid + 1
+  }
+  0
 }
 
 ///|
@@ -265,6 +494,7 @@ fn cff_bias(count : Int32) -> Int32 {
 ///|
 priv struct CffState {
   font : CffFont
+  subrs : Array[Bytes]
   path : Path
   mut x : Double
   mut y : Double
@@ -635,11 +865,11 @@ fn cff_run(
       10 =>
         if stack.length() > 0 {
           let index = match stack.pop() {
-            Some(value) => value.to_int() + cff_bias(state.font.lsubrs.length())
+            Some(value) => value.to_int() + cff_bias(state.subrs.length())
             None => -1
           }
-          if index >= 0 && index < state.font.lsubrs.length() {
-            cff_run(state.font.lsubrs[index], state, depth + 1)
+          if index >= 0 && index < state.subrs.length() {
+            cff_run(state.subrs[index], state, depth + 1)
           }
         }
       29 =>
@@ -676,8 +906,19 @@ pub fn CffFont::glyph_path(
   if glyph < 0 || glyph >= self.charstrings.length() {
     return None
   }
+  let subrs = if self.is_cid {
+    let fd = self.fd_select[glyph]
+    if fd >= 0 && fd < self.fd_subrs.length() {
+      self.fd_subrs[fd]
+    } else {
+      self.lsubrs
+    }
+  } else {
+    self.lsubrs
+  }
   let state = {
     font: self,
+    subrs,
     path: Path::new(),
     x: 0.0,
     y: 0.0,
