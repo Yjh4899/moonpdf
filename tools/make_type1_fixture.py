@@ -28,7 +28,8 @@ widths = [widths_by_code.get(code, 500) for code in range(32, 127)]
 font_data = FONT.read_bytes()
 content = (
     b"0 0 0 rg\n"
-    b"BT\n/F1 28 Tf\n20 70 Td\n(Type1 outlines) Tj\nET\n"
+    b"BT\n/F1 28 Tf\n20 75 Td\n(Type1 outlines) Tj\nET\n"
+    b"BT\n/F1 20 Tf\n20 35 Td\n(Caf\xe9 \xc5ngstr\xf6m) Tj\nET\n"
 )
 objects = [
     (1, b"<< /Type /Catalog /Pages 2 0 R >>"),

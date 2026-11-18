@@ -292,6 +292,12 @@ test "type1 charstrings" {
   )
   let path = try! font.glyph_path("A", @render.Matrix::identity(), 100.0)
   assert_true(path is Some(_))
+  let accented = try! font.glyph_path(
+    "eacute",
+    @render.Matrix::identity(),
+    100.0,
+  )
+  assert_true(accented is Some(_))
 }
 
 ///|
