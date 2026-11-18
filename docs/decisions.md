@@ -267,3 +267,19 @@ PDFs.
 
 **Consequence.** Embedded CMaps of 1/2/4-byte codes work. Named predefined CMaps
 still fall back to a two-byte code-as-CID interpretation and are the next step.
+
+## ADR-018: standard-14 kerning from AFM KernPairs
+
+**Decision.** Extract ASCII KernPairs from the Core 14 AFM files, store them as
+code-pair adjustments, and apply the adjustment before drawing the next glyph.
+
+**Alternatives.** Ignore kerning; use a hand-written pair list; parse TrueType
+`kern` tables for every embedded font.
+
+**Why.** Standard-14 text is common in generated PDFs and AFM already supplies
+authoritative pair values. Restricting to codes 32..126 keeps the table small
+while covering the pairs that dominate Latin text. The renderer interface stays
+the same: kerning is one more text-space translation.
+
+**Consequence.** Standard-14 Latin text gets correct pair spacing. Embedded
+TrueType/CFF kerning and non-ASCII AFM pairs remain out of scope.

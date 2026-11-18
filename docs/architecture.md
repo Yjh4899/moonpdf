@@ -158,10 +158,11 @@ The text path implements:
 - per-glyph advance in text space, composed with the CTM
 
 A hand-written 3×5 bitmap fallback remains for fonts without supported outlines
-(Type1, CID without a cmap). Standard-14 Helvetica/Times/Courier fonts use the
-Adobe Core 14 AFM widths, with bitmap glyphs scaled to the measured advance.
-Type1 and CID/CJK are the remaining M2 work; the interpreter interface does not
-change.
+(Symbol/ZapfDingbats, named CJK CMaps without an embedded map). Standard-14
+Helvetica/Times/Courier fonts use the Adobe Core 14 AFM widths and ASCII
+KernPairs, with bitmap glyphs scaled to the measured advance. Type1, CID-keyed
+CFF and embedded CMaps now have their own outline paths; named predefined CJK
+CMaps remain.
 
 ## Error model
 

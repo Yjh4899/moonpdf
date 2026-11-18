@@ -83,6 +83,7 @@ samples. Image-specific color transforms are part of the image milestone.
 | embedded CFF (`FontFile3` Type1C, non-CID) | yes | CFF INDEX/DICT and Type 2 charstrings |
 | embedded Type1 (`FontFile`) | yes | PFB/PFA eexec, charstring decrypt, Type 1 drawing ops, `seac` accents |
 | standard 14 font metrics | yes | AFM widths for Helvetica/Times/Courier; bitmap glyphs |
+| standard-14 kerning | yes | ASCII KernPairs from the Core 14 AFMs |
 | Type0 / CIDFontType2 (`Identity-H`, `/CIDToGIDMap`) | yes | two-byte codes, `/W` and `/DW` widths |
 | CID-keyed CFF (`CIDFontType0`) | yes | CFF charset, FDArray/FDSelect, per-FD subrs |
 | embedded Type0 encoding CMap (`begincidrange`/`begincidchar`) | yes | 1/2/4-byte codes; named predefined CMaps are next |
