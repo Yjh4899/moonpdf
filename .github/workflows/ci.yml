@@ -50,6 +50,7 @@ jobs:
           moon run --target native cmd/moonpdf -- fixtures/font-cid-cmap.pdf out/font-cid-cmap.png --scale 2
           moon run --target native cmd/moonpdf -- fixtures/font-named-cmap.pdf out/font-named-cmap.png --scale 2
           moon run --target native cmd/moonpdf -- fixtures/alpha.pdf out/alpha.png --scale 2
+          moon run --target native cmd/moonpdf -- fixtures/blend.pdf out/blend.png --scale 2
 
       - name: Verify PNG output and reused-resource pixels
         run: |
@@ -103,6 +104,7 @@ jobs:
               "font-cid-cmap.png": (600, 300),
               "font-named-cmap.png": (600, 300),
               "alpha.png": (400, 400),
+              "blend.png": (400, 400),
           }
           for name, size in expected.items():
               width, height, raw, stride = read_png(Path("out") / name)
@@ -241,6 +243,14 @@ jobs:
           assert red[0] > 200 and red[2] < 60, red
           assert blue[2] > 200 and blue[0] < 190, blue
           print("alpha", center, red, blue)
+
+          # Multiply blend: yellow times blue is black in the overlap.
+          width, height, raw, stride = read_png(Path("out/blend.png"))
+          center = pixel(raw, stride, 200, 200)
+          yellow = pixel(raw, stride, 120, 120)
+          assert center[0] < 30 and center[1] < 30 and center[2] < 30, center
+          assert yellow[0] > 200 and yellow[1] > 200 and yellow[2] < 60, yellow
+          print("blend", center, yellow)
           PY
 
       - name: Upload rendered pages
