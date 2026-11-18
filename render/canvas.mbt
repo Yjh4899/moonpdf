@@ -11,6 +11,7 @@ pub struct Canvas {
   mut clip_x1 : Int32
   mut clip_y1 : Int32
   mut alpha : Int32
+  mut blend_mode : Int32
 }
 
 ///|
@@ -47,6 +48,7 @@ pub fn Canvas::new(
     clip_x1: width,
     clip_y1: height,
     alpha: 255,
+    blend_mode: 0,
   }
   let mut i = 0
   while i < width * height {
@@ -69,6 +71,78 @@ pub fn Canvas::height(self : Canvas) -> Int32 {
 }
 
 ///|
+fn blend_channel(mode : Int32, backdrop : Int32, source : Int32) -> Int32 {
+  let d = clamp_byte(backdrop)
+  let s = clamp_byte(source)
+  match mode {
+    1 => d * s / 255 // Multiply
+    2 => 255 - (255 - d) * (255 - s) / 255 // Screen
+    3 =>
+      if d < 128 {
+        2 * d * s / 255
+      } else {
+        255 - 2 * (255 - d) * (255 - s) / 255
+      } // Overlay
+    4 => if d < s { d } else { s } // Darken
+    5 => if d > s { d } else { s } // Lighten
+    6 =>
+      if s >= 255 {
+        255
+      } else {
+        let value = d * 255 / (255 - s)
+        if value > 255 {
+          255
+        } else {
+          value
+        }
+      } // ColorDodge
+    7 =>
+      if s <= 0 {
+        0
+      } else {
+        let value = 255 - (255 - d) * 255 / s
+        if value < 0 {
+          0
+        } else {
+          value
+        }
+      } // ColorBurn
+    8 =>
+      if s < 128 {
+        2 * s * d / 255
+      } else {
+        255 - 2 * (255 - s) * (255 - d) / 255
+      } // HardLight
+    9 => {
+      let value = if s < 128 {
+        d - (255 - 2 * s) * d * (255 - d) / (255 * 255)
+      } else {
+        d +
+        (2 * s - 255) *
+        (if d < 64 { d * 4 } else { 255 }) *
+        (255 - d) /
+        (255 * 255)
+      }
+      clamp_byte(value)
+    } // SoftLight (approximation)
+    10 => {
+      let value = d - s
+      if value < 0 {
+        -value
+      } else {
+        value
+      }
+    } // Difference
+    _ => clamp_byte(d + s - 2 * d * s / 255) // Exclusion
+  }
+}
+
+///|
+pub fn Canvas::set_blend(self : Canvas, mode : Int32) -> Unit {
+  self.blend_mode = mode
+}
+
+///|
 pub fn Canvas::set(
   self : Canvas,
   x : Int32,
@@ -87,22 +161,34 @@ pub fn Canvas::set(
     return
   }
   let idx = (y * self.width + x) * 3
+  let dr = self.data[idx].to_int()
+  let dg = self.data[idx + 1].to_int()
+  let db = self.data[idx + 2].to_int()
+  let sr = if self.blend_mode == 0 {
+    clamp_byte(r)
+  } else {
+    blend_channel(self.blend_mode, dr, r)
+  }
+  let sg = if self.blend_mode == 0 {
+    clamp_byte(g)
+  } else {
+    blend_channel(self.blend_mode, dg, g)
+  }
+  let sb = if self.blend_mode == 0 {
+    clamp_byte(b)
+  } else {
+    blend_channel(self.blend_mode, db, b)
+  }
   let a = self.alpha
   if a >= 255 {
-    self.data[idx] = u8(clamp_byte(r))
-    self.data[idx + 1] = u8(clamp_byte(g))
-    self.data[idx + 2] = u8(clamp_byte(b))
+    self.data[idx] = u8(sr)
+    self.data[idx + 1] = u8(sg)
+    self.data[idx + 2] = u8(sb)
   } else if a > 0 {
     let inverse = 255 - a
-    self.data[idx] = u8(
-      (clamp_byte(r) * a + self.data[idx].to_int() * inverse) / 255,
-    )
-    self.data[idx + 1] = u8(
-      (clamp_byte(g) * a + self.data[idx + 1].to_int() * inverse) / 255,
-    )
-    self.data[idx + 2] = u8(
-      (clamp_byte(b) * a + self.data[idx + 2].to_int() * inverse) / 255,
-    )
+    self.data[idx] = u8((sr * a + dr * inverse) / 255)
+    self.data[idx + 1] = u8((sg * a + dg * inverse) / 255)
+    self.data[idx + 2] = u8((sb * a + db * inverse) / 255)
   }
 }
 

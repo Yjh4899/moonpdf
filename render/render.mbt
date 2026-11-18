@@ -42,6 +42,7 @@ priv struct GState {
   mut round_cap : Bool
   mut fill_alpha : Double
   mut stroke_alpha : Double
+  mut blend_mode : Int32
   mut clip : (Int32, Int32, Int32, Int32)
 }
 
@@ -59,6 +60,7 @@ fn GState::initial(ctm : Matrix, clip : (Int32, Int32, Int32, Int32)) -> GState 
     round_cap: false,
     fill_alpha: 1.0,
     stroke_alpha: 1.0,
+    blend_mode: 0,
     clip,
   }
 }
@@ -88,6 +90,24 @@ fn TextState::initial() -> TextState {
     leading: 0.0,
     rise: 0.0,
     font: None,
+  }
+}
+
+///|
+fn blend_mode_from_name(name : String) -> Int32 {
+  match name {
+    "Multiply" => 1
+    "Screen" => 2
+    "Overlay" => 3
+    "Darken" => 4
+    "Lighten" => 5
+    "ColorDodge" => 6
+    "ColorBurn" => 7
+    "HardLight" => 8
+    "SoftLight" => 9
+    "Difference" => 10
+    "Exclusion" => 11
+    _ => 0
   }
 }
 
@@ -218,6 +238,7 @@ fn paint(
     path.close()
   }
   let (subpaths, closed) = path.finish()
+  canvas.set_blend(state.blend_mode)
   if fill {
     canvas.set_alpha(alpha_component(state.fill_alpha))
     canvas.fill_polygons(
@@ -263,6 +284,7 @@ fn show_text_font(
   font : PdfFont,
 ) -> Unit {
   canvas.set_alpha(alpha_component(state.fill_alpha))
+  canvas.set_blend(state.blend_mode)
   let codes : Array[Int32] = []
   let raw = bytes.to_array()
   if font.two_byte {
@@ -408,6 +430,7 @@ fn show_text(
     Some(font) => show_text_font(canvas, state, text, bytes, font)
     None => {
       canvas.set_alpha(alpha_component(state.fill_alpha))
+      canvas.set_blend(state.blend_mode)
       let full = text.matrix.then(state.ctm)
       let advance = draw_text(
         canvas,
@@ -738,6 +761,19 @@ pub fn render_page(
                     None => ()
                   }
                 None => ()
+              }
+              match @pdf.dict_get(dict, "BM") {
+                Some(@pdf.Name(name)) =>
+                  state.blend_mode = blend_mode_from_name(name)
+                Some(@pdf.Array(items)) =>
+                  if items.length() > 0 {
+                    match items[0].as_name() {
+                      Some(name) =>
+                        state.blend_mode = blend_mode_from_name(name)
+                      None => ()
+                    }
+                  }
+                _ => ()
               }
             }
             None => ()
@@ -1091,6 +1127,7 @@ pub fn render_page(
                   if subtype == Some("Image") {
                     let image = decode_image(page, stream)
                     canvas.set_alpha(255)
+                    canvas.set_blend(state.blend_mode)
                     draw_image(canvas, state, image)
                   }
                 }

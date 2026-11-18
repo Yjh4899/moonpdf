@@ -55,6 +55,7 @@ pub struct Canvas {
   mut clip_x1 : Int32
   mut clip_y1 : Int32
   mut alpha : Int32
+  mut blend_mode : Int32
 }
 pub fn Canvas::clip_rect(Self) -> (Int32, Int32, Int32, Int32)
 pub fn Canvas::downsample(Self, Int32) -> Self
@@ -64,6 +65,7 @@ pub fn Canvas::new(Int32, Int32, Int32, Int32, Int32) -> Self
 pub fn Canvas::reset_clip(Self, Int32, Int32, Int32, Int32) -> Unit
 pub fn Canvas::set(Self, Int32, Int32, Int32, Int32, Int32) -> Unit
 pub fn Canvas::set_alpha(Self, Int32) -> Unit
+pub fn Canvas::set_blend(Self, Int32) -> Unit
 pub fn Canvas::set_clip(Self, Int32, Int32, Int32, Int32) -> Unit
 pub fn Canvas::stroke_polyline(Self, Array[Point], Bool, Double, Bool, Int32, Int32, Int32) -> Unit
 pub fn Canvas::to_rgb_bytes(Self) -> Bytes
