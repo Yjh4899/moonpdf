@@ -326,12 +326,109 @@ pub struct FontPoint {
 }
 
 ///|
-/// Return the contours of a simple glyph. Composite glyphs return an empty
-/// array; the text renderer then falls back to the bitmap glyph.
+/// Return the contours of a glyph, resolving composite components recursively.
 pub fn TrueTypeFont::glyph_contours(
   self : TrueTypeFont,
   glyph : Int32,
 ) -> Array[Array[FontPoint]] raise RenderError {
+  self.glyph_contours_depth(glyph, 0)
+}
+
+///|
+fn f2dot14(value : Int32) -> Double {
+  if value >= 0x8000 {
+    (value - 0x10000).to_double() / 16384.0
+  } else {
+    value.to_double() / 16384.0
+  }
+}
+
+///|
+fn int8_value(data : Bytes, pos : Int32) -> Int32 {
+  let value = data.at(pos).to_int()
+  if value >= 128 {
+    value - 256
+  } else {
+    value
+  }
+}
+
+///|
+fn TrueTypeFont::composite_contours(
+  self : TrueTypeFont,
+  _glyph : Int32,
+  start : Int32,
+  depth : Int32,
+) -> Array[Array[FontPoint]] raise RenderError {
+  let out : Array[Array[FontPoint]] = []
+  let mut pos = start + 10
+  let mut more = true
+  while more {
+    let flags = u16(self.data, pos)
+    let component = u16(self.data, pos + 2)
+    pos = pos + 4
+    let mut dx = 0.0
+    let mut dy = 0.0
+    let has_xy = (flags & 0x0002) != 0
+    if (flags & 0x0001) != 0 {
+      if has_xy {
+        dx = i16(self.data, pos).to_double()
+        dy = i16(self.data, pos + 2).to_double()
+      }
+      pos = pos + 4
+    } else {
+      if has_xy {
+        dx = int8_value(self.data, pos).to_double()
+        dy = int8_value(self.data, pos + 1).to_double()
+      }
+      pos = pos + 2
+    }
+    let mut xx = 1.0
+    let mut yy = 1.0
+    let mut xy = 0.0
+    let mut yx = 0.0
+    if (flags & 0x0008) != 0 {
+      let scale = f2dot14(i16(self.data, pos))
+      xx = scale
+      yy = scale
+      pos = pos + 2
+    } else if (flags & 0x0040) != 0 {
+      xx = f2dot14(i16(self.data, pos))
+      yy = f2dot14(i16(self.data, pos + 2))
+      pos = pos + 4
+    } else if (flags & 0x0080) != 0 {
+      xx = f2dot14(i16(self.data, pos))
+      yx = f2dot14(i16(self.data, pos + 2))
+      xy = f2dot14(i16(self.data, pos + 4))
+      yy = f2dot14(i16(self.data, pos + 6))
+      pos = pos + 8
+    }
+    let contours = self.glyph_contours_depth(component, depth + 1)
+    for contour in contours {
+      let transformed : Array[FontPoint] = Array(capacity=contour.length())
+      for point in contour {
+        transformed.push({
+          x: point.x * xx + point.y * xy + dx,
+          y: point.x * yx + point.y * yy + dy,
+          on_curve: point.on_curve,
+        })
+      }
+      out.push(transformed)
+    }
+    more = (flags & 0x0020) != 0
+  }
+  out
+}
+
+///|
+fn TrueTypeFont::glyph_contours_depth(
+  self : TrueTypeFont,
+  glyph : Int32,
+  depth : Int32,
+) -> Array[Array[FontPoint]] raise RenderError {
+  if depth > 8 {
+    return []
+  }
   if glyph < 0 || glyph + 1 >= self.loca.length() {
     return []
   }
@@ -341,7 +438,10 @@ pub fn TrueTypeFont::glyph_contours(
     return []
   }
   let contours = i16(self.data, start)
-  if contours <= 0 {
+  if contours < 0 {
+    return self.composite_contours(glyph, start, depth)
+  }
+  if contours == 0 {
     return []
   }
   let contour_count = contours
