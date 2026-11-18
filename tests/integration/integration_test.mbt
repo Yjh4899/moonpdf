@@ -66,6 +66,111 @@ test "incremental render equals full rewrite" {
 }
 
 ///|
+test "flate image xobject" {
+  let raster = match
+    @integration.rasterize(
+      @integration.fixture_bytes("fixtures/image-flate.pdf"),
+      1.0,
+    ) {
+    Some(raster) => raster
+    None => {
+      assert_true(false)
+      return
+    }
+  }
+  assert_eq(raster.width, 200)
+  assert_eq(raster.height, 200)
+  let left = (100 * raster.width + 70) * 3
+  assert_true(raster.pixels.at(left).to_int() > 180) // red
+  let right = (100 * raster.width + 130) * 3
+  assert_true(raster.pixels.at(right + 2).to_int() > 180) // blue
+  let center = (100 * raster.width + 100) * 3
+  assert_true(raster.pixels.at(center + 1).to_int() > 150) // green
+}
+
+///|
+test "baseline jpeg image xobject" {
+  let raster = match
+    @integration.rasterize(
+      @integration.fixture_bytes("fixtures/image-jpeg.pdf"),
+      1.0,
+    ) {
+    Some(raster) => raster
+    None => {
+      assert_true(false)
+      return
+    }
+  }
+  assert_eq(raster.width, 200)
+  assert_eq(raster.height, 200)
+  let red = (70 * raster.width + 70) * 3
+  let blue = (70 * raster.width + 130) * 3
+  let green = (130 * raster.width + 70) * 3
+  let yellow = (130 * raster.width + 130) * 3
+  assert_true(raster.pixels.at(red).to_int() > 150)
+  assert_true(raster.pixels.at(blue + 2).to_int() > 150)
+  assert_true(raster.pixels.at(green + 1).to_int() > 150)
+  assert_true(raster.pixels.at(yellow).to_int() > 180)
+}
+
+///|
+test "rotate and crop page geometry" {
+  let raster = match
+    @integration.rasterize(
+      @integration.fixture_bytes("fixtures/rotate-crop.pdf"),
+      1.0,
+    ) {
+    Some(raster) => raster
+    None => {
+      assert_true(false)
+      return
+    }
+  }
+  assert_eq(raster.width, 160)
+  assert_eq(raster.height, 300)
+  let top = (50 * raster.width + 20) * 3
+  let bottom = (250 * raster.width + 20) * 3
+  assert_true(raster.pixels.at(top).to_int() > 180) // red
+  assert_true(raster.pixels.at(bottom + 2).to_int() > 150) // blue
+}
+
+///|
+test "rectangular clip path" {
+  let raster = match
+    @integration.rasterize(@integration.fixture_bytes("fixtures/clip.pdf"), 1.0) {
+    Some(raster) => raster
+    None => {
+      assert_true(false)
+      return
+    }
+  }
+  let corner = (10 * raster.width + 10) * 3
+  let center = (100 * raster.width + 100) * 3
+  assert_true(raster.pixels.at(corner).to_int() > 180) // red
+  assert_true(raster.pixels.at(center + 2).to_int() > 180) // blue
+}
+
+///|
+test "inline image" {
+  let raster = match
+    @integration.rasterize(
+      @integration.fixture_bytes("fixtures/inline-image.pdf"),
+      1.0,
+    ) {
+    Some(raster) => raster
+    None => {
+      assert_true(false)
+      return
+    }
+  }
+  assert_eq(raster.width, 200)
+  assert_eq(raster.height, 200)
+  let center = (100 * raster.width + 100) * 3
+  assert_true(raster.pixels.at(center).to_int() > 180)
+  assert_true(raster.pixels.at(center + 1).to_int() < 60)
+}
+
+///|
 test "xref stream and object stream fixture" {
   let data = @integration.fixture_bytes("fixtures/xref-stream.pdf")
   let document = try! @pdf.parse_document(data)
