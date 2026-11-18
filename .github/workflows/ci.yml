@@ -51,6 +51,7 @@ jobs:
           moon run --target native cmd/moonpdf -- fixtures/font-named-cmap.pdf out/font-named-cmap.png --scale 2
           moon run --target native cmd/moonpdf -- fixtures/alpha.pdf out/alpha.png --scale 2
           moon run --target native cmd/moonpdf -- fixtures/blend.pdf out/blend.png --scale 2
+          moon run --target native cmd/moonpdf -- fixtures/clip-path.pdf out/clip-path.png --scale 2
 
       - name: Verify PNG output and reused-resource pixels
         run: |
@@ -105,6 +106,7 @@ jobs:
               "font-named-cmap.png": (600, 300),
               "alpha.png": (400, 400),
               "blend.png": (400, 400),
+              "clip-path.png": (400, 400),
           }
           for name, size in expected.items():
               width, height, raw, stride = read_png(Path("out") / name)
@@ -251,6 +253,14 @@ jobs:
           assert center[0] < 30 and center[1] < 30 and center[2] < 30, center
           assert yellow[0] > 200 and yellow[1] > 200 and yellow[2] < 60, yellow
           print("blend", center, yellow)
+
+          # Exact path clip: blue triangle on a red page.
+          width, height, raw, stride = read_png(Path("out/clip-path.png"))
+          center = pixel(raw, stride, 200, 220)
+          corner = pixel(raw, stride, 40, 40)
+          assert center[2] > 180 and center[0] < 60, center
+          assert corner[0] > 180 and corner[2] < 60, corner
+          print("clip path", center, corner)
           PY
 
       - name: Upload rendered pages
