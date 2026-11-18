@@ -55,7 +55,7 @@ The incremental page must show the reused blue header and the new green body.
 
 **Delivered**
 
-- embedded TrueType (`FontFile2`): `cmap` form 4/12, `hmtx` advances, `glyf` outlines;
+- embedded TrueType (`FontFile2`): `cmap` form 4/12, `hmtx` advances, simple and composite `glyf` outlines;
 - embedded CFF (`FontFile3` Type1C, non-CID): INDEX/DICT and Type 2 charstrings;
 - per-code PDF `/Widths`, glyph placement through text and CTM matrices;
 - embedded-font fixtures with pixel assertions.

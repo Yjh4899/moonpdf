@@ -136,10 +136,10 @@ objects, no hidden allocation in the inner loop.
 
 `Tf` resolves a `/Font` resource into a `PdfFont`. When the descriptor contains
 a `/FontFile2`, the loader parses the TrueType tables (`cmap` formats 4/12,
-`hmtx`, `loca`, `glyf`) and the renderer fills the glyph contours through the
-same path rasterizer used for vector art. A `/FontFile3` Type1C stream goes
-through the CFF reader (INDEX/DICT and Type 2 charstrings) and joins the same
-path pipeline. Per-code advances come from the PDF `/Widths` array, with `hmtx`
+`hmtx`, `loca`, simple and composite `glyf`) and the renderer fills the glyph
+contours through the same path rasterizer used for vector art. A `/FontFile3`
+Type1C stream goes through the CFF reader (INDEX/DICT and Type 2 charstrings)
+and joins the same path pipeline. Per-code advances come from the PDF `/Widths` array, with `hmtx`
 used as a fallback when `/Widths` is absent.
 
 The text path implements:

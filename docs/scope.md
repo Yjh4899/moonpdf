@@ -35,7 +35,7 @@ The concrete reuse fixture is documented in
    compares page hashes in CI, catching layout regressions without a JavaScript
    toolchain.
 
-## Delivered in release 0.5.0
+## Delivered in release 0.6.0
 
 - classic xref tables, xref streams, object streams and hybrid `/XRefStm`;
 - incremental updates: `/Prev` chain, revision overlay, free entries;
@@ -44,7 +44,7 @@ The concrete reuse fixture is documented in
 - content operators for graphics state, paths, fill/stroke, color and text;
 - Form XObjects (matrix, nested resources, recursive expansion, BBox clip);
 - image XObjects: 8-bit gray/RGB/CMYK, Flate and baseline JPEG; inline images;
-- embedded TrueType (`FontFile2`): cmap 4/12, hmtx advances, `glyf` outlines;
+- embedded TrueType (`FontFile2`): cmap 4/12, hmtx advances, simple/composite `glyf` outlines;
 - embedded CFF (`FontFile3` Type1C, non-CID): CFF INDEX/DICT, Type 2 charstrings;
 - `/Rotate` 0/90/180/270, `/CropBox`, rectangular `W`/`W*` clip;
 - fill rules, line width and round caps;

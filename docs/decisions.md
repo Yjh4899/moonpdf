@@ -161,7 +161,7 @@ visually consistent and avoids an FFI dependency. `cmap` 4/12 covers the common
 Latin and BMP cases; Type1/CFF can feed the same `Path` interface later.
 
 **Consequence.** Text is resolution-independent and transformed with the text
-matrix. Composite TrueType glyphs, Type1 and CID/CJK remain fallback cases.
+matrix. Type1 and CID/CJK remain fallback cases.
 
 ## ADR-012: CFF Type 2 charstrings feed the same path pipeline
 

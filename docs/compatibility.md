@@ -79,7 +79,7 @@ samples. Image-specific color transforms are part of the image milestone.
 | `Tc`, `Tw`, `Tz`, `TL`, `Ts` | yes | text state |
 | `Td`, `TD`, `Tm`, `T*` | yes | text and line matrices |
 | `Tj`, `TJ`, `'`, `"` | yes | fallback bitmap glyphs |
-| embedded TrueType (`FontFile2`) | yes | `glyf` simple outlines, cmap 4/12, hmtx advances |
+| embedded TrueType (`FontFile2`) | yes | `glyf` simple and composite outlines, cmap 4/12, hmtx advances |
 | embedded CFF (`FontFile3` Type1C, non-CID) | yes | CFF INDEX/DICT and Type 2 charstrings |
 | embedded Type1 (`FontFile`) | next | falls back to the bitmap font |
 | standard 14 font metrics | next | fallback bitmap advance currently |
