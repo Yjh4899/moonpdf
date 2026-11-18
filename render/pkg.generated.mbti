@@ -34,6 +34,8 @@ pub fn point(Double, Double) -> Point
 
 pub fn render_page(@pdf.PdfPage, RenderOptions) -> RenderedPage raise RenderError
 
+pub fn standard14_kerning(String) -> Array[(Int32, Int32, Int32)]?
+
 pub fn standard14_widths(String) -> Array[Int32]?
 
 // Errors
@@ -153,11 +155,13 @@ pub struct PdfFont {
   ascent : Double
   descent : Double
   standard : Bool
+  kern : Array[(Int32, Int32, Int32)]
 }
 pub fn PdfFont::ascent(Self) -> Double
 pub fn PdfFont::cid_for_code(Self, Int32) -> Int32
 pub fn PdfFont::descent(Self) -> Double
 pub fn PdfFont::glyph_for_code(Self, Int32) -> Int32
+pub fn PdfFont::kern_for(Self, Int32, Int32) -> Int32
 pub fn PdfFont::width_for(Self, Int32) -> Int32
 
 pub struct Point {

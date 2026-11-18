@@ -17,6 +17,7 @@ pub struct PdfFont {
   ascent : Double
   descent : Double
   standard : Bool
+  kern : Array[(Int32, Int32, Int32)]
 }
 
 ///|
@@ -271,6 +272,7 @@ fn load_type0_font(
     ascent,
     descent,
     standard: false,
+    kern: [],
   })
 }
 
@@ -378,6 +380,14 @@ pub fn load_pdf_font(page : @pdf.PdfPage, value : @pdf.PdfValue) -> PdfFont? {
       )
     None => (800.0, -200.0)
   }
+  let kern = if standard {
+    match standard14_kerning(base_name) {
+      Some(pairs) => pairs
+      None => []
+    }
+  } else {
+    []
+  }
   Some({
     base_name,
     tt,
@@ -394,6 +404,7 @@ pub fn load_pdf_font(page : @pdf.PdfPage, value : @pdf.PdfValue) -> PdfFont? {
     ascent,
     descent,
     standard,
+    kern,
   })
 }
 
@@ -418,6 +429,16 @@ pub fn PdfFont::width_for(self : PdfFont, code : Int32) -> Int32 {
   } else {
     self.missing_width
   }
+}
+
+///|
+pub fn PdfFont::kern_for(self : PdfFont, left : Int32, right : Int32) -> Int32 {
+  for entry in self.kern {
+    if entry.0 == left && entry.1 == right {
+      return entry.2
+    }
+  }
+  0
 }
 
 ///|

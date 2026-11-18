@@ -264,7 +264,19 @@ fn show_text_font(
       codes.push(b.to_int())
     }
   }
+  let mut previous = -1
   for code in codes {
+    if previous >= 0 {
+      let adjustment = font.kern_for(previous, code)
+      if adjustment != 0 {
+        text.matrix = text.matrix.then(
+          Matrix::translate(
+            adjustment.to_double() / 1000.0 * text.font_size * text.h_scale,
+            0.0,
+          ),
+        )
+      }
+    }
     let full = text.matrix.then(state.ctm)
     let glyph = font.glyph_for_code(code)
     let drawn = if glyph > 0 {
@@ -362,6 +374,7 @@ fn show_text_font(
     text.matrix = text.matrix.then(
       Matrix::translate(advance * text.h_scale, text.rise),
     )
+    previous = code
   }
 }
 
