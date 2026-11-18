@@ -294,7 +294,27 @@ fn show_text_font(
           }
       }
     } else {
-      false
+      match font.type1 {
+        Some(t1) => {
+          let (name, ok) = t1_glyph_name(code)
+          if ok {
+            draw_type1_glyph(
+              canvas,
+              t1,
+              name,
+              full,
+              text.font_size,
+              state.fill_r,
+              state.fill_g,
+              state.fill_b,
+            )
+            true
+          } else {
+            false
+          }
+        }
+        None => false
+      }
     }
     if !drawn {
       let bitmap_advance = text.font_size * 0.8

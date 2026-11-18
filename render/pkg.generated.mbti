@@ -16,6 +16,8 @@ pub fn draw_glyph(Canvas, TrueTypeFont, Int32, Matrix, Double, Int32, Int32, Int
 
 pub fn draw_text(Canvas, Bytes, Matrix, Double, Int32, Int32, Int32) -> Double
 
+pub fn draw_type1_glyph(Canvas, Type1Font, String, Matrix, Double, Int32, Int32, Int32) -> Unit
+
 pub fn encode_png(RenderedPage) -> Bytes
 
 pub fn load_pdf_font(@pdf.PdfPage, @pdf.PdfValue) -> PdfFont?
@@ -23,6 +25,8 @@ pub fn load_pdf_font(@pdf.PdfPage, @pdf.PdfValue) -> PdfFont?
 pub fn parse_cff(Bytes) -> CffFont raise RenderError
 
 pub fn parse_truetype(Bytes) -> TrueTypeFont raise RenderError
+
+pub fn parse_type1(Bytes) -> Type1Font raise RenderError
 
 pub fn point(Double, Double) -> Point
 
@@ -125,6 +129,7 @@ pub struct PdfFont {
   base_name : String
   tt : TrueTypeFont?
   cff : CffFont?
+  type1 : Type1Font?
   widths : Array[Int32]
   cid_widths : Array[(Int32, Int32)]
   cid_to_gid : Array[Int32]?
@@ -185,6 +190,12 @@ pub fn TrueTypeFont::descent(Self) -> Int32
 pub fn TrueTypeFont::glyph_contours(Self, Int32) -> Array[Array[FontPoint]] raise RenderError
 pub fn TrueTypeFont::glyph_id(Self, Int32) -> Int32
 pub fn TrueTypeFont::units_per_em(Self) -> Int32
+
+pub struct Type1Font {
+  charstrings : Array[(String, Bytes)]
+  subrs : Array[Bytes]
+}
+pub fn Type1Font::glyph_path(Self, String, Matrix, Double) -> Path? raise RenderError
 
 // Type aliases
 
