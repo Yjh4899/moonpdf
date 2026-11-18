@@ -443,6 +443,34 @@ test "named CJK CMap and Adobe-GB1 CIDs" {
 }
 
 ///|
+test "constant alpha ExtGState" {
+  let raster = match
+    @integration.rasterize(
+      @integration.fixture_bytes("fixtures/alpha.pdf"),
+      1.0,
+    ) {
+    Some(raster) => raster
+    None => {
+      assert_true(false)
+      return
+    }
+  }
+  assert_eq(raster.width, 200)
+  assert_eq(raster.height, 200)
+  let center = (100 * raster.width + 100) * 3
+  assert_true(raster.pixels.at(center).to_int() > 80)
+  assert_true(raster.pixels.at(center).to_int() < 190)
+  assert_true(raster.pixels.at(center + 2).to_int() > 80)
+  assert_true(raster.pixels.at(center + 1).to_int() < 60)
+  let red = (60 * raster.width + 60) * 3
+  assert_true(raster.pixels.at(red).to_int() > 200)
+  assert_true(raster.pixels.at(red + 2).to_int() < 60)
+  let blue = (60 * raster.width + 160) * 3
+  assert_true(raster.pixels.at(blue + 2).to_int() > 200)
+  assert_true(raster.pixels.at(blue).to_int() < 190)
+}
+
+///|
 test "xref stream and object stream fixture" {
   let data = @integration.fixture_bytes("fixtures/xref-stream.pdf")
   let document = try! @pdf.parse_document(data)
