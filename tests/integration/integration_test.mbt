@@ -321,6 +321,36 @@ test "type1 font program renders outlines" {
 }
 
 ///|
+test "CID-keyed CFF renders CJK glyphs" {
+  let cff = try! @render.parse_cff(
+    @integration.fixture_bytes("fixtures/fonts/NotoSansCJKsc-Subset.cff"),
+  )
+  assert_eq(cff.glyph_for_cid(9987), 2)
+  let raster = match
+    @integration.rasterize(
+      @integration.fixture_bytes("fixtures/font-cid-cff.pdf"),
+      1.0,
+    ) {
+    Some(raster) => raster
+    None => {
+      assert_true(false)
+      return
+    }
+  }
+  assert_eq(raster.width, 300)
+  assert_eq(raster.height, 150)
+  let mut dark = 0
+  let mut i = 0
+  while i < raster.pixels.length() {
+    if raster.pixels.at(i).to_int() < 128 {
+      dark = dark + 1
+    }
+    i = i + 1
+  }
+  assert_true(dark > 500)
+}
+
+///|
 test "xref stream and object stream fixture" {
   let data = @integration.fixture_bytes("fixtures/xref-stream.pdf")
   let document = try! @pdf.parse_document(data)
