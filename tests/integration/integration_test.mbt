@@ -383,6 +383,32 @@ test "embedded Type0 encoding CMap" {
 }
 
 ///|
+test "standard 14 kerning" {
+  let pairs = match @render.standard14_kerning("Helvetica") {
+    Some(pairs) => pairs
+    None => {
+      assert_true(false)
+      return
+    }
+  }
+  let mut av = 0
+  for entry in pairs {
+    if entry.0 == 65 && entry.1 == 86 {
+      av = entry.2
+    }
+  }
+  assert_eq(av, -70)
+  let courier = match @render.standard14_kerning("Courier") {
+    Some(pairs) => pairs
+    None => {
+      assert_true(false)
+      return
+    }
+  }
+  assert_eq(courier.length(), 0)
+}
+
+///|
 test "xref stream and object stream fixture" {
   let data = @integration.fixture_bytes("fixtures/xref-stream.pdf")
   let document = try! @pdf.parse_document(data)
