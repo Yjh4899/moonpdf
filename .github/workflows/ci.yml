@@ -49,6 +49,7 @@ jobs:
           moon run --target native cmd/moonpdf -- fixtures/font-cid-cff.pdf out/font-cid-cff.png --scale 2
           moon run --target native cmd/moonpdf -- fixtures/font-cid-cmap.pdf out/font-cid-cmap.png --scale 2
           moon run --target native cmd/moonpdf -- fixtures/font-named-cmap.pdf out/font-named-cmap.png --scale 2
+          moon run --target native cmd/moonpdf -- fixtures/alpha.pdf out/alpha.png --scale 2
 
       - name: Verify PNG output and reused-resource pixels
         run: |
@@ -101,6 +102,7 @@ jobs:
               "font-cid-cff.png": (600, 300),
               "font-cid-cmap.png": (600, 300),
               "font-named-cmap.png": (600, 300),
+              "alpha.png": (400, 400),
           }
           for name, size in expected.items():
               width, height, raw, stride = read_png(Path("out") / name)
@@ -229,6 +231,16 @@ jobs:
                       dark += 1
           assert dark > 3000, dark
           print("named CMap dark pixels", dark)
+
+          # Constant alpha ExtGState: 50% blue over red must produce purple.
+          width, height, raw, stride = read_png(Path("out/alpha.png"))
+          center = pixel(raw, stride, 200, 200)
+          red = pixel(raw, stride, 120, 120)
+          blue = pixel(raw, stride, 320, 120)
+          assert 80 < center[0] < 190 and center[1] < 60 and center[2] > 80, center
+          assert red[0] > 200 and red[2] < 60, red
+          assert blue[2] > 200 and blue[0] < 190, blue
+          print("alpha", center, red, blue)
           PY
 
       - name: Upload rendered pages
