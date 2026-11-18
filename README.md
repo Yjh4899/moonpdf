@@ -9,7 +9,7 @@
 stream, rasterize the page, and write a PNG without a JavaScript VM, a C
 library, or a browser.
 
-Published as [`Yjh4899/moonpdf@0.10.0`](https://mooncakes.io/docs/Yjh4899/moonpdf)
+Published as [`Yjh4899/moonpdf@0.11.0`](https://mooncakes.io/docs/Yjh4899/moonpdf)
 on mooncakes.io.
 
 ## Why this exists
@@ -38,7 +38,7 @@ real pages end to end, including incrementally saved files:
 | Clip | rectangular `W` / `W*`, Form `BBox` |
 | Forms | Form XObjects with `/Matrix`, nested resources and `BBox` clip |
 | Images | 8-bit gray/RGB/CMYK, Flate and baseline JPEG, inline images |
-| Text | text state, `Td/TD/Tm/T*`, `Tj/TJ/'/"`, embedded TrueType/CFF/Type1 outlines, standard-14 AFM metrics, Type0/CIDFontType2, CID-keyed CFF, bitmap fallback |
+| Text | text state, `Td/TD/Tm/T*`, `Tj/TJ/'/"`, embedded TrueType/CFF/Type1 outlines (with Type1 `seac`), standard-14 AFM metrics, Type0/CIDFontType2, CID-keyed CFF, bitmap fallback |
 | Output | RGB PNG with zlib compression |
 
 The target is ISO 32000-1:2008 page rendering. See
@@ -46,9 +46,9 @@ The target is ISO 32000-1:2008 page rendering. See
 target and corpus gate, and [`docs/incremental-updates.md`](docs/incremental-updates.md)
 for the `/Prev` algorithm and the reused-resource fixture.
 
-Still missing, and tracked as milestones: named CJK encoding CMaps, `seac`
-accent composition, progressive JPEG and soft masks, transparency, shadings and
-annotation appearance streams. See [`docs/compatibility.md`](docs/compatibility.md).
+Still missing, and tracked as milestones: named CJK encoding CMaps,
+progressive JPEG and soft masks, transparency, shadings and annotation
+appearance streams. See [`docs/compatibility.md`](docs/compatibility.md).
 
 ![MoonPDF rendering a fixture](docs/images/demo.png)
 

@@ -35,7 +35,7 @@ The concrete reuse fixture is documented in
    compares page hashes in CI, catching layout regressions without a JavaScript
    toolchain.
 
-## Delivered in release 0.10.0
+## Delivered in release 0.11.0
 
 - classic xref tables, xref streams, object streams and hybrid `/XRefStm`;
 - incremental updates: `/Prev` chain, revision overlay, free entries;
@@ -48,7 +48,7 @@ The concrete reuse fixture is documented in
 - embedded CFF (`FontFile3` Type1C, non-CID): CFF INDEX/DICT, Type 2 charstrings;
 - standard-14 Helvetica/Times/Courier metrics from the Adobe Core 14 AFMs;
 - Type0 / CIDFontType2 with Identity-H, two-byte codes, `/W` and `/CIDToGIDMap`;
-- Type1 (`FontFile`): PFB/PFA eexec, charstring decryption, Type 1 outline ops;
+- Type1 (`FontFile`): PFB/PFA eexec, charstring decryption, Type 1 outline ops, `seac`;
 - CID-keyed CFF (`CIDFontType0`): charset, FDArray/FDSelect, per-FD local subrs;
 - `/Rotate` 0/90/180/270, `/CropBox`, rectangular `W`/`W*` clip;
 - fill rules, line width and round caps;

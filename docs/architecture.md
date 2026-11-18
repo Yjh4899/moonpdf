@@ -142,7 +142,7 @@ Type1C stream goes through the CFF reader (INDEX/DICT and Type 2 charstrings)
 and joins the same path pipeline. CID-keyed CFF additionally resolves the
 charset (CID to GID), `FDArray`/`FDSelect`, and per-FD local Subrs. A `/FontFile`
 Type 1 program goes through the PFB/PFA eexec and charstring decryptors, then the
-Type 1 operator interpreter.
+Type 1 operator interpreter, including `seac` base/accent composition.
 A Type0 font resolves its `DescendantFonts` CIDFontType2 dictionary, decodes
 two-byte Identity-H codes, maps CIDs through `/CIDToGIDMap`, and reads advances
 from `/W`/`/DW`. Per-code advances for simple fonts come from the PDF `/Widths`

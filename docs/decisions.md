@@ -228,11 +228,11 @@ rely on external tools.
 **Why.** Older PDFs still embed Type 1 fonts, and the Type 1 charstring language
 is close enough to Type 2 that one more small interpreter completes the simple
 font matrix. PFB/PFA parsing is self-contained and does not add a dependency.
-`seac` is handled by drawing the base glyph; the accent is a later refinement.
+`seac` draws the base glyph and places the accent at `(adx - asb, ady)`.
 
 **Consequence.** Type 1 PFB/PFA fonts render with their own outlines. Charstring
-encodings other than StandardEncoding (via `/Encoding` Differences) and `seac`
-accents remain next, along with CID-keyed CFF/CJK.
+encodings other than StandardEncoding (via `/Encoding` Differences) remain open,
+along with CID-keyed CFF/CJK.
 
 ## ADR-016: CID-keyed CFF reuses the Type 2 interpreter
 
@@ -249,4 +249,4 @@ apply. Reusing the interpreter keeps CJK CFF rendering on the same path pipeline
 and avoids importing a second font stack.
 
 **Consequence.** CID-keyed CFF renders through Identity-H CIDs. Named CJK
-encoding CMaps (`UniGB-UCS2-H`, etc.) and `seac` accents remain open.
+encoding CMaps (`UniGB-UCS2-H`, etc.) remain open.
