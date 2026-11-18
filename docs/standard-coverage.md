@@ -53,7 +53,7 @@ The public acceptance corpus is:
    unknown content operators follow the PDF rule for unknown operators and are
    counted in the compatibility report.
 
-## Current status (release 0.15.0)
+## Current status (release 0.16.0)
 
 | Area | Current | Gap to target |
 | --- | --- | --- |
@@ -74,7 +74,8 @@ The public acceptance corpus is:
 | named Adobe CJK CMaps (`UniGB/UCS2`, `UniJIS/UCS2`, `UniKS/UCS2`, `UniCNS/UCS2`) | implemented | vertical layout |
 | embedded Type1 (`FontFile`) PFB/PFA charstrings, `seac` | implemented | CID-keyed CFF |
 | CID/CJK fonts | not yet | M2 |
-| constant alpha via ExtGState `ca`/`CA` | implemented | blend modes, transparency groups |
+| constant alpha via ExtGState `ca`/`CA` | implemented | transparency groups |
+| blend modes via ExtGState `/BM` | implemented | isolation groups |
 | transparency, soft masks, shadings, patterns | partial | M3 |
 | annotation appearance streams, optional content | not yet | M3 |
 

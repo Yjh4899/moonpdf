@@ -80,12 +80,13 @@ The incremental page must show the reused blue header and the new green body.
 
 **Delivered so far**
 
-- constant fill/stroke/text alpha from `ExtGState /ca` and `/CA`.
+- constant fill/stroke/text alpha from `ExtGState /ca` and `/CA`;
+- blend modes from `ExtGState /BM` (source-over canvas, no isolation yet).
 
 **Remaining**
 
 - clipping paths;
-- transparency groups and blend modes;
+- transparency groups and isolation;
 - shadings and patterns;
 - annotation appearance streams;
 - optional content visibility;

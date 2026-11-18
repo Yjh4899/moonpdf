@@ -319,3 +319,21 @@ text. Groups and blend modes can build on the same compositor later.
 
 **Consequence.** `ca`/`CA` alpha works for vector and text painting. Transparency
 groups, non-source-over blend modes and soft masks remain M3 work.
+
+## ADR-021: blend modes over an opaque source-over canvas
+
+**Decision.** Read `/BM` from ExtGState and apply the blend function to the
+source color against the current backdrop before alpha compositing. Support the
+common separable modes; treat unsupported modes as Normal.
+
+**Alternatives.** Implement isolated transparency groups first; render to layers;
+ignore blend modes.
+
+**Why.** Most documents use blend modes on ordinary page content, where the
+backdrop is already opaque. Computing `B(Cb, Cs)` per channel and then doing the
+existing source-over alpha blend is small and composes with `ca`/`CA`. Group
+isolation is a separate problem and can reuse the same functions later.
+
+**Consequence.** Multiply/Screen/Overlay/Darken/Lighten/Dodge/Burn/HardLight/
+SoftLight/Difference/Exclusion work on the main canvas. Non-separable modes and
+isolated groups remain M3 work.

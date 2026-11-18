@@ -52,7 +52,7 @@ PdfPage
 ContentOp[]
   ├─ expand_forms: inline Form XObjects with /Matrix and nested resources
   └─ interpreter
-       ├─ GState stack (CTM, colors, line width, cap, constant alpha)
+       ├─ GState stack (CTM, colors, line width, cap, alpha, blend mode)
        ├─ TextState (text matrix, line matrix, font size, spacing)
        ├─ Path builder (m l c v y re h, curves flattened on insert)
        ├─ paint (fill / stroke / fill+stroke)
@@ -61,6 +61,7 @@ ContentOp[]
 Canvas
   ├─ supersampled scanline fill (nonzero or even-odd)
   ├─ source-over alpha blending for constant `ca`/`CA`
+  ├─ blend modes (`BM`) over the backdrop before alpha compositing
   ├─ stroke as quads + round joins
   └─ box-filter downsample
 

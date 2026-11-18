@@ -9,7 +9,7 @@
 stream, rasterize the page, and write a PNG without a JavaScript VM, a C
 library, or a browser.
 
-Published as [`Yjh4899/moonpdf@0.15.0`](https://mooncakes.io/docs/Yjh4899/moonpdf)
+Published as [`Yjh4899/moonpdf@0.16.0`](https://mooncakes.io/docs/Yjh4899/moonpdf)
 on mooncakes.io.
 
 ## Why this exists
@@ -39,7 +39,7 @@ real pages end to end, including incrementally saved files:
 | Forms | Form XObjects with `/Matrix`, nested resources and `BBox` clip |
 | Images | 8-bit gray/RGB/CMYK, Flate and baseline JPEG, inline images |
 | Text | text state, `Td/TD/Tm/T*`, `Tj/TJ/'/"`, embedded TrueType/CFF/Type1 outlines (with Type1 `seac`), standard-14 AFM metrics and kerning, Type0/CIDFontType2, CID-keyed CFF, embedded and named CJK CMaps, bitmap fallback |
-| Transparency | constant `ca`/`CA` alpha via ExtGState `gs`; blend groups are next |
+| Transparency | constant `ca`/`CA` alpha and `BM` blend modes via ExtGState `gs`; isolation groups are next |
 | Output | RGB PNG with zlib compression |
 
 The target is ISO 32000-1:2008 page rendering. See
@@ -90,6 +90,10 @@ Constant alpha from `ExtGState` (`/ca 0.5`): blue over red produces purple in
 the overlap:
 
 ![Constant alpha](docs/images/alpha.png)
+
+`/BM /Multiply`: yellow × blue becomes black in the overlap:
+
+![Multiply blend mode](docs/images/blend.png)
 
 ## Quick start
 
@@ -148,7 +152,7 @@ Design rules:
 ## Testing
 
 ```sh
-moon test                 # 37 unit and integration tests
+moon test                 # 38 unit and integration tests
 moon run cmd/moonpdf -- fixtures/text.pdf out/text.png --scale 2
 ```
 
@@ -165,7 +169,7 @@ that CI can reproduce every render.
 | M0 (delivered) | file structure, filters, incremental updates, vector graphics |
 | M1 (delivered) | images, inline images, Rotate/CropBox, rectangular clipping |
 | M2 (delivered) | embedded TrueType/CFF/Type1, standard-14 metrics/kerning, Type0/CIDFontType2, CID-keyed CFF, embedded and named CJK CMaps |
-| M3 (current) | constant alpha delivered; clipping paths, blend groups, shadings, annotations, SVG |
+| M3 (current) | constant alpha and blend modes delivered; clipping paths, isolation groups, shadings, annotations, SVG |
 | M4 | corpus SSIM vs MuPDF, performance pass, wasm demo |
 
 The full plan, scope boundaries and acceptance criteria are in
