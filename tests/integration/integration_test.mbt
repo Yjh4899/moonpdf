@@ -286,6 +286,41 @@ test "type0 CIDFontType2 with Identity-H" {
 }
 
 ///|
+test "type1 charstrings" {
+  let font = try! @render.parse_type1(
+    @integration.fixture_bytes("fixtures/fonts/lmr10.pfb"),
+  )
+  let path = try! font.glyph_path("A", @render.Matrix::identity(), 100.0)
+  assert_true(path is Some(_))
+}
+
+///|
+test "type1 font program renders outlines" {
+  let raster = match
+    @integration.rasterize(
+      @integration.fixture_bytes("fixtures/font-type1.pdf"),
+      1.0,
+    ) {
+    Some(raster) => raster
+    None => {
+      assert_true(false)
+      return
+    }
+  }
+  assert_eq(raster.width, 340)
+  assert_eq(raster.height, 150)
+  let mut dark = 0
+  let mut i = 0
+  while i < raster.pixels.length() {
+    if raster.pixels.at(i).to_int() < 128 {
+      dark = dark + 1
+    }
+    i = i + 1
+  }
+  assert_true(dark > 500)
+}
+
+///|
 test "xref stream and object stream fixture" {
   let data = @integration.fixture_bytes("fixtures/xref-stream.pdf")
   let document = try! @pdf.parse_document(data)
