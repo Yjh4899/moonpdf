@@ -147,3 +147,18 @@ first image milestone and is easy to assert in tests.
 
 **Consequence.** Minified images show aliasing; bilinear or area sampling is a
 later quality improvement.
+
+## ADR-011: TrueType outlines rendered through the vector rasterizer
+
+**Decision.** Parse embedded `FontFile2` tables, extract `glyf` contours with
+`cmap`/`hmtx`, and fill them through the existing path rasterizer.
+
+**Alternatives.** Rasterize glyph bitmaps separately; bind to FreeType.
+
+**Why.** The path rasterizer already handles transformed, antialiased fills, so
+glyphs need no second rendering pipeline. Reusing it keeps text and vector art
+visually consistent and avoids an FFI dependency. `cmap` 4/12 covers the common
+Latin and BMP cases; Type1/CFF can feed the same `Path` interface later.
+
+**Consequence.** Text is resolution-independent and transformed with the text
+matrix. Composite glyphs, Type1/CFF and CID/CJK remain fallback cases.

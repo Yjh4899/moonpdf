@@ -21,7 +21,7 @@ The architecture optimizes for four properties:
 | Package | Responsibility | Key files |
 | --- | --- | --- |
 | `pdf/` | syntax, object model, xref chain, filters, page tree, content operators | `types.mbt`, `parse.mbt`, `document.mbt`, `content.mbt`, `filter.mbt` |
-| `render/` | graphics state, paths, scanline raster, text, forms, images, PNG | `geometry.mbt`, `path.mbt`, `canvas.mbt`, `font.mbt`, `image.mbt`, `jpeg.mbt`, `render.mbt`, `png.mbt` |
+| `render/` | graphics state, paths, scanline raster, text/fonts, forms, images, PNG | `geometry.mbt`, `path.mbt`, `canvas.mbt`, `font.mbt`, `pdf_font.mbt`, `truetype.mbt`, `image.mbt`, `jpeg.mbt`, `render.mbt`, `png.mbt` |
 | root | small facade: `page_count`, `render_page_png` | `moonpdf.mbt` |
 | `cmd/moonpdf/` | argument parsing and file I/O | `main.mbt` |
 | `tests/integration/` | end-to-end fixtures: incremental update, xref stream, pixel probes | `lib.mbt`, `integration_test.mbt` |
@@ -134,18 +134,23 @@ objects, no hidden allocation in the inner loop.
 
 ## Text
 
-The first slice ships a hand-written 3×5 bitmap fallback font. It is not a
-substitute for embedded font outlines, but it makes text-bearing fixtures
-readable and keeps layout debugging possible without a font engine. The text
-path already implements:
+`Tf` resolves a `/Font` resource into a `PdfFont`. When the descriptor contains
+a `/FontFile2`, the loader parses the TrueType tables (`cmap` formats 4/12,
+`hmtx`, `loca`, `glyf`) and the renderer fills the glyph contours through the
+same path rasterizer used for vector art. Per-code advances come from the PDF
+`/Widths` array, with `hmtx` used as a fallback when `/Widths` is absent.
+
+The text path implements:
 
 - `Tf`, `Tc`, `Tw`, `Tz`, `TL`, `Ts`
 - `Td`, `TD`, `Tm`, `T*`
 - `Tj`, `TJ`, `'`, `"`
 - per-glyph advance in text space, composed with the CTM
 
-The next milestone replaces the fallback with TrueType `glyf` outline extraction
-and a glyph cache; the interpreter interface stays the same.
+A hand-written 3×5 bitmap fallback remains for fonts without supported outlines
+(standard-14 without widths, Type1/CFF, CID without a cmap). Type1/CFF and
+standard-14 metrics are the remaining M2 work; the interpreter interface does
+not change.
 
 ## Error model
 

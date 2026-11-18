@@ -53,7 +53,7 @@ The public acceptance corpus is:
    unknown content operators follow the PDF rule for unknown operators and are
    counted in the compatibility report.
 
-## Current status (release 0.3.0)
+## Current status (release 0.4.0)
 
 | Area | Current | Gap to target |
 | --- | --- | --- |
@@ -64,10 +64,11 @@ The public acceptance corpus is:
 | paths, fill/stroke, RGB/gray/CMYK | implemented | exact path clipping, dash/miter details |
 | Form XObjects | implemented (expansion, matrix, nested resources, `BBox` clip) | — |
 | images: Flate/gray/RGB/CMYK, baseline DCT, inline images | implemented | progressive DCT, soft masks, 1/2/4-bit samples |
-| embedded Type1/TrueType/CFF fonts | not yet (fallback bitmap) | M2 |
+| embedded TrueType (`FontFile2`), cmap/hmtx/glyf outlines | implemented | Type1/CFF, standard-14 metrics |
+| embedded Type1/CFF fonts | not yet | M2 |
+| CID/CJK fonts | not yet | M2 |
 | transparency, soft masks, shadings, patterns | not yet | M3 |
 | annotation appearance streams, optional content | not yet | M3 |
-| CID/CJK fonts | not yet | M2 |
 
 The gap column is the development plan, not a redefinition of the standard.
 Each milestone is accepted against the same corpus and the same SSIM gate.

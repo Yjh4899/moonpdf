@@ -51,15 +51,19 @@ The incremental page must show the reused blue header and the new green body.
 - Rotation and crop boxes match the expected layout.
 - Unsupported codecs fail with a specific diagnostic.
 
-## M2 — Fonts and text fidelity
+## M2 — Fonts and text fidelity (current)
 
-**Deliverables**
+**Delivered**
 
-- TrueType `glyf` outline extraction and a glyph cache;
-- CFF/Type1 subset;
+- embedded TrueType (`FontFile2`): `cmap` form 4/12, `hmtx` advances, `glyf` outlines;
+- per-code PDF `/Widths`, glyph placement through text and CTM matrices;
+- an embedded-font fixture with pixel assertions.
+
+**Remaining**
+
+- Type1 and CFF outlines (`FontFile`, `FontFile3`);
 - standard-14 metrics fallback;
-- correct text advance and simple kerning;
-- CID/CJK fonts and encodings.
+- kerning and CID/CJK fonts and encodings.
 
 **Acceptance**
 
