@@ -302,3 +302,20 @@ keeping the fixture's Adobe-GB1 CIDs honest.
 **Consequence.** Named horizontal UCS2 CMaps work without external files.
 Vertical writing (`-V`) currently uses horizontal layout; true vertical metrics
 are a later item. UTF-8/UTF-16/UTF-32 named CMaps remain out of scope.
+
+## ADR-020: constant alpha in the canvas compositor
+
+**Decision.** Add a canvas alpha value and source-over blending in `Canvas::set`.
+`gs` reads `/ca` and `/CA` from the ExtGState and sets fill/stroke alpha on the
+graphics state; paint and text apply the corresponding alpha.
+
+**Alternatives.** Render each object to a separate layer and composite; implement
+full transparency groups and blend modes first; ignore alpha.
+
+**Why.** Constant alpha is the most common transparency feature in ordinary
+PDFs. Source-over blending at the pixel level is small, keeps the scanline
+rasterizer unchanged, and gives correct overlap colors for fills, strokes and
+text. Groups and blend modes can build on the same compositor later.
+
+**Consequence.** `ca`/`CA` alpha works for vector and text painting. Transparency
+groups, non-source-over blend modes and soft masks remain M3 work.

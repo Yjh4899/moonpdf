@@ -35,7 +35,7 @@ The concrete reuse fixture is documented in
    compares page hashes in CI, catching layout regressions without a JavaScript
    toolchain.
 
-## Delivered in release 0.14.0
+## Delivered in release 0.15.0
 
 - classic xref tables, xref streams, object streams and hybrid `/XRefStm`;
 - incremental updates: `/Prev` chain, revision overlay, free entries;
@@ -52,6 +52,7 @@ The concrete reuse fixture is documented in
 - CID-keyed CFF (`CIDFontType0`): charset, FDArray/FDSelect, per-FD local subrs;
 - embedded Type0 encoding CMaps (`begincidrange`/`begincidchar`);
 - named Adobe CJK CMaps (`UniGB/UCS2`, `UniJIS/UCS2`, `UniKS/UCS2`, `UniCNS/UCS2`);
+- constant alpha from `ExtGState /ca` and `/CA` (fill/stroke/text);
 - standard-14 ASCII kerning from the Core 14 AFM KernPairs;
 - `/Rotate` 0/90/180/270, `/CropBox`, rectangular `W`/`W*` clip;
 - fill rules, line width and round caps;
@@ -87,8 +88,8 @@ The concrete reuse fixture is documented in
 
 | Metric | Current | Target |
 | --- | --- | --- |
-| Fixture pages rendered end to end | 19/19 | public corpus |
-| Unit + integration tests | 36 | 100+ |
+| Fixture pages rendered end to end | 20/20 | public corpus |
+| Unit + integration tests | 37 | 100+ |
 | Unsupported-feature errors with a typed message | 100% | 100% |
 | Incremental-update fixtures | 1 | every `/Prev` document in corpus |
 | Visual diff vs reference renderer | pixel probes on fixtures | SSIM ≥ 0.95 on 98% of corpus |

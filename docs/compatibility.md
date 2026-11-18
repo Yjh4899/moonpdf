@@ -66,7 +66,8 @@ samples. Image-specific color transforms are part of the image milestone.
 | `Do` (Image XObject) | yes | Flate/RGB/gray/CMYK 8-bit; baseline DCT (JPEG) |
 | `sh` (shading) | next | skipped |
 | `BI ... ID ... EI` | yes | inline dictionary abbreviations, raw/Flate/DCT data |
-| transparency / blend groups | next | always opaque |
+| transparency: constant alpha (`ca`/`CA` via `gs`) | partial | fill/stroke alpha; groups and blend modes next |
+| transparency groups / blend modes | next | always source-over |
 | progressive JPEG (`SOF2`) | next | baseline `SOF0`/`SOF1` only |
 | soft mask (`/SMask`) | next | image alpha is ignored |
 

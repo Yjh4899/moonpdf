@@ -78,7 +78,11 @@ The incremental page must show the reused blue header and the new green body.
 
 ## M3 — Compositing and interactive appearance (current)
 
-**Deliverables**
+**Delivered so far**
+
+- constant fill/stroke/text alpha from `ExtGState /ca` and `/CA`.
+
+**Remaining**
 
 - clipping paths;
 - transparency groups and blend modes;
