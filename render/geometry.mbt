@@ -79,3 +79,21 @@ pub fn Matrix::scale_factor(self : Matrix) -> Double {
   let sy = @math.hypot(self.c, self.d)
   (sx + sy) / 2.0
 }
+
+///|
+/// Inverse affine matrix, or None when the matrix is singular.
+pub fn Matrix::invert(self : Matrix) -> Matrix? {
+  let det = self.a * self.d - self.b * self.c
+  if det > -0.0000001 && det < 0.0000001 {
+    return None
+  }
+  let inv = 1.0 / det
+  Some({
+    a: self.d * inv,
+    b: -self.b * inv,
+    c: -self.c * inv,
+    d: self.a * inv,
+    e: (self.c * self.f - self.d * self.e) * inv,
+    f: (self.b * self.e - self.a * self.f) * inv,
+  })
+}

@@ -6,6 +6,10 @@ import {
 }
 
 // Values
+pub fn decode_image(@pdf.PdfPage, @pdf.PdfStream) -> ImageData raise RenderError
+
+pub fn decode_jpeg(Bytes) -> ImageData raise RenderError
+
 pub fn draw_text(Canvas, Bytes, Matrix, Double, Int32, Int32, Int32) -> Double
 
 pub fn encode_png(RenderedPage) -> Bytes
@@ -24,15 +28,29 @@ pub struct Canvas {
   width : Int32
   height : Int32
   data : Array[Byte]
+  mut clip_x0 : Int32
+  mut clip_y0 : Int32
+  mut clip_x1 : Int32
+  mut clip_y1 : Int32
 }
+pub fn Canvas::clip_rect(Self) -> (Int32, Int32, Int32, Int32)
 pub fn Canvas::downsample(Self, Int32) -> Self
 pub fn Canvas::fill_polygons(Self, Array[Array[Point]], Bool, Int32, Int32, Int32) -> Unit
 pub fn Canvas::height(Self) -> Int32
 pub fn Canvas::new(Int32, Int32, Int32, Int32, Int32) -> Self
+pub fn Canvas::reset_clip(Self, Int32, Int32, Int32, Int32) -> Unit
 pub fn Canvas::set(Self, Int32, Int32, Int32, Int32, Int32) -> Unit
+pub fn Canvas::set_clip(Self, Int32, Int32, Int32, Int32) -> Unit
 pub fn Canvas::stroke_polyline(Self, Array[Point], Bool, Double, Bool, Int32, Int32, Int32) -> Unit
 pub fn Canvas::to_rgb_bytes(Self) -> Bytes
 pub fn Canvas::width(Self) -> Int32
+
+pub struct ImageData {
+  width : Int32
+  height : Int32
+  components : Int32
+  data : Bytes
+}
 
 pub struct Matrix {
   a : Double
@@ -44,6 +62,7 @@ pub struct Matrix {
 }
 pub fn Matrix::apply(Self, Double, Double) -> Point
 pub fn Matrix::identity() -> Self
+pub fn Matrix::invert(Self) -> Self?
 pub fn Matrix::new(Double, Double, Double, Double, Double, Double) -> Self
 pub fn Matrix::rotate(Double) -> Self
 pub fn Matrix::scale(Double, Double) -> Self
@@ -57,6 +76,7 @@ pub struct Path {
   mut current : Array[Point]
   mut current_closed : Bool
 }
+pub fn Path::bbox(Self) -> (Double, Double, Double, Double)?
 pub fn Path::close(Self) -> Unit
 pub fn Path::curve_to(Self, Point, Point, Point) -> Unit
 pub fn Path::finish(Self) -> (Array[Array[Point]], Array[Bool])

@@ -109,6 +109,11 @@ pub fn dict_get(dict : Array[(String, PdfValue)], key : String) -> PdfValue? {
 pub struct PdfPage {
   width : Double
   height : Double
+  crop_x0 : Double
+  crop_y0 : Double
+  crop_x1 : Double
+  crop_y1 : Double
+  rotate : Int32
   contents : Array[Bytes]
   resources : Array[(String, PdfValue)]
   objects : Array[PdfValue?]
@@ -183,4 +188,19 @@ pub fn PdfDocument::resolve_dict(
 /// Construct a real number object for synthesized operands.
 pub fn pdf_real(value : Double) -> PdfValue {
   Real(value)
+}
+
+///|
+/// Construct a name object for synthesized dictionaries.
+pub fn pdf_name(value : String) -> PdfValue {
+  Name(value)
+}
+
+///|
+/// Construct a stream object for an inline image dictionary and its raw bytes.
+pub fn inline_image_stream(
+  dict : Array[(String, PdfValue)],
+  data : Bytes,
+) -> PdfStream {
+  { dict, data, }
 }

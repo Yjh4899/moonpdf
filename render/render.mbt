@@ -40,10 +40,11 @@ priv struct GState {
   mut stroke_b : Int32
   mut line_width : Double
   mut round_cap : Bool
+  mut clip : (Int32, Int32, Int32, Int32)
 }
 
 ///|
-fn GState::initial(ctm : Matrix) -> GState {
+fn GState::initial(ctm : Matrix, clip : (Int32, Int32, Int32, Int32)) -> GState {
   {
     ctm,
     fill_r: 0,
@@ -54,6 +55,7 @@ fn GState::initial(ctm : Matrix) -> GState {
     stroke_b: 0,
     line_width: 1.0,
     round_cap: false,
+    clip,
   }
 }
 
@@ -397,13 +399,50 @@ fn expand_forms(
                 "cm",
               ),
             )
+            match @pdf.dict_get(stream.dict, "BBox") {
+              Some(value) =>
+                match page.resolve(value).as_array() {
+                  Some(items) =>
+                    if items.length() >= 4 {
+                      match
+                        (
+                          items[0].as_number(),
+                          items[1].as_number(),
+                          items[2].as_number(),
+                          items[3].as_number(),
+                        ) {
+                        (Some(bx0), Some(by0), Some(bx1), Some(by1)) =>
+                          if bx1 > bx0 && by1 > by0 {
+                            out.push(
+                              @pdf.content_op(
+                                [
+                                  @pdf.pdf_real(bx0),
+                                  @pdf.pdf_real(by0),
+                                  @pdf.pdf_real(bx1 - bx0),
+                                  @pdf.pdf_real(by1 - by0),
+                                ],
+                                "re",
+                              ),
+                            )
+                            out.push(@pdf.content_op([], "W"))
+                            out.push(@pdf.content_op([], "n"))
+                          }
+                        _ => ()
+                      }
+                    }
+                  None => ()
+                }
+              None => ()
+            }
             for sub in expanded {
               out.push(sub)
             }
             out.push(@pdf.content_op([], "Q"))
+          } else {
+            out.push(op)
           }
         }
-        _ => ()
+        _ => out.push(op)
       }
     } else {
       out.push(op)
@@ -424,7 +463,7 @@ pub fn render_page(
     buf.write_byte(u8(10))
   }
   let ops = @pdf.parse_content_stream(buf.to_bytes()) catch {
-    _ => raise RenderError("failed to parse page content stream")
+    @pdf.PdfError(msg) => raise RenderError("content stream: \{msg}")
   }
   let mut out_w = (page.width * options.scale).to_int()
   let mut out_h = (page.height * options.scale).to_int()
@@ -445,16 +484,50 @@ pub fn render_page(
     options.bg_b,
   )
   let device_scale = options.scale * ss.to_double()
-  let base = Matrix::new(
-    device_scale,
-    0.0,
-    0.0,
-    -device_scale,
-    0.0,
-    page.height * device_scale,
-  )
+  let x0 = page.crop_x0
+  let y0 = page.crop_y0
+  let x1 = page.crop_x1
+  let y1 = page.crop_y1
+  let base = match page.rotate {
+    90 =>
+      Matrix::new(
+        0.0,
+        device_scale,
+        device_scale,
+        0.0,
+        -y0 * device_scale,
+        -x0 * device_scale,
+      )
+    180 =>
+      Matrix::new(
+        -device_scale,
+        0.0,
+        0.0,
+        device_scale,
+        x1 * device_scale,
+        -y0 * device_scale,
+      )
+    270 =>
+      Matrix::new(
+        0.0,
+        -device_scale,
+        -device_scale,
+        0.0,
+        y1 * device_scale,
+        x1 * device_scale,
+      )
+    _ =>
+      Matrix::new(
+        device_scale,
+        0.0,
+        0.0,
+        -device_scale,
+        -x0 * device_scale,
+        y1 * device_scale,
+      )
+  }
   let expanded = expand_forms(page, page.resources, ops, 0)
-  let mut state = GState::initial(base)
+  let mut state = GState::initial(base, canvas.clip_rect())
   let stack : Array[GState] = Array(capacity=8)
   let mut text = TextState::initial()
   let mut path = Path::new()
@@ -463,7 +536,11 @@ pub fn render_page(
       "q" => stack.push(state)
       "Q" =>
         match stack.pop() {
-          Some(previous) => state = previous
+          Some(previous) => {
+            state = previous
+            let (cx0, cy0, cx1, cy1) = previous.clip
+            canvas.reset_clip(cx0, cy0, cx1, cy1)
+          }
           None => ()
         }
       "cm" =>
@@ -619,6 +696,31 @@ pub fn render_page(
           _ => ()
         }
       "h" => path.close()
+      "W" | "W*" =>
+        match path.bbox() {
+          Some((bx0, by0, bx1, by1)) => {
+            let mut nx0 = bx0.to_int()
+            let mut ny0 = by0.to_int()
+            let mut nx1 = bx1.to_int() + 1
+            let mut ny1 = by1.to_int() + 1
+            let (cx0, cy0, cx1, cy1) = state.clip
+            if nx0 < cx0 {
+              nx0 = cx0
+            }
+            if ny0 < cy0 {
+              ny0 = cy0
+            }
+            if nx1 > cx1 {
+              nx1 = cx1
+            }
+            if ny1 > cy1 {
+              ny1 = cy1
+            }
+            state.clip = (nx0, ny0, nx1, ny1)
+            canvas.set_clip(nx0, ny0, nx1, ny1)
+          }
+          None => ()
+        }
       "S" => {
         paint(canvas, state, path, false, true, false, false)
         path = Path::new()
@@ -747,6 +849,40 @@ pub fn render_page(
         match op_string(op, 2) {
           Some(bytes) => show_text(canvas, state, text, bytes)
           None => ()
+        }
+      }
+      "BI" =>
+        match (op.operands.get(0), op.operands.get(1)) {
+          (Some(@pdf.Dict(dict)), Some(@pdf.Str(data))) => {
+            let stream = @pdf.inline_image_stream(dict, data)
+            let image = decode_image(page, stream)
+            draw_image(canvas, state, image)
+          }
+          _ => ()
+        }
+      "Do" => {
+        let name = match op.operands.get(0) {
+          Some(@pdf.Name(name)) => name
+          _ => ""
+        }
+        if name != "" {
+          match lookup_resource(page, page.resources, "XObject", name) {
+            Some(value) =>
+              match value {
+                @pdf.Stream(stream) => {
+                  let subtype = match @pdf.dict_get(stream.dict, "Subtype") {
+                    Some(value) => value.as_name()
+                    None => None
+                  }
+                  if subtype == Some("Image") {
+                    let image = decode_image(page, stream)
+                    draw_image(canvas, state, image)
+                  }
+                }
+                _ => ()
+              }
+            None => ()
+          }
         }
       }
       _ => ()

@@ -508,16 +508,63 @@ fn walk_page_tree(
       if media.length() < 4 {
         raise PdfError("page has no usable MediaBox")
       }
-      let x0 = media.at(0)
-      let y0 = media.at(1)
-      let x1 = media.at(2)
-      let y1 = media.at(3)
-      let width = if x1 > x0 { x1 - x0 } else { 612.0 }
-      let height = if y1 > y0 { y1 - y0 } else { 792.0 }
+      let mx0 = media.at(0)
+      let my0 = media.at(1)
+      let mx1 = media.at(2)
+      let my1 = media.at(3)
+      if mx1 <= mx0 || my1 <= my0 {
+        raise PdfError("page has an empty MediaBox")
+      }
+      // CropBox is optional. Keep it inside the MediaBox so the renderer can
+      // use one consistent origin for crop and rotation.
+      let mut x0 = mx0
+      let mut y0 = my0
+      let mut x1 = mx1
+      let mut y1 = my1
+      match dict_numbers(doc, dict_get(node, "CropBox")) {
+        Some(crop) =>
+          if crop.length() >= 4 {
+            let cx0 = crop.at(0)
+            let cy0 = crop.at(1)
+            let cx1 = crop.at(2)
+            let cy1 = crop.at(3)
+            if cx1 > cx0 && cy1 > cy0 {
+              x0 = if cx0 > mx0 { cx0 } else { mx0 }
+              y0 = if cy0 > my0 { cy0 } else { my0 }
+              x1 = if cx1 < mx1 { cx1 } else { mx1 }
+              y1 = if cy1 < my1 { cy1 } else { my1 }
+            }
+          }
+        None => ()
+      }
+      let mut rotate = match dict_int(node, "Rotate") {
+        Some(r) => (r % 360 + 360) % 360
+        None => 0
+      }
+      if rotate != 90 && rotate != 180 && rotate != 270 {
+        rotate = 0
+      }
+      let raw_width = x1 - x0
+      let raw_height = y1 - y0
+      let width = if rotate == 90 || rotate == 270 {
+        raw_height
+      } else {
+        raw_width
+      }
+      let height = if rotate == 90 || rotate == 270 {
+        raw_width
+      } else {
+        raw_height
+      }
       let contents = collect_contents(doc, dict_get(node, "Contents"))
       let page : PdfPage = {
         width,
         height,
+        crop_x0: x0,
+        crop_y0: y0,
+        crop_x1: x1,
+        crop_y1: y1,
+        rotate,
         contents,
         resources,
         objects: doc.objects,

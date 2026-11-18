@@ -6,6 +6,10 @@ pub struct Canvas {
   width : Int32
   height : Int32
   data : Array[Byte]
+  mut clip_x0 : Int32
+  mut clip_y0 : Int32
+  mut clip_x1 : Int32
+  mut clip_y1 : Int32
 }
 
 ///|
@@ -33,7 +37,15 @@ pub fn Canvas::new(
   b : Int32,
 ) -> Canvas {
   let data : Array[Byte] = Array::make(width * height * 3, u8(255))
-  let canvas = { width, height, data, }
+  let canvas = {
+    width,
+    height,
+    data,
+    clip_x0: 0,
+    clip_y0: 0,
+    clip_x1: width,
+    clip_y1: height,
+  }
   let mut i = 0
   while i < width * height {
     canvas.data[i * 3] = u8(clamp_byte(r))
@@ -63,6 +75,12 @@ pub fn Canvas::set(
   g : Int32,
   b : Int32,
 ) -> Unit {
+  if x < self.clip_x0 ||
+    y < self.clip_y0 ||
+    x >= self.clip_x1 ||
+    y >= self.clip_y1 {
+    return
+  }
   if x < 0 || y < 0 || x >= self.width || y >= self.height {
     return
   }
@@ -315,4 +333,42 @@ pub fn Canvas::downsample(self : Canvas, factor : Int32) -> Canvas {
     y = y + 1
   }
   out
+}
+
+///|
+/// Intersect the current canvas clip with a device-space rectangle.
+pub fn Canvas::set_clip(
+  self : Canvas,
+  x0 : Int32,
+  y0 : Int32,
+  x1 : Int32,
+  y1 : Int32,
+) -> Unit {
+  let nx0 = if x0 > self.clip_x0 { x0 } else { self.clip_x0 }
+  let ny0 = if y0 > self.clip_y0 { y0 } else { self.clip_y0 }
+  let nx1 = if x1 < self.clip_x1 { x1 } else { self.clip_x1 }
+  let ny1 = if y1 < self.clip_y1 { y1 } else { self.clip_y1 }
+  self.clip_x0 = nx0
+  self.clip_y0 = ny0
+  self.clip_x1 = if nx1 > nx0 { nx1 } else { nx0 }
+  self.clip_y1 = if ny1 > ny0 { ny1 } else { ny0 }
+}
+
+///|
+pub fn Canvas::reset_clip(
+  self : Canvas,
+  x0 : Int32,
+  y0 : Int32,
+  x1 : Int32,
+  y1 : Int32,
+) -> Unit {
+  self.clip_x0 = x0
+  self.clip_y0 = y0
+  self.clip_x1 = x1
+  self.clip_y1 = y1
+}
+
+///|
+pub fn Canvas::clip_rect(self : Canvas) -> (Int32, Int32, Int32, Int32) {
+  (self.clip_x0, self.clip_y0, self.clip_x1, self.clip_y1)
 }

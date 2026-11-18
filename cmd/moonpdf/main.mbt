@@ -80,8 +80,8 @@ fn main {
     return
   }
   let png = @lib.render_page_png(data, page - 1, scale) catch {
-    _ => {
-      println("error: failed to render page \{page}")
+    @lib.MoonPdfError(msg) => {
+      println("error: \{msg}")
       return
     }
   }

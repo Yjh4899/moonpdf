@@ -10,6 +10,8 @@ pub fn decode_stream_lossy(PdfStream) -> Bytes
 
 pub fn dict_get(Array[(String, PdfValue)], String) -> PdfValue?
 
+pub fn inline_image_stream(Array[(String, PdfValue)], Bytes) -> PdfStream
+
 pub fn parse_content_stream(Bytes) -> Array[ContentOp] raise PdfError
 
 pub fn parse_document(Bytes) -> PdfDocument raise PdfError
@@ -17,6 +19,8 @@ pub fn parse_document(Bytes) -> PdfDocument raise PdfError
 pub fn parse_indirect_object(Bytes, Int32) -> (Int32, Int32, PdfValue) raise PdfError
 
 pub fn parse_value_from_bytes(Bytes) -> PdfValue raise PdfError
+
+pub fn pdf_name(String) -> PdfValue
 
 pub fn pdf_real(Double) -> PdfValue
 
@@ -44,6 +48,11 @@ pub fn PdfDocument::resolve_dict(Self, PdfValue) -> Array[(String, PdfValue)]
 pub struct PdfPage {
   width : Double
   height : Double
+  crop_x0 : Double
+  crop_y0 : Double
+  crop_x1 : Double
+  crop_y1 : Double
+  rotate : Int32
   contents : Array[Bytes]
   resources : Array[(String, PdfValue)]
   objects : Array[PdfValue?]

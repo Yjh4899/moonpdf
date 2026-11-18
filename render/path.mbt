@@ -118,3 +118,51 @@ pub fn Path::finish(self : Path) -> (Array[Array[Point]], Array[Bool]) {
   self.flush()
   (self.subpaths, self.closed_flags)
 }
+
+///|
+/// Axis-aligned bounds of all points currently in the path. Used for clipping
+/// (`W` / `W*`) and form BBox handling; the clip itself is rectangular for now.
+pub fn Path::bbox(self : Path) -> (Double, Double, Double, Double)? {
+  let mut x0 = 1.0e30
+  let mut y0 = 1.0e30
+  let mut x1 = -1.0e30
+  let mut y1 = -1.0e30
+  let mut found = false
+  for poly in self.subpaths {
+    for p in poly {
+      found = true
+      if p.x < x0 {
+        x0 = p.x
+      }
+      if p.y < y0 {
+        y0 = p.y
+      }
+      if p.x > x1 {
+        x1 = p.x
+      }
+      if p.y > y1 {
+        y1 = p.y
+      }
+    }
+  }
+  for p in self.current {
+    found = true
+    if p.x < x0 {
+      x0 = p.x
+    }
+    if p.y < y0 {
+      y0 = p.y
+    }
+    if p.x > x1 {
+      x1 = p.x
+    }
+    if p.y > y1 {
+      y1 = p.y
+    }
+  }
+  if found {
+    Some((x0, y0, x1, y1))
+  } else {
+    None
+  }
+}

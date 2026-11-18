@@ -32,7 +32,7 @@ pub fn render_page_png(
   }
   let options = @render.RenderOptions::with_scale(scale)
   let raster = @render.render_page(page, options) catch {
-    _ => raise MoonPdfError("failed to render page")
+    @render.RenderError(msg) => raise MoonPdfError(msg)
   }
   @render.encode_png(raster)
 }
