@@ -69,6 +69,7 @@ priv struct TextState {
   mut h_scale : Double
   mut leading : Double
   mut rise : Double
+  mut font : PdfFont?
 }
 
 ///|
@@ -82,6 +83,7 @@ fn TextState::initial() -> TextState {
     h_scale: 1.0,
     leading: 0.0,
     rise: 0.0,
+    font: None,
   }
 }
 
@@ -235,31 +237,94 @@ fn next_line(text : TextState) -> Unit {
 }
 
 ///|
+fn show_text_font(
+  canvas : Canvas,
+  state : GState,
+  text : TextState,
+  bytes : Bytes,
+  font : PdfFont,
+) -> Unit {
+  for b in bytes.to_array() {
+    let code = b.to_int()
+    let full = text.matrix.then(state.ctm)
+    let drawn = match font.tt {
+      Some(tt) => {
+        let glyph = tt.glyph_id(code)
+        if glyph > 0 {
+          draw_glyph(
+            canvas,
+            tt,
+            glyph,
+            full,
+            text.font_size,
+            state.fill_r,
+            state.fill_g,
+            state.fill_b,
+          )
+          true
+        } else {
+          false
+        }
+      }
+      None => false
+    }
+    if !drawn {
+      ignore(
+        draw_text(
+          canvas,
+          Bytes::make(1, b),
+          full,
+          text.font_size,
+          state.fill_r,
+          state.fill_g,
+          state.fill_b,
+        ),
+      )
+    }
+    let mut advance = font.width_for(code).to_double() / 1000.0 * text.font_size +
+      text.char_spacing
+    if code == 32 {
+      advance = advance + text.word_spacing
+    }
+    text.matrix = text.matrix.then(
+      Matrix::translate(advance * text.h_scale, text.rise),
+    )
+  }
+}
+
+///|
 fn show_text(
   canvas : Canvas,
   state : GState,
   text : TextState,
   bytes : Bytes,
 ) -> Unit {
-  let full = text.matrix.then(state.ctm)
-  let advance = draw_text(
-    canvas,
-    bytes,
-    full,
-    text.font_size,
-    state.fill_r,
-    state.fill_g,
-    state.fill_b,
-  )
-  let mut extra = 0.0
-  for b in bytes.to_array() {
-    if b.to_int() == 32 {
-      extra = extra + text.word_spacing
+  match text.font {
+    Some(font) => show_text_font(canvas, state, text, bytes, font)
+    None => {
+      let full = text.matrix.then(state.ctm)
+      let advance = draw_text(
+        canvas,
+        bytes,
+        full,
+        text.font_size,
+        state.fill_r,
+        state.fill_g,
+        state.fill_b,
+      )
+      let mut extra = 0.0
+      for b in bytes.to_array() {
+        if b.to_int() == 32 {
+          extra = extra + text.word_spacing
+        }
+      }
+      let total = advance +
+        bytes.length().to_double() * text.char_spacing +
+        extra
+      let tx = total * text.h_scale
+      text.matrix = text.matrix.then(Matrix::translate(tx, text.rise))
     }
   }
-  let total = advance + bytes.length().to_double() * text.char_spacing + extra
-  let tx = total * text.h_scale
-  text.matrix = text.matrix.then(Matrix::translate(tx, text.rise))
 }
 
 ///|
@@ -756,11 +821,24 @@ pub fn render_page(
       "n" => path = Path::new()
       "BT" => text = TextState::initial()
       "ET" => ()
-      "Tf" =>
+      "Tf" => {
         match op_number(op, 1) {
           Some(size) => text.font_size = size
           None => ()
         }
+        let name = match op.operands.get(0) {
+          Some(@pdf.Name(name)) => name
+          _ => ""
+        }
+        if name == "" {
+          text.font = None
+        } else {
+          match lookup_resource(page, page.resources, "Font", name) {
+            Some(value) => text.font = load_pdf_font(page, value)
+            None => text.font = None
+          }
+        }
+      }
       "Tc" =>
         match op_number(op, 0) {
           Some(v) => text.char_spacing = v

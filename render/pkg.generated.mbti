@@ -10,9 +10,15 @@ pub fn decode_image(@pdf.PdfPage, @pdf.PdfStream) -> ImageData raise RenderError
 
 pub fn decode_jpeg(Bytes) -> ImageData raise RenderError
 
+pub fn draw_glyph(Canvas, TrueTypeFont, Int32, Matrix, Double, Int32, Int32, Int32) -> Unit
+
 pub fn draw_text(Canvas, Bytes, Matrix, Double, Int32, Int32, Int32) -> Double
 
 pub fn encode_png(RenderedPage) -> Bytes
+
+pub fn load_pdf_font(@pdf.PdfPage, @pdf.PdfValue) -> PdfFont?
+
+pub fn parse_truetype(Bytes) -> TrueTypeFont raise RenderError
 
 pub fn point(Double, Double) -> Point
 
@@ -44,6 +50,12 @@ pub fn Canvas::set_clip(Self, Int32, Int32, Int32, Int32) -> Unit
 pub fn Canvas::stroke_polyline(Self, Array[Point], Bool, Double, Bool, Int32, Int32, Int32) -> Unit
 pub fn Canvas::to_rgb_bytes(Self) -> Bytes
 pub fn Canvas::width(Self) -> Int32
+
+pub struct FontPoint {
+  x : Double
+  y : Double
+  on_curve : Bool
+}
 
 pub struct ImageData {
   width : Int32
@@ -86,6 +98,19 @@ pub fn Path::new() -> Self
 pub fn Path::quad_to(Self, Point, Point) -> Unit
 pub fn Path::rect(Self, Double, Double, Double, Double) -> Unit
 
+pub struct PdfFont {
+  base_name : String
+  tt : TrueTypeFont?
+  widths : Array[Int32]
+  first_char : Int32
+  missing_width : Int32
+  ascent : Double
+  descent : Double
+}
+pub fn PdfFont::ascent(Self) -> Double
+pub fn PdfFont::descent(Self) -> Double
+pub fn PdfFont::width_for(Self, Int32) -> Int32
+
 pub struct Point {
   x : Double
   y : Double
@@ -106,6 +131,31 @@ pub struct RenderedPage {
   height : Int32
   pixels : Bytes
 }
+
+pub struct TrueTypeFont {
+  data : Bytes
+  units_per_em : Int32
+  num_glyphs : Int32
+  loca : Array[Int32]
+  glyf_offset : Int32
+  hmtx_offset : Int32
+  num_h_metrics : Int32
+  ascent : Int32
+  descent : Int32
+  cmap_format : Int32
+  cmap_sub : Int32
+  seg_end : Array[Int32]
+  seg_start : Array[Int32]
+  seg_delta : Array[Int32]
+  seg_range_pos : Array[Int32]
+  groups : Array[(Int32, Int32, Int32)]
+}
+pub fn TrueTypeFont::advance_width(Self, Int32) -> Int32
+pub fn TrueTypeFont::ascent(Self) -> Int32
+pub fn TrueTypeFont::descent(Self) -> Int32
+pub fn TrueTypeFont::glyph_contours(Self, Int32) -> Array[Array[FontPoint]] raise RenderError
+pub fn TrueTypeFont::glyph_id(Self, Int32) -> Int32
+pub fn TrueTypeFont::units_per_em(Self) -> Int32
 
 // Type aliases
 
