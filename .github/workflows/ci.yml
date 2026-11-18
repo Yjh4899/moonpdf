@@ -48,6 +48,7 @@ jobs:
           moon run --target native cmd/moonpdf -- fixtures/font-type1.pdf out/font-type1.png --scale 2
           moon run --target native cmd/moonpdf -- fixtures/font-cid-cff.pdf out/font-cid-cff.png --scale 2
           moon run --target native cmd/moonpdf -- fixtures/font-cid-cmap.pdf out/font-cid-cmap.png --scale 2
+          moon run --target native cmd/moonpdf -- fixtures/font-named-cmap.pdf out/font-named-cmap.png --scale 2
 
       - name: Verify PNG output and reused-resource pixels
         run: |
@@ -99,6 +100,7 @@ jobs:
               "font-type1.png": (680, 300),
               "font-cid-cff.png": (600, 300),
               "font-cid-cmap.png": (600, 300),
+              "font-named-cmap.png": (600, 300),
           }
           for name, size in expected.items():
               width, height, raw, stride = read_png(Path("out") / name)
@@ -217,6 +219,16 @@ jobs:
                       dark += 1
           assert dark > 3000, dark
           print("CID CMap dark pixels", dark)
+
+          # Named Adobe CJK CMap (UniGB-UCS2-H) mapped to Adobe-GB1 CIDs.
+          width, height, raw, stride = read_png(Path("out/font-named-cmap.png"))
+          dark = 0
+          for y in range(height):
+              for x in range(width):
+                  if pixel(raw, stride, x, y)[0] < 128:
+                      dark += 1
+          assert dark > 3000, dark
+          print("named CMap dark pixels", dark)
           PY
 
       - name: Upload rendered pages
