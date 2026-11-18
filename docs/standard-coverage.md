@@ -53,7 +53,7 @@ The public acceptance corpus is:
    unknown content operators follow the PDF rule for unknown operators and are
    counted in the compatibility report.
 
-## Current status (release 0.8.0)
+## Current status (release 0.9.0)
 
 | Area | Current | Gap to target |
 | --- | --- | --- |
@@ -64,11 +64,11 @@ The public acceptance corpus is:
 | paths, fill/stroke, RGB/gray/CMYK | implemented | exact path clipping, dash/miter details |
 | Form XObjects | implemented (expansion, matrix, nested resources, `BBox` clip) | — |
 | images: Flate/gray/RGB/CMYK, baseline DCT, inline images | implemented | progressive DCT, soft masks, 1/2/4-bit samples |
-| embedded TrueType (`FontFile2`), cmap/hmtx/simple+composite glyf outlines | implemented | Type1 |
+| embedded TrueType (`FontFile2`), cmap/hmtx/simple+composite glyf outlines | implemented | — |
 | standard-14 metrics (Helvetica/Times/Courier AFM widths) | implemented | Symbol/ZapfDingbats |
 | embedded CFF (`FontFile3` Type1C, non-CID) Type 2 charstrings | implemented | CID-keyed CFF |
 | Type0 / CIDFontType2, Identity-H, `/CIDToGIDMap` | implemented | CID-keyed CFF, CJK encodings |
-| embedded Type1 (`FontFile`) | not yet | M2 |
+| embedded Type1 (`FontFile`) PFB/PFA charstrings | implemented | `seac` accents, CID-keyed CFF |
 | CID/CJK fonts | not yet | M2 |
 | transparency, soft masks, shadings, patterns | not yet | M3 |
 | annotation appearance streams, optional content | not yet | M3 |

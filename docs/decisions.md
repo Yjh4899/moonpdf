@@ -215,3 +215,21 @@ the glyph outline is obtained.
 **Consequence.** Type0/CIDFontType2 documents render without a Unicode `cmap`;
 the fixture uses Latin glyphs to exercise the CID path. CID-keyed CFF and CJK
 encoding CMaps remain next.
+
+## ADR-015: Type1 PFB/PFA before CID-keyed CFF
+
+**Decision.** Parse `/FontFile` Type 1 programs, decrypt eexec and charstrings,
+interpret Type 1 drawing operators, and map simple-font codes to Type 1 glyph
+names.
+
+**Alternatives.** Skip Type 1 as legacy; convert Type 1 to CFF at build time;
+rely on external tools.
+
+**Why.** Older PDFs still embed Type 1 fonts, and the Type 1 charstring language
+is close enough to Type 2 that one more small interpreter completes the simple
+font matrix. PFB/PFA parsing is self-contained and does not add a dependency.
+`seac` is handled by drawing the base glyph; the accent is a later refinement.
+
+**Consequence.** Type 1 PFB/PFA fonts render with their own outlines. Charstring
+encodings other than StandardEncoding (via `/Encoding` Differences) and `seac`
+accents remain next, along with CID-keyed CFF/CJK.
