@@ -40,6 +40,8 @@ priv struct GState {
   mut stroke_b : Int32
   mut line_width : Double
   mut round_cap : Bool
+  mut fill_alpha : Double
+  mut stroke_alpha : Double
   mut clip : (Int32, Int32, Int32, Int32)
 }
 
@@ -55,6 +57,8 @@ fn GState::initial(ctm : Matrix, clip : (Int32, Int32, Int32, Int32)) -> GState 
     stroke_b: 0,
     line_width: 1.0,
     round_cap: false,
+    fill_alpha: 1.0,
+    stroke_alpha: 1.0,
     clip,
   }
 }
@@ -84,6 +88,18 @@ fn TextState::initial() -> TextState {
     leading: 0.0,
     rise: 0.0,
     font: None,
+  }
+}
+
+///|
+fn alpha_component(value : Double) -> Int32 {
+  let v = value * 255.0
+  if v <= 0.0 {
+    0
+  } else if v >= 255.0 {
+    255
+  } else {
+    v.to_int()
   }
 }
 
@@ -203,6 +219,7 @@ fn paint(
   }
   let (subpaths, closed) = path.finish()
   if fill {
+    canvas.set_alpha(alpha_component(state.fill_alpha))
     canvas.fill_polygons(
       subpaths,
       even_odd,
@@ -212,6 +229,7 @@ fn paint(
     )
   }
   if stroke {
+    canvas.set_alpha(alpha_component(state.stroke_alpha))
     let mut i = 0
     while i < subpaths.length() {
       canvas.stroke_polyline(
@@ -244,6 +262,7 @@ fn show_text_font(
   bytes : Bytes,
   font : PdfFont,
 ) -> Unit {
+  canvas.set_alpha(alpha_component(state.fill_alpha))
   let codes : Array[Int32] = []
   let raw = bytes.to_array()
   if font.two_byte {
@@ -388,6 +407,7 @@ fn show_text(
   match text.font {
     Some(font) => show_text_font(canvas, state, text, bytes, font)
     None => {
+      canvas.set_alpha(alpha_component(state.fill_alpha))
       let full = text.matrix.then(state.ctm)
       let advance = draw_text(
         canvas,
@@ -694,6 +714,36 @@ pub fn render_page(
           }
           None => ()
         }
+      "gs" => {
+        let name = match op.operands.get(0) {
+          Some(@pdf.Name(name)) => name
+          _ => ""
+        }
+        if name != "" {
+          match lookup_resource(page, page.resources, "ExtGState", name) {
+            Some(value) => {
+              let dict = page.resolve_dict(value)
+              match @pdf.dict_get(dict, "ca") {
+                Some(number) =>
+                  match page.resolve(number).as_number() {
+                    Some(alpha) => state.fill_alpha = alpha
+                    None => ()
+                  }
+                None => ()
+              }
+              match @pdf.dict_get(dict, "CA") {
+                Some(number) =>
+                  match page.resolve(number).as_number() {
+                    Some(alpha) => state.stroke_alpha = alpha
+                    None => ()
+                  }
+                None => ()
+              }
+            }
+            None => ()
+          }
+        }
+      }
       "cm" =>
         match
           (
@@ -1040,6 +1090,7 @@ pub fn render_page(
                   }
                   if subtype == Some("Image") {
                     let image = decode_image(page, stream)
+                    canvas.set_alpha(255)
                     draw_image(canvas, state, image)
                   }
                 }

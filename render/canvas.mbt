@@ -10,6 +10,7 @@ pub struct Canvas {
   mut clip_y0 : Int32
   mut clip_x1 : Int32
   mut clip_y1 : Int32
+  mut alpha : Int32
 }
 
 ///|
@@ -45,6 +46,7 @@ pub fn Canvas::new(
     clip_y0: 0,
     clip_x1: width,
     clip_y1: height,
+    alpha: 255,
   }
   let mut i = 0
   while i < width * height {
@@ -85,9 +87,28 @@ pub fn Canvas::set(
     return
   }
   let idx = (y * self.width + x) * 3
-  self.data[idx] = u8(clamp_byte(r))
-  self.data[idx + 1] = u8(clamp_byte(g))
-  self.data[idx + 2] = u8(clamp_byte(b))
+  let a = self.alpha
+  if a >= 255 {
+    self.data[idx] = u8(clamp_byte(r))
+    self.data[idx + 1] = u8(clamp_byte(g))
+    self.data[idx + 2] = u8(clamp_byte(b))
+  } else if a > 0 {
+    let inverse = 255 - a
+    self.data[idx] = u8(
+      (clamp_byte(r) * a + self.data[idx].to_int() * inverse) / 255,
+    )
+    self.data[idx + 1] = u8(
+      (clamp_byte(g) * a + self.data[idx + 1].to_int() * inverse) / 255,
+    )
+    self.data[idx + 2] = u8(
+      (clamp_byte(b) * a + self.data[idx + 2].to_int() * inverse) / 255,
+    )
+  }
+}
+
+///|
+pub fn Canvas::set_alpha(self : Canvas, alpha : Int32) -> Unit {
+  self.alpha = if alpha < 0 { 0 } else if alpha > 255 { 255 } else { alpha }
 }
 
 ///|
