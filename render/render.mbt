@@ -247,10 +247,17 @@ fn show_text_font(
   let codes : Array[Int32] = []
   let raw = bytes.to_array()
   if font.two_byte {
+    let step = if font.code_bytes > 0 { font.code_bytes } else { 2 }
     let mut i = 0
-    while i + 1 < raw.length() {
-      codes.push((raw[i].to_int() << 8) | raw[i + 1].to_int())
-      i = i + 2
+    while i + step <= raw.length() {
+      let mut code = 0
+      let mut j = 0
+      while j < step {
+        code = (code << 8) | raw[i + j].to_int()
+        j = j + 1
+      }
+      codes.push(code)
+      i = i + step
     }
   } else {
     for b in raw {
@@ -345,7 +352,9 @@ fn show_text_font(
         ),
       )
     }
-    let mut advance = font.width_for(code).to_double() / 1000.0 * text.font_size +
+    let mut advance = font.width_for(font.cid_for_code(code)).to_double() /
+      1000.0 *
+      text.font_size +
       text.char_spacing
     if code == 32 {
       advance = advance + text.word_spacing

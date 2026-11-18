@@ -24,6 +24,8 @@ pub fn load_pdf_font(@pdf.PdfPage, @pdf.PdfValue) -> PdfFont?
 
 pub fn parse_cff(Bytes) -> CffFont raise RenderError
 
+pub fn parse_cmap_data(Bytes) -> ParsedCMap raise RenderError
+
 pub fn parse_truetype(Bytes) -> TrueTypeFont raise RenderError
 
 pub fn parse_type1(Bytes) -> Type1Font raise RenderError
@@ -114,6 +116,11 @@ pub fn Matrix::scale_factor(Self) -> Double
 pub fn Matrix::then(Self, Self) -> Self
 pub fn Matrix::translate(Double, Double) -> Self
 
+pub struct ParsedCMap {
+  code_bytes : Int32
+  map : Array[(Int32, Int32)]
+}
+
 pub struct Path {
   subpaths : Array[Array[Point]]
   closed_flags : Array[Bool]
@@ -138,6 +145,8 @@ pub struct PdfFont {
   widths : Array[Int32]
   cid_widths : Array[(Int32, Int32)]
   cid_to_gid : Array[Int32]?
+  code_to_cid : Array[(Int32, Int32)]
+  code_bytes : Int32
   two_byte : Bool
   first_char : Int32
   missing_width : Int32
@@ -146,6 +155,7 @@ pub struct PdfFont {
   standard : Bool
 }
 pub fn PdfFont::ascent(Self) -> Double
+pub fn PdfFont::cid_for_code(Self, Int32) -> Int32
 pub fn PdfFont::descent(Self) -> Double
 pub fn PdfFont::glyph_for_code(Self, Int32) -> Int32
 pub fn PdfFont::width_for(Self, Int32) -> Int32

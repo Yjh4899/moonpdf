@@ -9,6 +9,8 @@ pub struct PdfFont {
   widths : Array[Int32]
   cid_widths : Array[(Int32, Int32)]
   cid_to_gid : Array[Int32]?
+  code_to_cid : Array[(Int32, Int32)]
+  code_bytes : Int32
   two_byte : Bool
   first_char : Int32
   missing_width : Int32
@@ -177,6 +179,26 @@ fn parse_cid_to_gid(
 }
 
 ///|
+fn parse_type0_encoding(
+  page : @pdf.PdfPage,
+  dict : Array[(String, @pdf.PdfValue)],
+) -> (Int32, Array[(Int32, Int32)]) {
+  match @pdf.dict_get(dict, "Encoding") {
+    Some(@pdf.Name("Identity-H")) => (2, [])
+    Some(value) =>
+      match page.resolve(value) {
+        @pdf.Stream(stream) => {
+          let data = @pdf.decode_stream(stream) catch { _ => return (2, []) }
+          let cmap = parse_cmap_data(data) catch { _ => return (2, []) }
+          (cmap.code_bytes, cmap.map)
+        }
+        _ => (2, [])
+      }
+    None => (2, [])
+  }
+}
+
+///|
 fn load_type0_font(
   page : @pdf.PdfPage,
   dict : Array[(String, @pdf.PdfValue)],
@@ -224,6 +246,7 @@ fn load_type0_font(
   }
   let cid_widths = parse_cid_widths(page, descendant, default_width)
   let cid_to_gid = parse_cid_to_gid(page, descendant)
+  let (code_bytes, code_to_cid) = parse_type0_encoding(page, dict)
   let (ascent, descent) = match tt {
     Some(font) =>
       (
@@ -240,6 +263,8 @@ fn load_type0_font(
     widths: [],
     cid_widths,
     cid_to_gid,
+    code_to_cid,
+    code_bytes,
     two_byte: true,
     first_char: 0,
     missing_width: default_width,
@@ -361,6 +386,8 @@ pub fn load_pdf_font(page : @pdf.PdfPage, value : @pdf.PdfValue) -> PdfFont? {
     widths,
     cid_widths: [],
     cid_to_gid: None,
+    code_to_cid: [],
+    code_bytes: 1,
     two_byte: false,
     first_char,
     missing_width,
@@ -394,14 +421,27 @@ pub fn PdfFont::width_for(self : PdfFont, code : Int32) -> Int32 {
 }
 
 ///|
+pub fn PdfFont::cid_for_code(self : PdfFont, code : Int32) -> Int32 {
+  if self.two_byte {
+    for entry in self.code_to_cid {
+      if entry.0 == code {
+        return entry.1
+      }
+    }
+  }
+  code
+}
+
+///|
 pub fn PdfFont::glyph_for_code(self : PdfFont, code : Int32) -> Int32 {
   if self.two_byte {
+    let cid = self.cid_for_code(code)
     match self.cid_to_gid {
-      Some(map) => if code >= 0 && code < map.length() { map[code] } else { 0 }
+      Some(map) => if cid >= 0 && cid < map.length() { map[cid] } else { 0 }
       None =>
         match self.cff {
-          Some(cff) => cff.glyph_for_cid(code)
-          None => code
+          Some(cff) => cff.glyph_for_cid(cid)
+          None => cid
         }
     }
   } else {
