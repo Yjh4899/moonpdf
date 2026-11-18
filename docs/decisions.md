@@ -197,3 +197,21 @@ positions without adding an external font.
 **Consequence.** Standard-14 text lines now have correct advances. Glyphs remain
 the 3×5 fallback and are squeezed for narrow characters; Symbol and ZapfDingbats
 are not covered.
+
+## ADR-014: Type0/CIDFontType2 before CID-keyed CFF
+
+**Decision.** Implement Type0 fonts with `/Identity-H`, a CIDFontType2
+descendant, two-byte codes, `/W`/`/DW` advances and `/CIDToGIDMap`. Resolve the
+CID to a TrueType glyph id and draw it through the existing `glyf` path.
+
+**Alternatives.** Start with CID-keyed CFF; map CJK Unicode through `cmap`;
+convert CID fonts to simple fonts in the fixture generator.
+
+**Why.** CIDFontType2 is the common CJK TrueType subset layout and needs no CFF
+charset/FDSelect machinery. Handling two-byte codes and CID-to-GID mapping
+first also prepares the text engine for CID-keyed CFF, which differs only in how
+the glyph outline is obtained.
+
+**Consequence.** Type0/CIDFontType2 documents render without a Unicode `cmap`;
+the fixture uses Latin glyphs to exercise the CID path. CID-keyed CFF and CJK
+encoding CMaps remain next.

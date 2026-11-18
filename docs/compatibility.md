@@ -83,7 +83,8 @@ samples. Image-specific color transforms are part of the image milestone.
 | embedded CFF (`FontFile3` Type1C, non-CID) | yes | CFF INDEX/DICT and Type 2 charstrings |
 | embedded Type1 (`FontFile`) | next | falls back to the bitmap font |
 | standard 14 font metrics | yes | AFM widths for Helvetica/Times/Courier; bitmap glyphs |
-| CID / CJK fonts | next | milestone M2 |
+| Type0 / CIDFontType2 (`Identity-H`, `/CIDToGIDMap`) | yes | two-byte codes, `/W` and `/DW` widths |
+| CID-keyed CFF / CJK encodings | next | milestone M2 |
 | vertical writing mode | next | ignored |
 
 ## Output

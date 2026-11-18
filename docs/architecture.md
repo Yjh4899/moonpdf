@@ -139,8 +139,11 @@ a `/FontFile2`, the loader parses the TrueType tables (`cmap` formats 4/12,
 `hmtx`, `loca`, simple and composite `glyf`) and the renderer fills the glyph
 contours through the same path rasterizer used for vector art. A `/FontFile3`
 Type1C stream goes through the CFF reader (INDEX/DICT and Type 2 charstrings)
-and joins the same path pipeline. Per-code advances come from the PDF `/Widths` array, with `hmtx`
-used as a fallback when `/Widths` is absent.
+and joins the same path pipeline. A Type0 font resolves its `DescendantFonts`
+CIDFontType2 dictionary, decodes two-byte Identity-H codes, maps CIDs through
+`/CIDToGIDMap`, and reads advances from `/W`/`/DW`. Per-code advances for simple
+fonts come from the PDF `/Widths` array, with `hmtx` used as a fallback when
+`/Widths` is absent.
 
 The text path implements:
 

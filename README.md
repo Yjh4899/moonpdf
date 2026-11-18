@@ -9,7 +9,7 @@
 stream, rasterize the page, and write a PNG without a JavaScript VM, a C
 library, or a browser.
 
-Published as [`Yjh4899/moonpdf@0.7.0`](https://mooncakes.io/docs/Yjh4899/moonpdf)
+Published as [`Yjh4899/moonpdf@0.8.0`](https://mooncakes.io/docs/Yjh4899/moonpdf)
 on mooncakes.io.
 
 ## Why this exists
@@ -38,7 +38,7 @@ real pages end to end, including incrementally saved files:
 | Clip | rectangular `W` / `W*`, Form `BBox` |
 | Forms | Form XObjects with `/Matrix`, nested resources and `BBox` clip |
 | Images | 8-bit gray/RGB/CMYK, Flate and baseline JPEG, inline images |
-| Text | text state, `Td/TD/Tm/T*`, `Tj/TJ/'/"`, embedded TrueType/CFF outlines, standard-14 AFM metrics, bitmap fallback |
+| Text | text state, `Td/TD/Tm/T*`, `Tj/TJ/'/"`, embedded TrueType/CFF outlines, standard-14 AFM metrics, Type0/CIDFontType2, bitmap fallback |
 | Output | RGB PNG with zlib compression |
 
 The target is ISO 32000-1:2008 page rendering. See
@@ -46,9 +46,9 @@ The target is ISO 32000-1:2008 page rendering. See
 target and corpus gate, and [`docs/incremental-updates.md`](docs/incremental-updates.md)
 for the `/Prev` algorithm and the reused-resource fixture.
 
-Still missing, and tracked as milestones: Type1 fonts, CID/CJK, progressive JPEG
-and soft masks, transparency, shadings and annotation appearance streams. See
-[`docs/compatibility.md`](docs/compatibility.md).
+Still missing, and tracked as milestones: Type1 fonts, CID-keyed CFF and CJK
+encoding CMaps, progressive JPEG and soft masks, transparency, shadings and
+annotation appearance streams. See [`docs/compatibility.md`](docs/compatibility.md).
 
 ![MoonPDF rendering a fixture](docs/images/demo.png)
 
@@ -70,6 +70,11 @@ advances:
 Embedded Source Sans 3 (OFL) rendered from CFF Type 2 charstrings:
 
 ![Embedded CFF font](docs/images/font-cff.png)
+
+Type0 / `CIDFontType2` with Identity-H, two-byte codes and an explicit
+`/CIDToGIDMap`:
+
+![Type0 CID font](docs/images/font-cid.png)
 
 ## Quick start
 
@@ -128,7 +133,7 @@ Design rules:
 ## Testing
 
 ```sh
-moon test                 # 29 unit and integration tests
+moon test                 # 30 unit and integration tests
 moon run cmd/moonpdf -- fixtures/text.pdf out/text.png --scale 2
 ```
 
@@ -144,7 +149,7 @@ that CI can reproduce every render.
 | --- | --- |
 | M0 (delivered) | file structure, filters, incremental updates, vector graphics |
 | M1 (delivered) | images, inline images, Rotate/CropBox, rectangular clipping |
-| M2 (current) | embedded TrueType/CFF and standard-14 metrics delivered; Type1, CID/CJK |
+| M2 (current) | embedded TrueType/CFF, standard-14 metrics and Type0/CIDFontType2 delivered; Type1, CID CFF |
 | M3 | transparency, shadings, annotation appearance, SVG |
 | M4 | corpus SSIM vs MuPDF, performance pass, wasm demo |
 

@@ -58,13 +58,15 @@ The incremental page must show the reused blue header and the new green body.
 - embedded TrueType (`FontFile2`): `cmap` form 4/12, `hmtx` advances, simple and composite `glyf` outlines;
 - embedded CFF (`FontFile3` Type1C, non-CID): INDEX/DICT and Type 2 charstrings;
 - standard-14 Helvetica/Times/Courier metrics from the Adobe Core 14 AFMs;
+- Type0 / CIDFontType2 with Identity-H, `/W` widths and `/CIDToGIDMap`;
 - per-code PDF `/Widths`, glyph placement through text and CTM matrices;
 - embedded-font fixtures with pixel assertions.
 
 **Remaining**
 
 - Type1 outlines (`FontFile`);
-- kerning and CID/CJK fonts and encodings.
+- CID-keyed CFF and CJK encoding CMaps;
+- kerning.
 
 **Acceptance**
 
