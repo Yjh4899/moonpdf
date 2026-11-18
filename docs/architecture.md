@@ -21,7 +21,7 @@ The architecture optimizes for four properties:
 | Package | Responsibility | Key files |
 | --- | --- | --- |
 | `pdf/` | syntax, object model, xref chain, filters, page tree, content operators | `types.mbt`, `parse.mbt`, `document.mbt`, `content.mbt`, `filter.mbt` |
-| `render/` | graphics state, path flattening, scanline raster, fallback text, forms, PNG | `geometry.mbt`, `path.mbt`, `canvas.mbt`, `font.mbt`, `render.mbt`, `png.mbt` |
+| `render/` | graphics state, paths, scanline raster, text, forms, images, PNG | `geometry.mbt`, `path.mbt`, `canvas.mbt`, `font.mbt`, `image.mbt`, `jpeg.mbt`, `render.mbt`, `png.mbt` |
 | root | small facade: `page_count`, `render_page_png` | `moonpdf.mbt` |
 | `cmd/moonpdf/` | argument parsing and file I/O | `main.mbt` |
 | `tests/integration/` | end-to-end fixtures: incremental update, xref stream, pixel probes | `lib.mbt`, `integration_test.mbt` |
@@ -55,7 +55,8 @@ ContentOp[]
        ├─ GState stack (CTM, colors, line width, cap)
        ├─ TextState (text matrix, line matrix, font size, spacing)
        ├─ Path builder (m l c v y re h, curves flattened on insert)
-       └─ paint (fill / stroke / fill+stroke)
+       ├─ paint (fill / stroke / fill+stroke)
+       └─ Do: Form expansion, image XObject, inline image
 
 Canvas
   ├─ supersampled scanline fill (nonzero or even-odd)

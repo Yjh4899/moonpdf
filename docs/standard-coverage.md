@@ -53,17 +53,17 @@ The public acceptance corpus is:
    unknown content operators follow the PDF rule for unknown operators and are
    counted in the compatibility report.
 
-## Current status (release 0.2.0)
+## Current status (release 0.3.0)
 
 | Area | Current | Gap to target |
 | --- | --- | --- |
 | classic xref, xref streams, object streams, hybrid `/XRefStm` | implemented | — |
 | incremental updates (`/Prev`, free entries, revision overlay) | implemented | — |
 | Flate, ASCIIHex, ASCII85, RunLength, LZW filters | implemented | image-specific codecs |
-| page tree, inherited `MediaBox`/`Resources` | implemented | `/Rotate`, `/CropBox` |
-| paths, fill/stroke, RGB/gray/CMYK | implemented | clipping, dash/miter details |
-| Form XObjects | implemented (expansion, matrix, nested resources) | `BBox` clipping |
-| images, inline images | not yet | M1 |
+| page tree, inherited `MediaBox`/`Resources`, `/Rotate`, `/CropBox` | implemented | `BBox`/`CropBox` edge cases |
+| paths, fill/stroke, RGB/gray/CMYK | implemented | exact path clipping, dash/miter details |
+| Form XObjects | implemented (expansion, matrix, nested resources, `BBox` clip) | — |
+| images: Flate/gray/RGB/CMYK, baseline DCT, inline images | implemented | progressive DCT, soft masks, 1/2/4-bit samples |
 | embedded Type1/TrueType/CFF fonts | not yet (fallback bitmap) | M2 |
 | transparency, soft masks, shadings, patterns | not yet | M3 |
 | annotation appearance streams, optional content | not yet | M3 |

@@ -46,8 +46,8 @@ samples. Image-specific color transforms are part of the image milestone.
 | `/Pages` → `/Kids` recursion | yes | arbitrary depth |
 | inherited `/MediaBox` | yes | default Letter if absent |
 | inherited `/Resources` | yes | page-local overrides parent |
-| `/Rotate` | next | page rotation is ignored |
-| `/CropBox` | next | `MediaBox` is used |
+| `/Rotate` | yes | 0/90/180/270; output dimensions swap for 90/270 |
+| `/CropBox` | yes | intersected with `MediaBox`; used as the render origin |
 | multiple content streams | yes | concatenated in order |
 | content stream filters | yes | decoded before parsing |
 
@@ -59,14 +59,16 @@ samples. Image-specific color transforms are part of the image milestone.
 | `w`, `J`, `j`, `M`, `d` | partial | width and cap; join/miter/dash stored but not applied |
 | `m`, `l`, `c`, `v`, `y`, `re`, `h` | yes | curves flattened at 16 segments |
 | `S`, `s`, `f`, `F`, `f*`, `B`, `B*`, `b`, `b*`, `n` | yes | nonzero and even-odd |
-| `W`, `W*` (clip) | next | ignored |
+| `W`, `W*` (clip) | partial | rectangular path bounds; exact path clipping is next |
 | `g`, `G`, `rg`, `RG`, `k`, `K` | yes | gray, RGB, CMYK → RGB |
 | `cs`, `CS`, `sc`, `scn`, `SC`, `SCN` | partial | 1/3/4 numeric components; named spaces ignored |
-| `Do` (Form XObject) | yes | content expanded with `/Matrix` and nested resources; `BBox` clipping next |
-| `Do` (Image XObject) | next | images and inline images are skipped |
+| `Do` (Form XObject) | yes | content expanded with `/Matrix`, nested resources and `BBox` clip |
+| `Do` (Image XObject) | yes | Flate/RGB/gray/CMYK 8-bit; baseline DCT (JPEG) |
 | `sh` (shading) | next | skipped |
-| `BI ... ID ... EI` | next | inline images are not parsed |
+| `BI ... ID ... EI` | yes | inline dictionary abbreviations, raw/Flate/DCT data |
 | transparency / blend groups | next | always opaque |
+| progressive JPEG (`SOF2`) | next | baseline `SOF0`/`SOF1` only |
+| soft mask (`/SMask`) | next | image alpha is ignored |
 
 ## Text
 

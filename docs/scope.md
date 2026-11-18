@@ -35,14 +35,16 @@ The concrete reuse fixture is documented in
    compares page hashes in CI, catching layout regressions without a JavaScript
    toolchain.
 
-## Delivered in release 0.2.0
+## Delivered in release 0.3.0
 
 - classic xref tables, xref streams, object streams and hybrid `/XRefStm`;
 - incremental updates: `/Prev` chain, revision overlay, free entries;
 - FlateDecode, ASCIIHexDecode, ASCII85Decode, RunLengthDecode, LZWDecode;
 - page tree with inherited `MediaBox` and `Resources`;
 - content operators for graphics state, paths, fill/stroke, color and text;
-- Form XObjects (matrix, nested resources, recursive expansion);
+- Form XObjects (matrix, nested resources, recursive expansion, BBox clip);
+- image XObjects: 8-bit gray/RGB/CMYK, Flate and baseline JPEG; inline images;
+- `/Rotate` 0/90/180/270, `/CropBox`, rectangular `W`/`W*` clip;
 - fill rules, line width and round caps;
 - 3×5 fallback text with `Tj` / `TJ` and text positioning;
 - RGB PNG output;
@@ -76,8 +78,8 @@ The concrete reuse fixture is documented in
 
 | Metric | Current | Target |
 | --- | --- | --- |
-| Fixture pages rendered end to end | 5/5 | public corpus |
-| Unit + integration tests | 20 | 100+ |
+| Fixture pages rendered end to end | 12/12 | public corpus |
+| Unit + integration tests | 25 | 100+ |
 | Unsupported-feature errors with a typed message | 100% | 100% |
 | Incremental-update fixtures | 1 | every `/Prev` document in corpus |
 | Visual diff vs reference renderer | pixel probes on fixtures | SSIM ≥ 0.95 on 98% of corpus |

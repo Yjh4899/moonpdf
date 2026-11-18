@@ -5,7 +5,7 @@ with an observable acceptance check, so progress is visible without reading the
 source. The final target is ISO 32000-1:2008 page rendering; see
 [`standard-coverage.md`](standard-coverage.md).
 
-## M0 — File structure and vector slice (current)
+## M0 — File structure and vector slice (delivered)
 
 **Delivered**
 
@@ -30,19 +30,26 @@ moon run cmd/moonpdf -- fixtures/incremental.pdf out/incremental.png --scale 2
 
 The incremental page must show the reused blue header and the new green body.
 
-## M1 — Images and page geometry
+## M1 — Images and page geometry (current)
 
-**Deliverables**
+**Delivered**
 
-- image XObjects and inline images: DCTDecode (JPEG), Flate/PNG predictors;
-- `/Rotate`, `/CropBox`, `BBox` clipping and rectangular `W`/`W*`;
-- more real-world fixtures, including camera/scanner output.
+- image XObjects: 8-bit gray/RGB/CMYK, Flate and baseline DCTDecode;
+- inline images (`BI ... ID ... EI`) with abbreviated dictionaries;
+- `/Rotate` 0/90/180/270, `/CropBox`, rectangular `W`/`W*` and Form `BBox` clip;
+- fixtures with pixel assertions for images, rotation/crop and clipping.
+
+**Remaining**
+
+- progressive JPEG, soft masks and 1/2/4-bit image samples;
+- exact path clipping (currently rectangular bounds);
+- a larger camera/scanner image corpus.
 
 **Acceptance**
 
-- A declared image corpus renders with correct dimensions and visible content.
-- Rotation and crop boxes match the reference layout.
-- Unsupported image codecs fail with a specific diagnostic.
+- The declared image fixtures render with correct dimensions and colors.
+- Rotation and crop boxes match the expected layout.
+- Unsupported codecs fail with a specific diagnostic.
 
 ## M2 — Fonts and text fidelity
 

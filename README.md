@@ -3,48 +3,41 @@
 [![CI](https://github.com/Yjh4899/moonpdf/actions/workflows/ci.yml/badge.svg)](https://github.com/Yjh4899/moonpdf/actions/workflows/ci.yml)
 [![mooncakes](https://img.shields.io/badge/mooncakes-Yjh4899%2Fmoonpdf-blue)](https://mooncakes.io/docs/Yjh4899/moonpdf)
 
-[绠€浣撲腑鏂嘳(README.zh.md)
+[简体中文](README.zh.md)
 
 **A pure-MoonBit PDF page rendering engine.** Parse a PDF, interpret its content
-stream, rasterize the page, and write a PNG 鈥?without a JavaScript VM, a C
+stream, rasterize the page, and write a PNG without a JavaScript VM, a C
 library, or a browser.
 
-Published as [`Yjh4899/moonpdf@0.2.0`](https://mooncakes.io/docs/Yjh4899/moonpdf)
+Published as [`Yjh4899/moonpdf@0.3.0`](https://mooncakes.io/docs/Yjh4899/moonpdf)
 on mooncakes.io.
-
-MoonPDF is an original implementation built for the MoonBit ecosystem. It is not
-a binding and not a port of an existing renderer: the parser, graphics state,
-path flattening, scanline rasterizer and PNG encoder are written in MoonBit.
 
 ## Why this exists
 
-MoonBit already has excellent PDF **document** tooling:
+MoonBit already has PDF document tooling: `moonbitlang/pdflite` reads, writes and
+manipulates PDF objects, `moonbitlang/pagelayout` generates pages, and the
+official office viewer renders PDF previews by shipping PDF.js into the browser.
 
-- [`moonbitlang/pdflite`](https://mooncakes.io/docs/moonbitlang/pdflite) reads,
-  writes and manipulates PDF objects and extracts text;
-- [`moonbitlang/pagelayout`](https://mooncakes.io/docs/moonbitlang/pagelayout)
-  generates paginated documents and PDF/SVG output;
-- the official office viewer renders PDF previews by shipping **PDF.js** into
-  the browser.
-
-What the ecosystem does not have is the last mile: a native **page rasterizer**.
-Any MoonBit application that needs a thumbnail, a page image for OCR or a
-visual regression check currently has to embed a JavaScript engine or call out
-to an external binary. MoonPDF closes that gap with a small, inspectable,
-multi-target rendering core.
+What the ecosystem does not have is the last mile: a native page rasterizer. Any
+MoonBit application that needs a thumbnail, a page image for OCR or a visual
+regression check currently has to embed a JavaScript engine or call out to an
+external binary. MoonPDF closes that gap with a small, inspectable, multi-target
+rendering core.
 
 ## Status
 
-This repository is at the **file-structure and vector-graphics milestone**. It
-already renders real pages end to end, including incrementally saved files:
+This repository is at the **images and page-geometry milestone**. It renders
+real pages end to end, including incrementally saved files:
 
 | Area | Current support |
 | --- | --- |
 | File structure | classic xref, xref streams, object streams, hybrid `/XRefStm`, incremental updates (`/Prev`) |
 | Filters | Flate, ASCIIHex, ASCII85, RunLength, LZW; TIFF/PNG predictors |
-| Page tree | inherited `MediaBox` / `Resources`, multiple pages |
-| Content | `q/Q/cm`, path construction (`m l c v y re h`), fill/stroke (`S s f F f* B B* b b* n`), RGB/gray/CMYK, line width/cap |
-| Forms | Form XObjects with `/Matrix` and nested resources |
+| Page tree | inherited `MediaBox` / `Resources`, `/Rotate`, `/CropBox`, multiple pages |
+| Content | `q/Q/cm`, paths (`m l c v y re h`), fill/stroke, RGB/gray/CMYK, line width/cap |
+| Clip | rectangular `W` / `W*`, Form `BBox` |
+| Forms | Form XObjects with `/Matrix`, nested resources and `BBox` clip |
+| Images | 8-bit gray/RGB/CMYK, Flate and baseline JPEG, inline images |
 | Text | text state, `Td/TD/Tm/T*`, `Tj/TJ/'/"`, fallback bitmap glyphs |
 | Output | RGB PNG with zlib compression |
 
@@ -53,9 +46,9 @@ The target is ISO 32000-1:2008 page rendering. See
 target and corpus gate, and [`docs/incremental-updates.md`](docs/incremental-updates.md)
 for the `/Prev` algorithm and the reused-resource fixture.
 
-Still missing, and tracked as milestones: embedded font outlines, images,
-clipping, transparency, shadings and annotation appearance streams. See
-[`docs/compatibility.md`](docs/compatibility.md).
+Still missing, and tracked as milestones: embedded font outlines, progressive
+JPEG and soft masks, transparency, shadings and annotation appearance streams.
+See [`docs/compatibility.md`](docs/compatibility.md).
 
 ![MoonPDF rendering a fixture](docs/images/demo.png)
 
@@ -64,10 +57,15 @@ font/resources, with a newly appended body stream:
 
 ![Incremental update: reused header, new body](docs/images/incremental.png)
 
+A baseline JPEG image XObject with 4:2:0 chroma subsampling, decoded by the
+in-tree JPEG decoder:
+
+![JPEG image XObject](docs/images/image-jpeg.png)
+
 ## Quick start
 
-Requirements: the MoonBit toolchain (`moon 0.1.20261102` or newer) and Node.js
-is **not** required.
+Requirements: the MoonBit toolchain (`moon 0.1.20261102` or newer). Node.js is
+not required.
 
 ```sh
 moon check
@@ -91,19 +89,22 @@ moonpdf <input.pdf> [output.png] [--page N] [--scale S]
 
 ```text
 bytes
-  鈹?  鈹溾攢 pdf/        lexer, object parser, classic xref, page tree
-  鈹?  鈹溾攢 render/     content-stream interpreter, graphics state, text state
-  鈹?   鈹溾攢 path    B茅zier flattening
-  鈹?   鈹溾攢 canvas  supersampled scanline fill / stroke
-  鈹?   鈹溾攢 font    3脳5 fallback glyphs
-  鈹?   鈹斺攢 png     zlib + PNG chunks + CRC32
-  鈹?  鈹斺攢 cmd/moonpdf CLI
+  |
+  +-- pdf/        lexer, object parser, xref chain, filters, page tree
+  |
+  +-- render/     content interpreter, graphics state, forms, text, images
+  |    +-- path    Bezier flattening
+  |    +-- canvas  supersampled scanline fill / stroke
+  |    +-- font    3x5 fallback glyphs
+  |    +-- image   image XObject sampling, baseline JPEG
+  |    +-- png     zlib + PNG chunks + CRC32
+  |
+  +-- cmd/moonpdf CLI
 ```
 
-The parser and the renderer are separate packages so that document inspection
-tools can use the object model without pulling in the rasterizer. The public
-facade is `Yjh4899/moonpdf`; `page_count` and `render_page_png` are the stable
-entry points.
+The parser and renderer are separate packages so that document inspection tools
+can use the object model without pulling in the rasterizer. The public facade is
+`Yjh4899/moonpdf`; `page_count` and `render_page_png` are the stable entry points.
 
 Design rules:
 
@@ -118,33 +119,32 @@ Design rules:
 ## Testing
 
 ```sh
-moon test                 # 20 unit and integration tests
+moon test                 # 25 unit and integration tests
 moon run cmd/moonpdf -- fixtures/text.pdf out/text.png --scale 2
 ```
 
-CI runs `moon fmt --check`, `moon check --deny-warn`, `moon test`, renders both
-fixtures and verifies the PNG signature and dimensions.
+CI runs `moon fmt --check`, `moon check --deny-warn`, `moon test`, renders all
+fixtures and checks PNG dimensions and sampled pixels.
 
-The fixtures are generated by [`tools/make_fixtures.py`](tools/make_fixtures.py)
-and intentionally use uncompressed content streams so that the first vertical
-slice is exercised without a decompressor.
+The fixtures are generated by scripts under [`tools/`](tools) and committed so
+that CI can reproduce every render.
 
 ## Roadmap
 
 | Milestone | Goal |
 | --- | --- |
-| M0 (this repository) | vector graphics + fallback text + PNG, strict errors, CI |
-| M1 | FlateDecode (zlib), xref streams, object streams, images (JPEG/PNG) |
-| M2 | embedded TrueType/CFF glyph outlines, correct text metrics, font cache |
-| M3 | clipping, transparency groups, shadings, patterns, SVG output |
-| M4 | differential corpus against MuPDF, performance pass, wasm demo |
+| M0 (delivered) | file structure, filters, incremental updates, vector graphics |
+| M1 (current) | images, inline images, Rotate/CropBox, rectangular clipping |
+| M2 | embedded TrueType/CFF fonts, CID/CJK, text metrics |
+| M3 | transparency, shadings, annotation appearance, SVG |
+| M4 | corpus SSIM vs MuPDF, performance pass, wasm demo |
 
 The full plan, scope boundaries and acceptance criteria are in
 [`docs/scope.md`](docs/scope.md) and [`docs/roadmap.md`](docs/roadmap.md).
 
 ## References and license
 
-- PDF 32000-1:2008, *Document management 鈥?Portable Document Format*.
+- PDF 32000-1:2008, *Document management: Portable Document Format*.
 - Behavioral reference implementations: MuPDF, PDFium and Poppler. No source
   code from those projects is copied; MoonPDF is implemented from the
   specification and from black-box output comparisons.
