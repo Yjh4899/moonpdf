@@ -260,6 +260,32 @@ test "standard 14 font metrics" {
 }
 
 ///|
+test "type0 CIDFontType2 with Identity-H" {
+  let raster = match
+    @integration.rasterize(
+      @integration.fixture_bytes("fixtures/font-cid.pdf"),
+      1.0,
+    ) {
+    Some(raster) => raster
+    None => {
+      assert_true(false)
+      return
+    }
+  }
+  assert_eq(raster.width, 340)
+  assert_eq(raster.height, 150)
+  let mut dark = 0
+  let mut i = 0
+  while i < raster.pixels.length() {
+    if raster.pixels.at(i).to_int() < 128 {
+      dark = dark + 1
+    }
+    i = i + 1
+  }
+  assert_true(dark > 500)
+}
+
+///|
 test "xref stream and object stream fixture" {
   let data = @integration.fixture_bytes("fixtures/xref-stream.pdf")
   let document = try! @pdf.parse_document(data)
