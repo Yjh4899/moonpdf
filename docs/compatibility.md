@@ -75,12 +75,13 @@ samples. Image-specific color transforms are part of the image milestone.
 | Operator | Status | Notes |
 | --- | --- | --- |
 | `BT`, `ET` | yes | resets text state |
-| `Tf` | partial | size and embedded TrueType resource; Type1/CFF next |
+| `Tf` | partial | size, embedded TrueType and non-CID CFF resources |
 | `Tc`, `Tw`, `Tz`, `TL`, `Ts` | yes | text state |
 | `Td`, `TD`, `Tm`, `T*` | yes | text and line matrices |
 | `Tj`, `TJ`, `'`, `"` | yes | fallback bitmap glyphs |
 | embedded TrueType (`FontFile2`) | yes | `glyf` simple outlines, cmap 4/12, hmtx advances |
-| embedded Type1 / CFF (`FontFile`, `FontFile3`) | next | falls back to the bitmap font |
+| embedded CFF (`FontFile3` Type1C, non-CID) | yes | CFF INDEX/DICT and Type 2 charstrings |
+| embedded Type1 (`FontFile`) | next | falls back to the bitmap font |
 | standard 14 font metrics | next | fallback bitmap advance currently |
 | CID / CJK fonts | next | milestone M2 |
 | vertical writing mode | next | ignored |

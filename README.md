@@ -9,7 +9,7 @@
 stream, rasterize the page, and write a PNG without a JavaScript VM, a C
 library, or a browser.
 
-Published as [`Yjh4899/moonpdf@0.4.0`](https://mooncakes.io/docs/Yjh4899/moonpdf)
+Published as [`Yjh4899/moonpdf@0.5.0`](https://mooncakes.io/docs/Yjh4899/moonpdf)
 on mooncakes.io.
 
 ## Why this exists
@@ -38,7 +38,7 @@ real pages end to end, including incrementally saved files:
 | Clip | rectangular `W` / `W*`, Form `BBox` |
 | Forms | Form XObjects with `/Matrix`, nested resources and `BBox` clip |
 | Images | 8-bit gray/RGB/CMYK, Flate and baseline JPEG, inline images |
-| Text | text state, `Td/TD/Tm/T*`, `Tj/TJ/'/"`, embedded TrueType glyph outlines, bitmap fallback |
+| Text | text state, `Td/TD/Tm/T*`, `Tj/TJ/'/"`, embedded TrueType/CFF outlines, bitmap fallback |
 | Output | RGB PNG with zlib compression |
 
 The target is ISO 32000-1:2008 page rendering. See
@@ -46,7 +46,7 @@ The target is ISO 32000-1:2008 page rendering. See
 target and corpus gate, and [`docs/incremental-updates.md`](docs/incremental-updates.md)
 for the `/Prev` algorithm and the reused-resource fixture.
 
-Still missing, and tracked as milestones: Type1/CFF fonts, standard-14 metrics,
+Still missing, and tracked as milestones: Type1 fonts, standard-14 metrics,
 CID/CJK, progressive JPEG and soft masks, transparency, shadings and annotation
 appearance streams. See [`docs/compatibility.md`](docs/compatibility.md).
 
@@ -66,6 +66,10 @@ Embedded OpenSans (OFL) rendered from `FontFile2` `glyf` outlines and `hmtx`
 advances:
 
 ![Embedded TrueType font](docs/images/font-embedded.png)
+
+Embedded Source Sans 3 (OFL) rendered from CFF Type 2 charstrings:
+
+![Embedded CFF font](docs/images/font-cff.png)
 
 ## Quick start
 
@@ -124,7 +128,7 @@ Design rules:
 ## Testing
 
 ```sh
-moon test                 # 27 unit and integration tests
+moon test                 # 28 unit and integration tests
 moon run cmd/moonpdf -- fixtures/text.pdf out/text.png --scale 2
 ```
 
@@ -140,7 +144,7 @@ that CI can reproduce every render.
 | --- | --- |
 | M0 (delivered) | file structure, filters, incremental updates, vector graphics |
 | M1 (delivered) | images, inline images, Rotate/CropBox, rectangular clipping |
-| M2 (current) | embedded TrueType delivered; Type1/CFF, CID/CJK, text metrics |
+| M2 (current) | embedded TrueType/CFF delivered; Type1, CID/CJK, text metrics |
 | M3 | transparency, shadings, annotation appearance, SVG |
 | M4 | corpus SSIM vs MuPDF, performance pass, wasm demo |
 

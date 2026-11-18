@@ -21,7 +21,7 @@ The architecture optimizes for four properties:
 | Package | Responsibility | Key files |
 | --- | --- | --- |
 | `pdf/` | syntax, object model, xref chain, filters, page tree, content operators | `types.mbt`, `parse.mbt`, `document.mbt`, `content.mbt`, `filter.mbt` |
-| `render/` | graphics state, paths, scanline raster, text/fonts, forms, images, PNG | `geometry.mbt`, `path.mbt`, `canvas.mbt`, `font.mbt`, `pdf_font.mbt`, `truetype.mbt`, `image.mbt`, `jpeg.mbt`, `render.mbt`, `png.mbt` |
+| `render/` | graphics state, paths, scanline raster, text/fonts, forms, images, PNG | `geometry.mbt`, `path.mbt`, `canvas.mbt`, `font.mbt`, `pdf_font.mbt`, `truetype.mbt`, `cff.mbt`, `image.mbt`, `jpeg.mbt`, `render.mbt`, `png.mbt` |
 | root | small facade: `page_count`, `render_page_png` | `moonpdf.mbt` |
 | `cmd/moonpdf/` | argument parsing and file I/O | `main.mbt` |
 | `tests/integration/` | end-to-end fixtures: incremental update, xref stream, pixel probes | `lib.mbt`, `integration_test.mbt` |
@@ -137,8 +137,10 @@ objects, no hidden allocation in the inner loop.
 `Tf` resolves a `/Font` resource into a `PdfFont`. When the descriptor contains
 a `/FontFile2`, the loader parses the TrueType tables (`cmap` formats 4/12,
 `hmtx`, `loca`, `glyf`) and the renderer fills the glyph contours through the
-same path rasterizer used for vector art. Per-code advances come from the PDF
-`/Widths` array, with `hmtx` used as a fallback when `/Widths` is absent.
+same path rasterizer used for vector art. A `/FontFile3` Type1C stream goes
+through the CFF reader (INDEX/DICT and Type 2 charstrings) and joins the same
+path pipeline. Per-code advances come from the PDF `/Widths` array, with `hmtx`
+used as a fallback when `/Widths` is absent.
 
 The text path implements:
 
@@ -148,7 +150,7 @@ The text path implements:
 - per-glyph advance in text space, composed with the CTM
 
 A hand-written 3×5 bitmap fallback remains for fonts without supported outlines
-(standard-14 without widths, Type1/CFF, CID without a cmap). Type1/CFF and
+(Type1, CID without a cmap, standard-14 without widths). Type1, CID/CJK and
 standard-14 metrics are the remaining M2 work; the interpreter interface does
 not change.
 

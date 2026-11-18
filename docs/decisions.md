@@ -161,4 +161,21 @@ visually consistent and avoids an FFI dependency. `cmap` 4/12 covers the common
 Latin and BMP cases; Type1/CFF can feed the same `Path` interface later.
 
 **Consequence.** Text is resolution-independent and transformed with the text
-matrix. Composite glyphs, Type1/CFF and CID/CJK remain fallback cases.
+matrix. Composite TrueType glyphs, Type1 and CID/CJK remain fallback cases.
+
+## ADR-012: CFF Type 2 charstrings feed the same path pipeline
+
+**Decision.** Parse `/FontFile3` Type1C with the CFF INDEX/DICT reader and
+interpret Type 2 charstrings into `Path` cubic segments. Non-CID CFF fonts are
+resolved through the OpenType `cmap`, as with TrueType.
+
+**Alternatives.** Convert CFF to outlines with an external font tool; add a
+FreeType binding; rasterize CFF glyphs separately.
+
+**Why.** CFF is the other common embedded outline format, especially for
+OpenType/OTF fonts. Type 2 charstrings are a compact stack language, and their
+lines/curves map directly onto the existing path API, so the renderer keeps one
+rasterization path for TrueType, CFF and vector art.
+
+**Consequence.** Non-CID CFF fonts render without conversion. CID-keyed CFF,
+Type1 (`FontFile`) and standard-14 metrics still fall back to the bitmap font.
