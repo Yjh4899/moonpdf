@@ -22,6 +22,8 @@ pub fn encode_png(RenderedPage) -> Bytes
 
 pub fn load_pdf_font(@pdf.PdfPage, @pdf.PdfValue) -> PdfFont?
 
+pub fn named_cmap(String) -> NamedCMap?
+
 pub fn parse_cff(Bytes) -> CffFont raise RenderError
 
 pub fn parse_cmap_data(Bytes) -> ParsedCMap raise RenderError
@@ -117,6 +119,14 @@ pub fn Matrix::scale(Double, Double) -> Self
 pub fn Matrix::scale_factor(Self) -> Double
 pub fn Matrix::then(Self, Self) -> Self
 pub fn Matrix::translate(Double, Double) -> Self
+
+pub struct NamedCMap {
+  name : String
+  code_bytes : Int32
+  ranges : Array[(Int32, Int32, Int32)]
+}
+pub fn NamedCMap::cid_for(Self, Int32) -> Int32
+pub fn NamedCMap::expand(Self) -> Array[(Int32, Int32)]
 
 pub struct ParsedCMap {
   code_bytes : Int32

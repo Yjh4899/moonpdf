@@ -186,6 +186,11 @@ fn parse_type0_encoding(
 ) -> (Int32, Array[(Int32, Int32)]) {
   match @pdf.dict_get(dict, "Encoding") {
     Some(@pdf.Name("Identity-H")) => (2, [])
+    Some(@pdf.Name(name)) =>
+      match named_cmap(name) {
+        Some(cmap) => (cmap.code_bytes, cmap.expand())
+        None => (2, [])
+      }
     Some(value) =>
       match page.resolve(value) {
         @pdf.Stream(stream) => {
