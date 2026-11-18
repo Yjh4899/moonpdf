@@ -171,6 +171,44 @@ test "inline image" {
 }
 
 ///|
+test "truetype cmap and glyph outlines" {
+  let font = try! @render.parse_truetype(
+    @integration.fixture_bytes("fixtures/fonts/OpenSans.ttf"),
+  )
+  let glyph = font.glyph_id(65) // 'A'
+  assert_true(glyph > 0)
+  let contours = try! font.glyph_contours(glyph)
+  assert_true(contours.length() > 0)
+  assert_true(font.units_per_em() > 0)
+}
+
+///|
+test "embedded truetype font renders glyph outlines" {
+  let raster = match
+    @integration.rasterize(
+      @integration.fixture_bytes("fixtures/font-embedded.pdf"),
+      1.0,
+    ) {
+    Some(raster) => raster
+    None => {
+      assert_true(false)
+      return
+    }
+  }
+  assert_eq(raster.width, 340)
+  assert_eq(raster.height, 150)
+  let mut dark = 0
+  let mut i = 0
+  while i < raster.pixels.length() {
+    if raster.pixels.at(i).to_int() < 128 {
+      dark = dark + 1
+    }
+    i = i + 1
+  }
+  assert_true(dark > 500)
+}
+
+///|
 test "xref stream and object stream fixture" {
   let data = @integration.fixture_bytes("fixtures/xref-stream.pdf")
   let document = try! @pdf.parse_document(data)
