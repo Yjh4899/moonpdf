@@ -179,6 +179,10 @@ test "truetype cmap and glyph outlines" {
   assert_true(glyph > 0)
   let contours = try! font.glyph_contours(glyph)
   assert_true(contours.length() > 0)
+  let accented = font.glyph_id(233) // 'é' is usually a composite glyph
+  assert_true(accented > 0)
+  let accented_contours = try! font.glyph_contours(accented)
+  assert_true(accented_contours.length() >= 2)
   assert_true(font.units_per_em() > 0)
 }
 
