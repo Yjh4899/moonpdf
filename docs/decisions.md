@@ -1,4 +1,4 @@
-﻿# Decision log
+# Decision log
 
 Short architecture decision records. Each entry states the decision, the
 alternatives and the consequence.
@@ -112,5 +112,38 @@ state; implement a full form execution context.
 Expanding forms keeps it flat, makes nested resources explicit, and lets the
 existing path/text/paint operators handle form content unchanged.
 
-**Consequence.** `BBox` clipping and form-level transparency groups are not
-applied yet; both are tracked in the compatibility matrix.
+**Consequence.** `BBox` is synthesized as a rectangular `W` clip; form-level
+transparency groups are not applied yet and remain in the compatibility matrix.
+
+## ADR-009: in-tree baseline JPEG instead of a codec dependency
+
+**Decision.** Implement baseline sequential JPEG (`SOF0`/`SOF1`) in
+`render/jpeg.mbt`: marker parsing, DQT/DHT/SOF0/SOS, canonical Huffman decode,
+dequantize, 8x8 IDCT, 4:2:0/4:2:2 upsampling and YCbCr to RGB.
+
+**Alternatives.** Depend on a third-party JPEG decoder; bind to a C library.
+
+**Why.** Image XObjects are common in real documents, and a JPEG decoder is the
+one codec that cannot be avoided for camera/scanner PDFs. A small baseline
+decoder keeps the rendering path pure MoonBit and avoids an FFI dependency in
+the most performance-sensitive part. Progressive JPEG is rejected with a
+diagnostic and stays on the roadmap.
+
+**Consequence.** Baseline JPEG works; progressive JPEG, arithmetic coding and
+CMYK/YCCK JPEG remain unsupported and are listed in the compatibility matrix.
+
+## ADR-010: image sampling through the inverse CTM
+
+**Decision.** Map each destination pixel center through the inverse CTM into the
+image unit square, then sample the nearest source pixel.
+
+**Alternatives.** Restrict images to axis-aligned rectangles; implement bilinear
+sampling first.
+
+**Why.** PDF images are painted into the unit square and can be rotated,
+sheared or flipped by the CTM. Inverse mapping handles all of those cases with
+one loop and no special-case geometry. Nearest sampling is sufficient for the
+first image milestone and is easy to assert in tests.
+
+**Consequence.** Minified images show aliasing; bilinear or area sampling is a
+later quality improvement.
