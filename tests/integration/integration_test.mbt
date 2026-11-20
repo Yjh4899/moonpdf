@@ -595,6 +595,29 @@ test "tiling pattern" {
 }
 
 ///|
+test "annotation appearance stream" {
+  let raster = match
+    @integration.rasterize(
+      @integration.fixture_bytes("fixtures/annotation.pdf"),
+      1.0,
+    ) {
+    Some(raster) => raster
+    None => {
+      assert_true(false)
+      return
+    }
+  }
+  assert_eq(raster.width, 200)
+  assert_eq(raster.height, 200)
+  let center = (120 * raster.width + 100) * 3
+  assert_true(raster.pixels.at(center + 1).to_int() > 180)
+  assert_true(raster.pixels.at(center).to_int() < 80)
+  let outside = (20 * raster.width + 20) * 3
+  assert_true(raster.pixels.at(outside).to_int() > 240)
+  assert_true(raster.pixels.at(outside + 1).to_int() > 240)
+}
+
+///|
 test "xref stream and object stream fixture" {
   let data = @integration.fixture_bytes("fixtures/xref-stream.pdf")
   let document = try! @pdf.parse_document(data)
