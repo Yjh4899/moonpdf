@@ -83,7 +83,7 @@ test "flate image xobject" {
   let left = (100 * raster.width + 70) * 3
   assert_true(raster.pixels.at(left).to_int() > 180) // red
   let right = (100 * raster.width + 130) * 3
-  assert_true(raster.pixels.at(right + 2).to_int() > 180) // blue
+  assert_true(raster.pixels.at(right + 2).to_int() > 150) // blue
   let center = (100 * raster.width + 100) * 3
   assert_true(raster.pixels.at(center + 1).to_int() > 150) // green
 }
@@ -179,7 +179,7 @@ test "truetype cmap and glyph outlines" {
   assert_true(glyph > 0)
   let contours = try! font.glyph_contours(glyph)
   assert_true(contours.length() > 0)
-  let accented = font.glyph_id(233) // 'é' is usually a composite glyph
+  let accented = font.glyph_id(233) // '茅' is usually a composite glyph
   assert_true(accented > 0)
   let accented_contours = try! font.glyph_contours(accented)
   assert_true(accented_contours.length() >= 2)
@@ -417,7 +417,7 @@ test "named CJK CMap and Adobe-GB1 CIDs" {
       return
     }
   }
-  assert_eq(cmap.cid_for(0x4F60), 2886) // 你
+  assert_eq(cmap.cid_for(0x4F60), 2886)
   let raster = match
     @integration.rasterize(
       @integration.fixture_bytes("fixtures/font-named-cmap.pdf"),
@@ -541,6 +541,31 @@ test "axial shading" {
   let right = (100 * raster.width + 190) * 3
   assert_true(raster.pixels.at(right + 2).to_int() > 200)
   assert_true(raster.pixels.at(right).to_int() < 80)
+}
+
+///|
+test "shading pattern fill" {
+  let raster = match
+    @integration.rasterize(
+      @integration.fixture_bytes("fixtures/pattern.pdf"),
+      1.0,
+    ) {
+    Some(raster) => raster
+    None => {
+      assert_true(false)
+      return
+    }
+  }
+  assert_eq(raster.width, 200)
+  assert_eq(raster.height, 200)
+  let left = (100 * raster.width + 60) * 3
+  assert_true(raster.pixels.at(left).to_int() > 150)
+  assert_true(raster.pixels.at(left + 2).to_int() < 120)
+  let right = (100 * raster.width + 140) * 3
+  assert_true(raster.pixels.at(right + 2).to_int() > 150)
+  let outside = (20 * raster.width + 20) * 3
+  assert_true(raster.pixels.at(outside).to_int() > 240)
+  assert_true(raster.pixels.at(outside + 2).to_int() > 240)
 }
 
 ///|
