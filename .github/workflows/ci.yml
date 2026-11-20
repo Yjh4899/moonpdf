@@ -53,6 +53,7 @@ jobs:
           moon run --target native cmd/moonpdf -- fixtures/blend.pdf out/blend.png --scale 2
           moon run --target native cmd/moonpdf -- fixtures/clip-path.pdf out/clip-path.png --scale 2
           moon run --target native cmd/moonpdf -- fixtures/shading.pdf out/shading.png --scale 2
+          moon run --target native cmd/moonpdf -- fixtures/pattern.pdf out/pattern.png --scale 2
 
       - name: Verify PNG output and reused-resource pixels
         run: |
@@ -109,6 +110,7 @@ jobs:
               "blend.png": (400, 400),
               "clip-path.png": (400, 400),
               "shading.png": (400, 400),
+              "pattern.png": (400, 400),
           }
           for name, size in expected.items():
               width, height, raw, stride = read_png(Path("out") / name)
@@ -271,6 +273,14 @@ jobs:
           assert left[0] > 200 and left[2] < 80, left
           assert right[2] > 200 and right[0] < 80, right
           print("shading", left, right)
+
+          # Shading pattern: gradient inside the rect, white outside.
+          width, height, raw, stride = read_png(Path("out/pattern.png"))
+          inside = pixel(raw, stride, 120, 200)
+          outside = pixel(raw, stride, 40, 40)
+          assert inside[0] > 120 and inside[2] > 40, inside
+          assert outside[0] > 240 and outside[2] > 240, outside
+          print("pattern", inside, outside)
           PY
 
       - name: Upload rendered pages
