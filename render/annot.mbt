@@ -1,4 +1,52 @@
 ///|
+fn annotation_normal_form(
+  page : @pdf.PdfPage,
+  annot : Array[(String, @pdf.PdfValue)],
+  ap : Array[(String, @pdf.PdfValue)],
+) -> @pdf.PdfStream? {
+  let normal = match @pdf.dict_get(ap, "N") {
+    Some(value) => page.resolve(value)
+    None => return None
+  }
+  match normal {
+    @pdf.Stream(stream) => Some(stream)
+    @pdf.Dict(states) => {
+      let state = match @pdf.dict_get(annot, "AS") {
+        Some(value) =>
+          match value.as_name() {
+            Some(name) => name
+            None => ""
+          }
+        None => ""
+      }
+      if state != "" {
+        match @pdf.dict_get(states, state) {
+          Some(value) =>
+            match page.resolve(value) {
+              @pdf.Stream(stream) => Some(stream)
+              _ => None
+            }
+          None => None
+        }
+      } else {
+        let mut found : @pdf.PdfStream? = None
+        for entry in states {
+          match page.resolve(entry.1) {
+            @pdf.Stream(stream) => {
+              found = Some(stream)
+              break
+            }
+            _ => ()
+          }
+        }
+        found
+      }
+    }
+    _ => None
+  }
+}
+
+///|
 /// Render annotation appearance streams on top of page content.
 pub fn draw_annotations(
   page : @pdf.PdfPage,
@@ -54,13 +102,9 @@ pub fn draw_annotations(
       Some(value) => page.resolve_dict(value)
       None => []
     }
-    let form_value = match @pdf.dict_get(ap, "N") {
-      Some(value) => value
+    let form = match annotation_normal_form(page, annot, ap) {
+      Some(stream) => stream
       None => continue
-    }
-    let form = match page.resolve(form_value) {
-      @pdf.Stream(stream) => stream
-      _ => continue
     }
     let bbox = match @pdf.dict_get(form.dict, "BBox") {
       Some(value) =>
