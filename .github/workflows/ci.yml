@@ -52,6 +52,7 @@ jobs:
           moon run --target native cmd/moonpdf -- fixtures/alpha.pdf out/alpha.png --scale 2
           moon run --target native cmd/moonpdf -- fixtures/blend.pdf out/blend.png --scale 2
           moon run --target native cmd/moonpdf -- fixtures/clip-path.pdf out/clip-path.png --scale 2
+          moon run --target native cmd/moonpdf -- fixtures/shading.pdf out/shading.png --scale 2
 
       - name: Verify PNG output and reused-resource pixels
         run: |
@@ -107,6 +108,7 @@ jobs:
               "alpha.png": (400, 400),
               "blend.png": (400, 400),
               "clip-path.png": (400, 400),
+              "shading.png": (400, 400),
           }
           for name, size in expected.items():
               width, height, raw, stride = read_png(Path("out") / name)
@@ -261,6 +263,14 @@ jobs:
           assert center[2] > 180 and center[0] < 60, center
           assert corner[0] > 180 and corner[2] < 60, corner
           print("clip path", center, corner)
+
+          # Axial shading: red on the left, blue on the right.
+          width, height, raw, stride = read_png(Path("out/shading.png"))
+          left = pixel(raw, stride, 20, 200)
+          right = pixel(raw, stride, 380, 200)
+          assert left[0] > 200 and left[2] < 80, left
+          assert right[2] > 200 and right[0] < 80, right
+          print("shading", left, right)
           PY
 
       - name: Upload rendered pages
