@@ -521,6 +521,29 @@ test "exact triangular path clip" {
 }
 
 ///|
+test "axial shading" {
+  let raster = match
+    @integration.rasterize(
+      @integration.fixture_bytes("fixtures/shading.pdf"),
+      1.0,
+    ) {
+    Some(raster) => raster
+    None => {
+      assert_true(false)
+      return
+    }
+  }
+  assert_eq(raster.width, 200)
+  assert_eq(raster.height, 200)
+  let left = (100 * raster.width + 10) * 3
+  assert_true(raster.pixels.at(left).to_int() > 200)
+  assert_true(raster.pixels.at(left + 2).to_int() < 80)
+  let right = (100 * raster.width + 190) * 3
+  assert_true(raster.pixels.at(right + 2).to_int() > 200)
+  assert_true(raster.pixels.at(right).to_int() < 80)
+}
+
+///|
 test "xref stream and object stream fixture" {
   let data = @integration.fixture_bytes("fixtures/xref-stream.pdf")
   let document = try! @pdf.parse_document(data)
