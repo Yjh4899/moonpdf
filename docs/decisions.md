@@ -475,3 +475,19 @@ appearance rendering, and matches the flag semantics used by PDF viewers.
 
 **Consequence.** Hidden/NoView annotations are omitted. Print-only semantics and
 annotation appearances on the `/AP /R`/`/D` paths remain out of scope.
+
+## ADR-030: uncolored patterns as tinted stencils
+
+**Decision.** Render a `PaintType 2` tiling cell once with the default black
+fill, keep it as a stencil, and at paint time tint non-white tile pixels with the
+color components preceding the pattern name in `scn`.
+
+**Alternatives.** Re-render the cell for every fill color; require pattern
+content to declare its own color; skip uncolored patterns.
+
+**Why.** Uncolored pattern content is a stencil by definition. The rendered black
+tile is a usable coverage mask, and tinting needs no per-fill recursive render.
+Opacity from antialiased tile edges is preserved as alpha.
+
+**Consequence.** Uncolored tiling patterns work with RGB/solid fill colors.
+Pattern color spaces and per-fill caching remain refinements.

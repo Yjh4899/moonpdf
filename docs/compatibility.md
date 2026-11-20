@@ -67,7 +67,7 @@ samples. Image-specific color transforms are part of the image milestone.
 | `sh` (shading) | yes | axial/radial types 2/3 with type 2 exponential functions |
 | PatternType 2 (shading pattern) | yes | `scn` pattern fill clipped to the path |
 | PatternType 1 (colored tiling pattern) | yes | cell rendered recursively and tiled in pattern space |
-| PatternType 1 (uncolored tiling pattern) | partial | falls back to solid fill |
+| PatternType 1 (uncolored tiling pattern) | yes | stencil tile tinted by the `scn` color |
 | `BI ... ID ... EI` | yes | inline dictionary abbreviations, raw/Flate/DCT data |
 | transparency: constant alpha (`ca`/`CA` via `gs`) | partial | fill/stroke alpha; groups next |
 | blend modes (`/BM` in ExtGState) | partial | Multiply/Screen/Overlay/Darken/Lighten/Dodge/Burn/HardLight/SoftLight/Difference/Exclusion |

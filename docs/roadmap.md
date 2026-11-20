@@ -89,12 +89,12 @@ The incremental page must show the reused blue header and the new green body.
 - static annotation `/AP /N` appearance rendering;
 - widget `/AS` state dictionaries;
 - hidden optional content groups (`/OC` BDC);
-- annotation Hidden/NoView/Invisible flags.
+- annotation Hidden/NoView/Invisible flags;
+- uncolored tiling patterns (`PaintType 2`).
 
 **Remaining**
 
 - transparency groups and isolation;
-- uncolored tiling patterns;
 - SVG output and a wasm demo.
 
 **Acceptance**

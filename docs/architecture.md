@@ -183,8 +183,9 @@ CMaps remain.
 
 Tiling patterns render their `/BBox` cell through a synthetic `PdfPage` (same
 content interpreter and resources), then map each device pixel back through the
-CTM and pattern matrix to a cell coordinate. This reuses form/image/text
-handling inside a pattern cell.
+CTM and pattern matrix to a cell coordinate. Colored patterns copy the tile;
+uncolored (`PaintType 2`) patterns use the tile as a stencil and tint it with the
+`scn` color.
 
 ## Error model
 

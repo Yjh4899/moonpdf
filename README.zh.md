@@ -4,7 +4,7 @@
 
 **纯 MoonBit 的 PDF 页面渲染引擎**：解析 PDF、解释内容流、光栅化页面并输出 PNG，不依赖 JavaScript 虚拟机、C 库或浏览器。
 
-已发布到 mooncakes.io：[`Yjh4899/moonpdf@0.24.0`](https://mooncakes.io/docs/Yjh4899/moonpdf)。
+已发布到 mooncakes.io：[`Yjh4899/moonpdf@0.25.0`](https://mooncakes.io/docs/Yjh4899/moonpdf)。
 
 ## 为什么需要
 
@@ -12,7 +12,7 @@ MoonBit 生态已经能“读写 PDF”：`pdflite`/`mbtpdf` 负责对象解析�
 
 ## 当前状态
 
-已完成字体与文本里程碑的 TrueType 与 CFF 部分：经典 xref、xref stream、object stream、混合 `/XRefStm`、增量更新（`/Prev`）、Flate/ASCIIHex/ASCII85/RunLength/LZW、Form XObject、图像 XObject（灰度/RGB/CMYK、Flate、基线 JPEG）、内联图像、`/Rotate`、`/CropBox`、矩形裁剪、嵌入 TrueType（`FontFile2` 的 cmap/hmtx/glyf，含复合字形）、嵌入 CFF（`FontFile3` Type1C 的 INDEX/DICT/Type 2 charstrings）、标准 14 字体度量与 ASCII kerning（Helvetica/Times/Courier AFM）、Type0 / CIDFontType2（Identity-H、`/CIDToGIDMap`）、Type1（`FontFile` 的 PFB/PFA eexec、charstring 与 `seac` 重音）、CID-keyed CFF（`CIDFontType0` 的 charset/FDArray/FDSelect）、嵌入 Type0 编码 CMap（`begincidrange`）、具名 Adobe CJK CMap（UniGB/UniJIS/UniKS/UniCNS UCS2）、ExtGState 常量 alpha（`ca`/`CA`）与 blend modes（`/BM`）、精确 `W`/`W*` 路径裁剪、轴向/径向 shading（`sh`）、shading pattern（`PatternType 2`）与彩色 tiling pattern（`PatternType 1`）、静态 annotation appearance（`/AP /N`）与 widget `/AS` 状态、隐藏 optional content（`/OC` BDC）、annotation Hidden/NoView 标志、页面树、内容流解释、路径填充/描边、RGB/灰度/CMYK、文本状态与回退字形、2× 超采样、PNG、CLI、46 个单元/集成测试与 CI。
+已完成字体与文本里程碑的 TrueType 与 CFF 部分：经典 xref、xref stream、object stream、混合 `/XRefStm`、增量更新（`/Prev`）、Flate/ASCIIHex/ASCII85/RunLength/LZW、Form XObject、图像 XObject（灰度/RGB/CMYK、Flate、基线 JPEG）、内联图像、`/Rotate`、`/CropBox`、矩形裁剪、嵌入 TrueType（`FontFile2` 的 cmap/hmtx/glyf，含复合字形）、嵌入 CFF（`FontFile3` Type1C 的 INDEX/DICT/Type 2 charstrings）、标准 14 字体度量与 ASCII kerning（Helvetica/Times/Courier AFM）、Type0 / CIDFontType2（Identity-H、`/CIDToGIDMap`）、Type1（`FontFile` 的 PFB/PFA eexec、charstring 与 `seac` 重音）、CID-keyed CFF（`CIDFontType0` 的 charset/FDArray/FDSelect）、嵌入 Type0 编码 CMap（`begincidrange`）、具名 Adobe CJK CMap（UniGB/UniJIS/UniKS/UniCNS UCS2）、ExtGState 常量 alpha（`ca`/`CA`）与 blend modes（`/BM`）、精确 `W`/`W*` 路径裁剪、轴向/径向 shading（`sh`）、shading pattern（`PatternType 2`）与彩色/uncolored tiling pattern（`PatternType 1`）、静态 annotation appearance（`/AP /N`）与 widget `/AS` 状态、隐藏 optional content（`/OC` BDC）、annotation Hidden/NoView 标志、页面树、内容流解释、路径填充/描边、RGB/灰度/CMYK、文本状态与回退字形、2× 超采样、PNG、CLI、47 个单元/集成测试与 CI。
 
 ![MoonPDF 渲染示例](docs/images/demo.png)
 
@@ -67,6 +67,10 @@ shading pattern（`PatternType 2`）填充矩形：
 彩色 tiling pattern（`PatternType 1`）：20×20 单元格递归渲染后平铺。
 
 ![tiling pattern](docs/images/tiling-pattern.png)
+
+uncolored tiling pattern（`PaintType 2`），按 `scn` 颜色染成红色：
+
+![uncolored tiling pattern](docs/images/uncolored-pattern.png)
 
 静态 annotation appearance（`/AP /N` form）叠加到页面上：
 

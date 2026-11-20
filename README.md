@@ -9,7 +9,7 @@
 stream, rasterize the page, and write a PNG without a JavaScript VM, a C
 library, or a browser.
 
-Published as [`Yjh4899/moonpdf@0.24.0`](https://mooncakes.io/docs/Yjh4899/moonpdf)
+Published as [`Yjh4899/moonpdf@0.25.0`](https://mooncakes.io/docs/Yjh4899/moonpdf)
 on mooncakes.io.
 
 ## Why this exists
@@ -41,7 +41,7 @@ real pages end to end, including incrementally saved files:
 | Text | text state, `Td/TD/Tm/T*`, `Tj/TJ/'/"`, embedded TrueType/CFF/Type1 outlines (with Type1 `seac`), standard-14 AFM metrics and kerning, Type0/CIDFontType2, CID-keyed CFF, embedded and named CJK CMaps, bitmap fallback |
 | Transparency | constant `ca`/`CA` alpha and `BM` blend modes via ExtGState `gs`; isolation groups are next |
 | Shading | axial/radial `sh` (types 2/3) with type 2 exponential functions |
-| Patterns | shading patterns (`PatternType 2`) and colored tiling patterns (`PatternType 1`); uncolored tiling is next |
+| Patterns | shading patterns (`PatternType 2`), colored and uncolored tiling patterns (`PatternType 1`) |
 | Annotations | static `/AP /N` forms, widget `/AS` states and Hidden/NoView flags |
 | Optional content | hidden OCGs from `/OCProperties /D` and `/OC` BDC |
 | Output | RGB PNG with zlib compression |
@@ -115,6 +115,10 @@ Colored tiling pattern (`PatternType 1`): a recursive 20脳20 cell repeated
 across the page.
 
 ![Tiling pattern](docs/images/tiling-pattern.png)
+
+Uncolored tiling pattern (`PaintType 2`), tinted red by the `scn` color:
+
+![Uncolored tiling pattern](docs/images/uncolored-pattern.png)
 
 Static annotation appearance stream (`/AP /N` form) composited over the page:
 
@@ -190,7 +194,7 @@ Design rules:
 ## Testing
 
 ```sh
-moon test                 # 46 unit and integration tests
+moon test                 # 47 unit and integration tests
 moon run cmd/moonpdf -- fixtures/text.pdf out/text.png --scale 2
 ```
 
@@ -207,7 +211,7 @@ that CI can reproduce every render.
 | M0 (delivered) | file structure, filters, incremental updates, vector graphics |
 | M1 (delivered) | images, inline images, Rotate/CropBox, rectangular clipping |
 | M2 (delivered) | embedded TrueType/CFF/Type1, standard-14 metrics/kerning, Type0/CIDFontType2, CID-keyed CFF, embedded and named CJK CMaps |
-| M3 (current) | alpha, blend modes, exact clipping, shadings, patterns, annotations, flags and optional content delivered; isolation groups, uncolored patterns, SVG |
+| M3 (current) | alpha, blend modes, exact clipping, shadings, patterns, annotations, flags and optional content delivered; isolation groups, SVG |
 | M4 | corpus SSIM vs MuPDF, performance pass, wasm demo |
 
 The full plan, scope boundaries and acceptance criteria are in
