@@ -163,6 +163,14 @@ pub fn Path::rect(Self, Double, Double, Double, Double) -> Unit
 
 pub struct Pattern {
   shading : Shading?
+  tile : RenderedPage?
+  matrix : Matrix
+  bbox_x0 : Double
+  bbox_y0 : Double
+  bbox_x1 : Double
+  bbox_y1 : Double
+  x_step : Double
+  y_step : Double
 }
 
 pub struct PdfFont {

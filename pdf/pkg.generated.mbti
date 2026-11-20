@@ -12,6 +12,8 @@ pub fn dict_get(Array[(String, PdfValue)], String) -> PdfValue?
 
 pub fn inline_image_stream(Array[(String, PdfValue)], Bytes) -> PdfStream
 
+pub fn make_page(Double, Double, Double, Double, Double, Double, Int32, Array[Bytes], Array[(String, PdfValue)], Array[PdfValue?]) -> PdfPage
+
 pub fn parse_content_stream(Bytes) -> Array[ContentOp] raise PdfError
 
 pub fn parse_document(Bytes) -> PdfDocument raise PdfError

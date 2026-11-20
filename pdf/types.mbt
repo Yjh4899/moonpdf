@@ -204,3 +204,32 @@ pub fn inline_image_stream(
 ) -> PdfStream {
   { dict, data, }
 }
+
+///|
+/// Construct a synthetic page for recursive rendering (for example a tiling
+/// pattern cell).
+pub fn make_page(
+  width : Double,
+  height : Double,
+  crop_x0 : Double,
+  crop_y0 : Double,
+  crop_x1 : Double,
+  crop_y1 : Double,
+  rotate : Int32,
+  contents : Array[Bytes],
+  resources : Array[(String, PdfValue)],
+  objects : Array[PdfValue?],
+) -> PdfPage {
+  {
+    width,
+    height,
+    crop_x0,
+    crop_y0,
+    crop_x1,
+    crop_y1,
+    rotate,
+    contents,
+    resources,
+    objects,
+  }
+}
