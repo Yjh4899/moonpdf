@@ -22,6 +22,8 @@ pub fn encode_png(RenderedPage) -> Bytes
 
 pub fn load_pdf_font(@pdf.PdfPage, @pdf.PdfValue) -> PdfFont?
 
+pub fn load_shading(@pdf.PdfPage, @pdf.PdfValue) -> Shading?
+
 pub fn named_cmap(String) -> NamedCMap?
 
 pub fn parse_cff(Bytes) -> CffFont raise RenderError
@@ -201,6 +203,17 @@ pub struct RenderedPage {
   width : Int32
   height : Int32
   pixels : Bytes
+}
+
+pub struct Shading {
+  kind : Int32
+  coords : Array[Double]
+  c0 : Array[Double]
+  c1 : Array[Double]
+  exponent : Double
+  components : Int32
+  extend0 : Bool
+  extend1 : Bool
 }
 
 pub struct TrueTypeFont {

@@ -1097,6 +1097,22 @@ pub fn render_page(
           }
           _ => ()
         }
+      "sh" => {
+        let name = match op.operands.get(0) {
+          Some(@pdf.Name(name)) => name
+          _ => ""
+        }
+        if name != "" {
+          match lookup_resource(page, page.resources, "Shading", name) {
+            Some(value) =>
+              match load_shading(page, value) {
+                Some(shading) => paint_shading(canvas, state, shading)
+                None => ()
+              }
+            None => ()
+          }
+        }
+      }
       "Do" => {
         let name = match op.operands.get(0) {
           Some(@pdf.Name(name)) => name
