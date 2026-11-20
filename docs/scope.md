@@ -1,4 +1,4 @@
-# Scope and acceptance
+﻿# Scope and acceptance
 
 ## Problem
 
@@ -35,7 +35,7 @@ The concrete reuse fixture is documented in
    compares page hashes in CI, catching layout regressions without a JavaScript
    toolchain.
 
-## Delivered in release 0.21.0
+## Delivered in release 0.21.1
 
 - classic xref tables, xref streams, object streams and hybrid `/XRefStm`;
 - incremental updates: `/Prev` chain, revision overlay, free entries;
@@ -62,7 +62,7 @@ The concrete reuse fixture is documented in
 - standard-14 ASCII kerning from the Core 14 AFM KernPairs;
 - `/Rotate` 0/90/180/270, `/CropBox`, rectangular `W`/`W*` clip;
 - fill rules, line width and round caps;
-- 3×5 fallback text with `Tj` / `TJ` and text positioning;
+- 3脳5 fallback text with `Tj` / `TJ` and text positioning;
 - RGB PNG output;
 - CLI with page selection and scale;
 - unit and integration tests, fixtures and CI;
@@ -98,4 +98,4 @@ The concrete reuse fixture is documented in
 | Unit + integration tests | 43 | 100+ |
 | Unsupported-feature errors with a typed message | 100% | 100% |
 | Incremental-update fixtures | 1 | every `/Prev` document in corpus |
-| Visual diff vs reference renderer | pixel probes on fixtures | SSIM ≥ 0.95 on 98% of corpus |
+| Visual diff vs reference renderer | pixel probes on fixtures | SSIM 鈮?0.95 on 98% of corpus |

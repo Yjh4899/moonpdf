@@ -424,4 +424,5 @@ PDF display order.
 
 **Consequence.** Static widget/stamp appearances render in the right rectangle.
 Interactive state dictionaries (`/AP /N` as a state map), annotation flags and
-optional content remain M3 work.
+optional content remain M3 work. Nested annotation appearances are capped at
+depth 4 to keep recursive appearance rendering bounded.

@@ -1,15 +1,15 @@
-# MoonPDF
+﻿# MoonPDF
 
 [![CI](https://github.com/Yjh4899/moonpdf/actions/workflows/ci.yml/badge.svg)](https://github.com/Yjh4899/moonpdf/actions/workflows/ci.yml)
 [![mooncakes](https://img.shields.io/badge/mooncakes-Yjh4899%2Fmoonpdf-blue)](https://mooncakes.io/docs/Yjh4899/moonpdf)
 
-[简体中文](README.zh.md)
+[绠€浣撲腑鏂嘳(README.zh.md)
 
 **A pure-MoonBit PDF page rendering engine.** Parse a PDF, interpret its content
 stream, rasterize the page, and write a PNG without a JavaScript VM, a C
 library, or a browser.
 
-Published as [`Yjh4899/moonpdf@0.21.0`](https://mooncakes.io/docs/Yjh4899/moonpdf)
+Published as [`Yjh4899/moonpdf@0.21.1`](https://mooncakes.io/docs/Yjh4899/moonpdf)
 on mooncakes.io.
 
 ## Why this exists
@@ -94,7 +94,7 @@ the overlap:
 
 ![Constant alpha](docs/images/alpha.png)
 
-`/BM /Multiply`: yellow × blue becomes black in the overlap:
+`/BM /Multiply`: yellow 脳 blue becomes black in the overlap:
 
 ![Multiply blend mode](docs/images/blend.png)
 
@@ -110,7 +110,7 @@ Shading pattern (`PatternType 2`) clipped to a filled rectangle:
 
 ![Shading pattern](docs/images/pattern.png)
 
-Colored tiling pattern (`PatternType 1`): a recursive 20×20 cell repeated
+Colored tiling pattern (`PatternType 1`): a recursive 20脳20 cell repeated
 across the page.
 
 ![Tiling pattern](docs/images/tiling-pattern.png)
