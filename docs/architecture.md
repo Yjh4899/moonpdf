@@ -21,7 +21,7 @@ The architecture optimizes for four properties:
 | Package | Responsibility | Key files |
 | --- | --- | --- |
 | `pdf/` | syntax, object model, xref chain, filters, page tree, content operators | `types.mbt`, `parse.mbt`, `document.mbt`, `content.mbt`, `filter.mbt` |
-| `render/` | graphics state, paths, scanline raster, text/fonts, forms, images, PNG | `geometry.mbt`, `path.mbt`, `canvas.mbt`, `font.mbt`, `pdf_font.mbt`, `truetype.mbt`, `cff.mbt`, `image.mbt`, `jpeg.mbt`, `shading.mbt`, `render.mbt`, `png.mbt` |
+| `render/` | graphics state, paths, scanline raster, text/fonts, forms, images, PNG | `geometry.mbt`, `path.mbt`, `canvas.mbt`, `font.mbt`, `pdf_font.mbt`, `truetype.mbt`, `cff.mbt`, `image.mbt`, `jpeg.mbt`, `shading.mbt`, `pattern.mbt`, `render.mbt`, `png.mbt` |
 | root | small facade: `page_count`, `render_page_png` | `moonpdf.mbt` |
 | `cmd/moonpdf/` | argument parsing and file I/O | `main.mbt` |
 | `tests/integration/` | end-to-end fixtures: incremental update, xref stream, pixel probes | `lib.mbt`, `integration_test.mbt` |
@@ -57,6 +57,7 @@ ContentOp[]
        ├─ Path builder (m l c v y re h, curves flattened on insert)
        ├─ paint (fill / stroke / fill+stroke)
        ├─ sh: axial/radial gradient over the current clip
+       ├─ scn: shading-pattern fill clipped to the current path
        └─ Do: Form expansion, image XObject, inline image
 
 Canvas

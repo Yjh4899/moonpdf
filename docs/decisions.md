@@ -372,3 +372,20 @@ can replace it later if profiling demands.
 
 **Consequence.** Axial/radial gradients render. Stitching/sampled functions,
 patterns and shading types 4–7 remain M3 work.
+
+## ADR-024: shading patterns reuse the shading painter
+
+**Decision.** Model a `PatternType 2` resource as a shading. On `scn`, set the
+fill pattern on the graphics state; on fill, intersect the canvas clip with the
+path mask, paint the shading, then restore the previous mask.
+
+**Alternatives.** Build a pattern tile texture; implement tiling patterns first;
+convert shading patterns to shading operators in the fixture.
+
+**Why.** A shading pattern is already a shading plus a fill mask. Reusing
+`paint_shading` and the exact clip mask avoids a second rendering path and keeps
+pattern fills consistent with `sh`. Tiling patterns need cell rendering and
+repeat logic, which is a larger separate piece.
+
+**Consequence.** Shading-pattern fills work. Tiling patterns (`PatternType 1`)
+fall back to the solid fill color and remain M3 work.

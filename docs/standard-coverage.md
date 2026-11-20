@@ -53,7 +53,7 @@ The public acceptance corpus is:
    unknown content operators follow the PDF rule for unknown operators and are
    counted in the compatibility report.
 
-## Current status (release 0.18.0)
+## Current status (release 0.19.0)
 
 | Area | Current | Gap to target |
 | --- | --- | --- |
@@ -78,7 +78,8 @@ The public acceptance corpus is:
 | constant alpha via ExtGState `ca`/`CA` | implemented | transparency groups |
 | blend modes via ExtGState `/BM` | implemented | isolation groups |
 | transparency, soft masks, shadings, patterns | partial | M3 |
-| axial/radial shadings (`sh`, types 2/3, function type 2) | implemented | stitching/sampled functions, patterns |
+| axial/radial shadings (`sh`, types 2/3, function type 2) | implemented | stitching/sampled functions |
+| shading patterns (`PatternType 2`) | implemented | tiling patterns, pattern color spaces |
 | annotation appearance streams, optional content | not yet | M3 |
 
 The gap column is the development plan, not a redefinition of the standard.
