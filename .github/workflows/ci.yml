@@ -55,6 +55,7 @@ jobs:
           moon run --target native cmd/moonpdf -- fixtures/shading.pdf out/shading.png --scale 2
           moon run --target native cmd/moonpdf -- fixtures/pattern.pdf out/pattern.png --scale 2
           moon run --target native cmd/moonpdf -- fixtures/tiling-pattern.pdf out/tiling-pattern.png --scale 2
+          moon run --target native cmd/moonpdf -- fixtures/uncolored-pattern.pdf out/uncolored-pattern.png --scale 2
           moon run --target native cmd/moonpdf -- fixtures/annotation.pdf out/annotation.png --scale 2
           moon run --target native cmd/moonpdf -- fixtures/widget-states.pdf out/widget-states.png --scale 2
           moon run --target native cmd/moonpdf -- fixtures/optional-content.pdf out/optional-content.png --scale 2
@@ -117,6 +118,7 @@ jobs:
               "shading.png": (400, 400),
               "pattern.png": (400, 400),
               "tiling-pattern.png": (400, 400),
+              "uncolored-pattern.png": (400, 400),
               "annotation.png": (400, 400),
               "widget-states.png": (400, 400),
               "optional-content.png": (400, 400),
