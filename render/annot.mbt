@@ -4,7 +4,11 @@ pub fn draw_annotations(
   page : @pdf.PdfPage,
   canvas : Canvas,
   base : Matrix,
+  depth : Int32,
 ) -> Unit {
+  if depth > 4 {
+    return
+  }
   canvas.reset_clip(0, 0, canvas.width, canvas.height)
   canvas.set_clip_mask(None)
   canvas.set_alpha(255)
@@ -113,7 +117,11 @@ pub fn draw_annotations(
       [],
       page.objects,
     )
-    let tile = render_page(synthetic, RenderOptions::with_scale(1.0)) catch {
+    let tile = render_page_inner(
+      synthetic,
+      RenderOptions::with_scale(1.0),
+      depth + 1,
+    ) catch {
       _ => continue
     }
     let p0 = base.apply(rx0, ry0)

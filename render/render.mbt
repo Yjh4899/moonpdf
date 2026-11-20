@@ -665,6 +665,15 @@ pub fn render_page(
   page : @pdf.PdfPage,
   options : RenderOptions,
 ) -> RenderedPage raise RenderError {
+  render_page_inner(page, options, 0)
+}
+
+///|
+fn render_page_inner(
+  page : @pdf.PdfPage,
+  options : RenderOptions,
+  depth : Int32,
+) -> RenderedPage raise RenderError {
   let buf = @buffer.Buffer::Buffer()
   for part in page.contents {
     buf.write_bytes(part)
@@ -1167,7 +1176,7 @@ pub fn render_page(
       _ => ()
     }
   }
-  draw_annotations(page, canvas, base)
+  draw_annotations(page, canvas, base, depth)
   let final_canvas = canvas.downsample(ss)
   {
     width: final_canvas.width,
