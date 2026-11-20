@@ -53,7 +53,7 @@ The public acceptance corpus is:
    unknown content operators follow the PDF rule for unknown operators and are
    counted in the compatibility report.
 
-## Current status (release 0.23.0)
+## Current status (release 0.24.0)
 
 | Area | Current | Gap to target |
 | --- | --- | --- |
@@ -85,6 +85,7 @@ The public acceptance corpus is:
 | optional content groups (`/OC` BDC, `/OCProperties /D`) | implemented | form-level OC filtering |
 | static annotation `/AP /N` form rendering | implemented | annotation flags and optional content |
 | widget `/AS` appearance states (`/N` dictionary) | implemented | annotation flags |
+| annotation Hidden/NoView/Invisible flags (`/F`) | implemented | — |
 
 The gap column is the development plan, not a redefinition of the standard.
 Each milestone is accepted against the same corpus and the same SSIM gate.

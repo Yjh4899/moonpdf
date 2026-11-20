@@ -460,3 +460,18 @@ same decision.
 **Consequence.** Hidden layers are omitted from rendered output. Optional content
 inside Form XObjects, `/OCProperties` usage dictionaries and per-page
 configuration overrides remain next.
+
+## ADR-029: honor annotation visibility flags
+
+**Decision.** Before rendering an annotation, read `/F` and skip when the
+Invisible (1), Hidden (2) or NoView (32) bits are set.
+
+**Alternatives.** Render every annotation; only honor Hidden; rely on `/AP`
+presence.
+
+**Why.** Visibility flags are explicit document instructions, and rendering a
+Hidden annotation would be visibly wrong. The bit check is cheap, happens before
+appearance rendering, and matches the flag semantics used by PDF viewers.
+
+**Consequence.** Hidden/NoView annotations are omitted. Print-only semantics and
+annotation appearances on the `/AP /R`/`/D` paths remain out of scope.

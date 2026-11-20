@@ -78,7 +78,8 @@ RenderedPage
 
 Annotations are rendered after page content: each `/AP /N` form is rendered into
 a synthetic page sized to its `/Rect`, then composited at the rect. Widgets with
-an `/N` state dictionary select the form named by `/AS`.
+an `/N` state dictionary select the form named by `/AS`; annotations with the
+Invisible/Hidden/NoView `/F` bits are skipped.
 
 Hidden optional-content groups are resolved from catalog `/OCProperties /D`
 (`/BaseState`, `/ON`, `/OFF`); operations inside a hidden `/OC` BDC/EMC section

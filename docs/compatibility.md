@@ -74,7 +74,7 @@ samples. Image-specific color transforms are part of the image milestone.
 | transparency groups | next | isolation and group alpha are next |
 | progressive JPEG (`SOF2`) | next | baseline `SOF0`/`SOF1` only |
 | soft mask (`/SMask`) | next | image alpha is ignored |
-| annotation appearance streams (`/AP /N`) | partial | static forms and `/AS` widget state dictionaries; flags next |
+| annotation appearance streams (`/AP /N`) | partial | static forms, `/AS` states, Hidden/NoView flags |
 | optional content (`/OC` BDC, `/OCProperties /D`) | partial | page content; form content filtering next |
 
 ## Text
