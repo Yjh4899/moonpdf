@@ -1,4 +1,4 @@
-﻿# MoonPDF
+# MoonPDF
 
 [![CI](https://github.com/Yjh4899/moonpdf/actions/workflows/ci.yml/badge.svg)](https://github.com/Yjh4899/moonpdf/actions/workflows/ci.yml)
 [![mooncakes](https://img.shields.io/badge/mooncakes-Yjh4899%2Fmoonpdf-blue)](https://mooncakes.io/docs/Yjh4899/moonpdf)
@@ -9,7 +9,7 @@
 stream, rasterize the page, and write a PNG without a JavaScript VM, a C
 library, or a browser.
 
-Published as [`Yjh4899/moonpdf@0.21.1`](https://mooncakes.io/docs/Yjh4899/moonpdf)
+Published as [`Yjh4899/moonpdf@0.22.0`](https://mooncakes.io/docs/Yjh4899/moonpdf)
 on mooncakes.io.
 
 ## Why this exists
@@ -42,7 +42,7 @@ real pages end to end, including incrementally saved files:
 | Transparency | constant `ca`/`CA` alpha and `BM` blend modes via ExtGState `gs`; isolation groups are next |
 | Shading | axial/radial `sh` (types 2/3) with type 2 exponential functions |
 | Patterns | shading patterns (`PatternType 2`) and colored tiling patterns (`PatternType 1`); uncolored tiling is next |
-| Annotations | static `/AP /N` appearance form XObjects; widget states are next |
+| Annotations | static `/AP /N` forms and widget `/AS` state dictionaries |
 | Output | RGB PNG with zlib compression |
 
 The target is ISO 32000-1:2008 page rendering. See
@@ -119,6 +119,10 @@ Static annotation appearance stream (`/AP /N` form) composited over the page:
 
 ![Annotation appearance](docs/images/annotation.png)
 
+Widget appearance states: `/AS /On` renders green, `/AS /Off` renders red.
+
+![Widget appearance states](docs/images/widget-states.png)
+
 ## Quick start
 
 Requirements: the MoonBit toolchain (`moon 0.1.20261102` or newer). Node.js is
@@ -176,7 +180,7 @@ Design rules:
 ## Testing
 
 ```sh
-moon test                 # 43 unit and integration tests
+moon test                 # 44 unit and integration tests
 moon run cmd/moonpdf -- fixtures/text.pdf out/text.png --scale 2
 ```
 
@@ -193,7 +197,7 @@ that CI can reproduce every render.
 | M0 (delivered) | file structure, filters, incremental updates, vector graphics |
 | M1 (delivered) | images, inline images, Rotate/CropBox, rectangular clipping |
 | M2 (delivered) | embedded TrueType/CFF/Type1, standard-14 metrics/kerning, Type0/CIDFontType2, CID-keyed CFF, embedded and named CJK CMaps |
-| M3 (current) | alpha, blend modes, exact clipping, shadings, shading/tiling patterns and static annotations delivered; isolation groups, uncolored patterns, widget states, SVG |
+| M3 (current) | alpha, blend modes, exact clipping, shadings, patterns, static annotations and widget states delivered; isolation groups, uncolored patterns, annotation flags, SVG |
 | M4 | corpus SSIM vs MuPDF, performance pass, wasm demo |
 
 The full plan, scope boundaries and acceptance criteria are in

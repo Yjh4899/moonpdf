@@ -76,7 +76,8 @@ RenderedPage
 ```
 
 Annotations are rendered after page content: each `/AP /N` form is rendered into
-a synthetic page sized to its `/Rect`, then composited at the rect.
+a synthetic page sized to its `/Rect`, then composited at the rect. Widgets with
+an `/N` state dictionary select the form named by `/AS`.
 
 ## Cross-reference chain and revisions
 

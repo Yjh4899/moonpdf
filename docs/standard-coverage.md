@@ -53,7 +53,7 @@ The public acceptance corpus is:
    unknown content operators follow the PDF rule for unknown operators and are
    counted in the compatibility report.
 
-## Current status (release 0.21.1)
+## Current status (release 0.22.0)
 
 | Area | Current | Gap to target |
 | --- | --- | --- |
@@ -82,7 +82,8 @@ The public acceptance corpus is:
 | shading patterns (`PatternType 2`) | implemented | pattern color spaces |
 | colored tiling patterns (`PatternType 1`, PaintType 1) | implemented | uncolored (PaintType 2) patterns |
 | annotation appearance streams, optional content | partial | interactive widget states, optional content |
-| static annotation `/AP /N` form rendering | implemented | annotation flags and state dictionaries |
+| static annotation `/AP /N` form rendering | implemented | annotation flags and optional content |
+| widget `/AS` appearance states (`/N` dictionary) | implemented | annotation flags |
 
 The gap column is the development plan, not a redefinition of the standard.
 Each milestone is accepted against the same corpus and the same SSIM gate.

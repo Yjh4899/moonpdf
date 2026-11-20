@@ -426,3 +426,18 @@ PDF display order.
 Interactive state dictionaries (`/AP /N` as a state map), annotation flags and
 optional content remain M3 work. Nested annotation appearances are capped at
 depth 4 to keep recursive appearance rendering bounded.
+
+## ADR-027: widget appearance states via `/AS`
+
+**Decision.** When `/AP /N` is a state dictionary, resolve the stream named by
+the annotation `/AS`; if `/AS` is absent, use the first stream in the dictionary.
+
+**Alternatives.** Always use `/On`; render every state stacked; ignore widget
+states.
+
+**Why.** `/AS` is the document's declaration of which appearance is active. It
+is a small lookup after the static form path and makes checkbox/radio widgets
+render in the state the PDF says they are in.
+
+**Consequence.** `/On`/`/Off` and custom state names work. Annotation flags and
+appearance-stream `/AP /R`/`/D` variants remain M3 work.
