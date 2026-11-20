@@ -1,4 +1,4 @@
-﻿// MoonPDF module manifest.
+// MoonPDF module manifest.
 // Toolchain docs: https://docs.moonbitlang.com/en/latest/toolchain/moon/module.html
 
 name = "Yjh4899/moonpdf"

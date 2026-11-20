@@ -1,4 +1,4 @@
-﻿# Standard coverage target
+# Standard coverage target
 
 ## Target statement
 
@@ -28,9 +28,9 @@ The public acceptance corpus is:
 | 7.5 | File structure: header, xref table, xref stream, incremental updates, free list, trailer, object streams, stream filters | complete |
 | 7.7 | Document structure: catalog, page tree, inherited attributes, resources | complete |
 | 7.8 | Content streams and content model | complete |
-| 8.2鈥?.5 | Graphics state, paths, painting, color spaces | complete |
-| 8.6鈥?.9 | Images, Form XObjects, inline images, soft masks | complete |
-| 8.10鈥?.11 | Shadings, patterns | complete |
+| 8.2–8.5 | Graphics state, paths, painting, color spaces | complete |
+| 8.6–8.9 | Images, Form XObjects, inline images, soft masks | complete |
+| 8.10–8.11 | Shadings, patterns | complete |
 | 9 | Text: fonts, encodings, text state, rendering modes, Type 1/TrueType/CFF, CID fonts | complete |
 | 11 | Transparency and blend modes | complete |
 | 12.5 | Annotation appearance streams | complete |
@@ -42,7 +42,7 @@ The public acceptance corpus is:
 1. **No crash, no hang.** Every page in the corpus either renders or raises a
    specific diagnostic within a fixed time budget.
 2. **Visual agreement.** On the declared corpus, at least 98% of pages reach
-   SSIM 鈮?0.95 against a MuPDF reference render at 144 dpi; the remaining pages
+   SSIM ≥ 0.95 against a MuPDF reference render at 144 dpi; the remaining pages
    are listed with the missing feature and a link to the corresponding clause.
 3. **Incremental updates.** Every document with a `/Prev` chain renders the
    latest revision; reused objects from older revisions are resolved correctly.
@@ -57,20 +57,20 @@ The public acceptance corpus is:
 
 | Area | Current | Gap to target |
 | --- | --- | --- |
-| classic xref, xref streams, object streams, hybrid `/XRefStm` | implemented | 鈥?|
-| incremental updates (`/Prev`, free entries, revision overlay) | implemented | 鈥?|
+| classic xref, xref streams, object streams, hybrid `/XRefStm` | implemented | — |
+| incremental updates (`/Prev`, free entries, revision overlay) | implemented | — |
 | Flate, ASCIIHex, ASCII85, RunLength, LZW filters | implemented | image-specific codecs |
 | page tree, inherited `MediaBox`/`Resources`, `/Rotate`, `/CropBox` | implemented | `BBox`/`CropBox` edge cases |
 | paths, fill/stroke, RGB/gray/CMYK | implemented | dash/miter details |
 | exact path clipping (`W`/`W*`) | implemented | clip stack depth is bounded by memory |
-| Form XObjects | implemented (expansion, matrix, nested resources, `BBox` clip) | 鈥?|
+| Form XObjects | implemented (expansion, matrix, nested resources, `BBox` clip) | — |
 | images: Flate/gray/RGB/CMYK, baseline DCT, inline images | implemented | progressive DCT, soft masks, 1/2/4-bit samples |
-| embedded TrueType (`FontFile2`), cmap/hmtx/simple+composite glyf outlines | implemented | 鈥?|
+| embedded TrueType (`FontFile2`), cmap/hmtx/simple+composite glyf outlines | implemented | — |
 | standard-14 metrics (Helvetica/Times/Courier AFM widths) | implemented | Symbol/ZapfDingbats |
-| standard-14 ASCII kerning (AFM KernPairs) | implemented | 鈥?|
-| embedded CFF (`FontFile3` Type1C, non-CID) Type 2 charstrings | implemented | 鈥?|
-| CID-keyed CFF (`CIDFontType0`), charset/FDArray/FDSelect | implemented | 鈥?|
-| Type0 / CIDFontType2, Identity-H, `/CIDToGIDMap` | implemented | 鈥?|
+| standard-14 ASCII kerning (AFM KernPairs) | implemented | — |
+| embedded CFF (`FontFile3` Type1C, non-CID) Type 2 charstrings | implemented | — |
+| CID-keyed CFF (`CIDFontType0`), charset/FDArray/FDSelect | implemented | — |
+| Type0 / CIDFontType2, Identity-H, `/CIDToGIDMap` | implemented | — |
 | embedded Type0 encoding CMaps (`begincidrange`/`begincidchar`) | implemented | vertical writing |
 | named Adobe CJK CMaps (`UniGB/UCS2`, `UniJIS/UCS2`, `UniKS/UCS2`, `UniCNS/UCS2`) | implemented | vertical layout |
 | embedded Type1 (`FontFile`) PFB/PFA charstrings, `seac` | implemented | CID-keyed CFF |
