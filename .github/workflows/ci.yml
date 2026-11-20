@@ -56,6 +56,7 @@ jobs:
           moon run --target native cmd/moonpdf -- fixtures/pattern.pdf out/pattern.png --scale 2
           moon run --target native cmd/moonpdf -- fixtures/tiling-pattern.pdf out/tiling-pattern.png --scale 2
           moon run --target native cmd/moonpdf -- fixtures/annotation.pdf out/annotation.png --scale 2
+          moon run --target native cmd/moonpdf -- fixtures/widget-states.pdf out/widget-states.png --scale 2
 
       - name: Verify PNG output and reused-resource pixels
         run: |
@@ -115,6 +116,7 @@ jobs:
               "pattern.png": (400, 400),
               "tiling-pattern.png": (400, 400),
               "annotation.png": (400, 400),
+              "widget-states.png": (400, 400),
           }
           for name, size in expected.items():
               width, height, raw, stride = read_png(Path("out") / name)
@@ -303,6 +305,14 @@ jobs:
           assert center[1] > 180 and center[0] < 80, center
           assert outside[0] > 240 and outside[2] > 240, outside
           print("annotation", center, outside)
+
+          # Widget /AS states: On is green, Off is red.
+          width, height, raw, stride = read_png(Path("out/widget-states.png"))
+          on = pixel(raw, stride, 150, 250)
+          off = pixel(raw, stride, 290, 250)
+          assert on[1] > 180 and on[0] < 80, on
+          assert off[0] > 180 and off[1] < 80, off
+          print("widget states", on, off)
           PY
 
       - name: Upload rendered pages
