@@ -57,7 +57,7 @@ ContentOp[]
        ├─ Path builder (m l c v y re h, curves flattened on insert)
        ├─ paint (fill / stroke / fill+stroke)
        ├─ sh: axial/radial gradient over the current clip
-       ├─ scn: shading-pattern fill clipped to the current path
+       ├─ scn: shading-pattern or tiling-pattern fill clipped to the path
        └─ Do: Form expansion, image XObject, inline image
 
 Canvas
@@ -170,6 +170,11 @@ Helvetica/Times/Courier fonts use the Adobe Core 14 AFM widths and ASCII
 KernPairs, with bitmap glyphs scaled to the measured advance. Type1, CID-keyed
 CFF and embedded CMaps now have their own outline paths; named predefined CJK
 CMaps remain.
+
+Tiling patterns render their `/BBox` cell through a synthetic `PdfPage` (same
+content interpreter and resources), then map each device pixel back through the
+CTM and pattern matrix to a cell coordinate. This reuses form/image/text
+handling inside a pattern cell.
 
 ## Error model
 

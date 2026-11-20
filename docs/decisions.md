@@ -389,3 +389,21 @@ repeat logic, which is a larger separate piece.
 
 **Consequence.** Shading-pattern fills work. Tiling patterns (`PatternType 1`)
 fall back to the solid fill color and remain M3 work.
+
+## ADR-025: tiling pattern cells rendered through a synthetic page
+
+**Decision.** Render a `PatternType 1` cell by constructing a synthetic
+`PdfPage` from its `/BBox`, content stream and resources, then sampling that
+tile in pattern space. Colored patterns (`PaintType 1`) are supported; uncolored
+patterns fall back to the solid fill color.
+
+**Alternatives.** Write a separate mini-interpreter for pattern content; raster
+the cell into a texture with a bespoke parser; support only shading patterns.
+
+**Why.** Pattern cell content is ordinary PDF content with its own resources.
+Reusing `render_page` avoids duplicating the operator interpreter and gives
+pattern cells forms, text, images and nested clipping for free. The tile is
+small, so the recursive render cost is bounded by the cell BBox.
+
+**Consequence.** Colored tiling patterns repeat correctly under CTM and pattern
+matrices. Uncolored patterns and very large cells remain M3 work.
