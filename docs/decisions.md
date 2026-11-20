@@ -355,3 +355,20 @@ downsampling.
 **Consequence.** Exact `W`/`W*` clipping works and composes with alpha/blend.
 Each clip allocation is `width * height` bytes at supersampled resolution;
 deep clip stacks trade memory for simplicity.
+
+## ADR-023: shading as per-pixel inverse mapping
+
+**Decision.** Parse shading types 2 (axial) and 3 (radial) with a type 2
+exponential function, then for each device pixel in the clip bbox inverse-map
+through the CTM, compute `t`, evaluate C0/C1, and write the pixel.
+
+**Alternatives.** Build a gradient texture and fill the path; rasterize the
+shading into a separate canvas and composite; only support axial shadings.
+
+**Why.** The inverse map handles arbitrary CTMs and works for both axial and
+radial geometry with one loop. It reuses the existing clip mask and alpha/blend
+state, so `sh` respects the same compositing rules as fills. A texture pipeline
+can replace it later if profiling demands.
+
+**Consequence.** Axial/radial gradients render. Stitching/sampled functions,
+patterns and shading types 4–7 remain M3 work.

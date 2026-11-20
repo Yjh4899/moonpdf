@@ -82,12 +82,13 @@ The incremental page must show the reused blue header and the new green body.
 
 - constant fill/stroke/text alpha from `ExtGState /ca` and `/CA`;
 - blend modes from `ExtGState /BM` (source-over canvas, no isolation yet);
-- exact `W`/`W*` path clipping with a per-pixel mask.
+- exact `W`/`W*` path clipping with a per-pixel mask;
+- axial/radial shadings (`sh`, types 2/3).
 
 **Remaining**
 
 - transparency groups and isolation;
-- shadings and patterns;
+- patterns;
 - annotation appearance streams;
 - optional content visibility;
 - SVG output and a wasm demo.
