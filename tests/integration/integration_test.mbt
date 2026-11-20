@@ -683,6 +683,29 @@ test "hidden annotation flag" {
 }
 
 ///|
+test "uncolored tiling pattern" {
+  let raster = match
+    @integration.rasterize(
+      @integration.fixture_bytes("fixtures/uncolored-pattern.pdf"),
+      1.0,
+    ) {
+    Some(raster) => raster
+    None => {
+      assert_true(false)
+      return
+    }
+  }
+  assert_eq(raster.width, 200)
+  assert_eq(raster.height, 200)
+  let red = (195 * raster.width + 5) * 3
+  assert_true(raster.pixels.at(red).to_int() > 180)
+  assert_true(raster.pixels.at(red + 1).to_int() < 80)
+  let white = (195 * raster.width + 15) * 3
+  assert_true(raster.pixels.at(white).to_int() > 240)
+  assert_true(raster.pixels.at(white + 1).to_int() > 240)
+}
+
+///|
 test "xref stream and object stream fixture" {
   let data = @integration.fixture_bytes("fixtures/xref-stream.pdf")
   let document = try! @pdf.parse_document(data)
