@@ -20,6 +20,8 @@ pub fn draw_type1_glyph(Canvas, Type1Font, String, Matrix, Double, Int32, Int32,
 
 pub fn encode_png(RenderedPage) -> Bytes
 
+pub fn load_pattern(@pdf.PdfPage, @pdf.PdfValue) -> Pattern?
+
 pub fn load_pdf_font(@pdf.PdfPage, @pdf.PdfValue) -> PdfFont?
 
 pub fn load_shading(@pdf.PdfPage, @pdf.PdfValue) -> Shading?
@@ -158,6 +160,10 @@ pub fn Path::move_to(Self, Point) -> Unit
 pub fn Path::new() -> Self
 pub fn Path::quad_to(Self, Point, Point) -> Unit
 pub fn Path::rect(Self, Double, Double, Double, Double) -> Unit
+
+pub struct Pattern {
+  shading : Shading?
+}
 
 pub struct PdfFont {
   base_name : String

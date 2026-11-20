@@ -43,6 +43,7 @@ priv struct GState {
   mut fill_alpha : Double
   mut stroke_alpha : Double
   mut blend_mode : Int32
+  mut fill_pattern : Pattern?
   mut clip_mask : Array[Byte]?
   clip : (Int32, Int32, Int32, Int32)
 }
@@ -66,6 +67,7 @@ fn GState::initial(
     fill_alpha: 1.0,
     stroke_alpha: 1.0,
     blend_mode: 0,
+    fill_pattern: None,
     clip_mask,
     clip,
   }
@@ -178,6 +180,7 @@ fn set_fill(state : GState, r : Int32, g : Int32, b : Int32) -> Unit {
   state.fill_r = r
   state.fill_g = g
   state.fill_b = b
+  state.fill_pattern = None
 }
 
 ///|
@@ -246,14 +249,19 @@ fn paint(
   let (subpaths, closed) = path.finish()
   canvas.set_blend(state.blend_mode)
   if fill {
-    canvas.set_alpha(alpha_component(state.fill_alpha))
-    canvas.fill_polygons(
-      subpaths,
-      even_odd,
-      state.fill_r,
-      state.fill_g,
-      state.fill_b,
-    )
+    match state.fill_pattern {
+      Some(pattern) => paint_pattern(canvas, state, subpaths, even_odd, pattern)
+      None => {
+        canvas.set_alpha(alpha_component(state.fill_alpha))
+        canvas.fill_polygons(
+          subpaths,
+          even_odd,
+          state.fill_r,
+          state.fill_g,
+          state.fill_b,
+        )
+      }
+    }
   }
   if stroke {
     canvas.set_alpha(alpha_component(state.stroke_alpha))
@@ -811,6 +819,22 @@ pub fn render_page(
           Some(cap) => state.round_cap = cap.to_int() == 1
           None => ()
         }
+      "cs" | "CS" => state.fill_pattern = None
+      "scn" => {
+        let name = match op.operands.get(0) {
+          Some(@pdf.Name(name)) => name
+          _ => ""
+        }
+        if name == "" {
+          state.fill_pattern = None
+        } else {
+          match lookup_resource(page, page.resources, "Pattern", name) {
+            Some(value) => state.fill_pattern = load_pattern(page, value)
+            None => state.fill_pattern = None
+          }
+        }
+      }
+      "SCN" => state.fill_pattern = None
       "g" =>
         match op_number(op, 0) {
           Some(v) => apply_gray(state, v, false)
