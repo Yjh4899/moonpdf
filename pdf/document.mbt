@@ -576,11 +576,101 @@ fn walk_page_tree(
         contents,
         resources,
         annots,
+        oc_off: [],
         objects: doc.objects,
       }
       doc.pages.push(page)
     }
   }
+}
+
+///|
+fn oc_ref_number(value : PdfValue) -> Int32? {
+  match value {
+    Ref(number, _) => Some(number)
+    _ => None
+  }
+}
+
+///|
+fn oc_ref_array(doc : PdfDocument, value : PdfValue?) -> Array[Int32] {
+  let out : Array[Int32] = []
+  match value {
+    Some(value) =>
+      match doc.resolve(value).as_array() {
+        Some(items) =>
+          for item in items {
+            match oc_ref_number(item) {
+              Some(number) => out.push(number)
+              None => ()
+            }
+          }
+        None => ()
+      }
+    None => ()
+  }
+  out
+}
+
+///|
+fn oc_set_visible(
+  visible : Array[(Int32, Bool)],
+  number : Int32,
+  value : Bool,
+) -> Unit {
+  let mut found = false
+  let mut i = 0
+  while i < visible.length() {
+    if visible[i].0 == number {
+      visible[i] = (number, value)
+      found = true
+    }
+    i = i + 1
+  }
+  if !found {
+    visible.push((number, value))
+  }
+}
+
+///|
+fn optional_content_off(
+  doc : PdfDocument,
+  root : Array[(String, PdfValue)],
+) -> Array[Int32] {
+  let properties = match dict_get(root, "OCProperties") {
+    Some(value) => doc.resolve_dict(value)
+    None => return []
+  }
+  let config = match dict_get(properties, "D") {
+    Some(value) => doc.resolve_dict(value)
+    None => return []
+  }
+  let base_off = match dict_get(config, "BaseState") {
+    Some(value) =>
+      match value.as_name() {
+        Some(name) => name == "OFF"
+        None => false
+      }
+    None => false
+  }
+  let visible : Array[(Int32, Bool)] = []
+  let ocgs = oc_ref_array(doc, dict_get(properties, "OCGs"))
+  for number in ocgs {
+    visible.push((number, !base_off))
+  }
+  for number in oc_ref_array(doc, dict_get(config, "ON")) {
+    oc_set_visible(visible, number, true)
+  }
+  for number in oc_ref_array(doc, dict_get(config, "OFF")) {
+    oc_set_visible(visible, number, false)
+  }
+  let hidden : Array[Int32] = []
+  for entry in visible {
+    if !entry.1 {
+      hidden.push(entry.0)
+    }
+  }
+  hidden
 }
 
 ///|
@@ -606,5 +696,11 @@ pub fn parse_document(data : Bytes) -> PdfDocument raise PdfError {
     None => raise PdfError("catalog has no Pages")
   }
   walk_page_tree(doc, pages_value, [], [0.0, 0.0, 612.0, 792.0])
+  let oc_off = optional_content_off(doc, root)
+  let mut page_index = 0
+  while page_index < doc.pages.length() {
+    doc.pages[page_index].oc_off = oc_off
+    page_index = page_index + 1
+  }
   doc
 }

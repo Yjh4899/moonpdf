@@ -159,6 +159,7 @@ pub fn draw_annotations(
       [buf.to_bytes()],
       resources,
       [],
+      [],
       page.objects,
     )
     let tile = render_page_inner(

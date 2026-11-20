@@ -117,6 +117,7 @@ pub struct PdfPage {
   contents : Array[Bytes]
   resources : Array[(String, PdfValue)]
   annots : Array[PdfValue]
+  mut oc_off : Array[Int32]
   objects : Array[PdfValue?]
 }
 
@@ -220,6 +221,7 @@ pub fn make_page(
   contents : Array[Bytes],
   resources : Array[(String, PdfValue)],
   annots : Array[PdfValue],
+  oc_off : Array[Int32],
   objects : Array[PdfValue?],
 ) -> PdfPage {
   {
@@ -233,6 +235,7 @@ pub fn make_page(
     contents,
     resources,
     annots,
+    oc_off,
     objects,
   }
 }

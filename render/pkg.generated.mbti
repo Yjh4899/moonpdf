@@ -22,6 +22,8 @@ pub fn draw_type1_glyph(Canvas, Type1Font, String, Matrix, Double, Int32, Int32,
 
 pub fn encode_png(RenderedPage) -> Bytes
 
+pub fn filter_optional_content(@pdf.PdfPage, Array[@pdf.ContentOp]) -> Array[@pdf.ContentOp]
+
 pub fn load_pattern(@pdf.PdfPage, @pdf.PdfValue) -> Pattern?
 
 pub fn load_pdf_font(@pdf.PdfPage, @pdf.PdfValue) -> PdfFont?

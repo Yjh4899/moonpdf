@@ -743,7 +743,8 @@ fn render_page_inner(
         y1 * device_scale,
       )
   }
-  let expanded = expand_forms(page, page.resources, ops, 0)
+  let filtered = filter_optional_content(page, ops)
+  let expanded = expand_forms(page, page.resources, filtered, 0)
   let mut state = GState::initial(base, canvas.clip_rect(), canvas.clip_mask())
   let stack : Array[GState] = Array(capacity=8)
   let mut text = TextState::initial()
