@@ -58,6 +58,7 @@ jobs:
           moon run --target native cmd/moonpdf -- fixtures/annotation.pdf out/annotation.png --scale 2
           moon run --target native cmd/moonpdf -- fixtures/widget-states.pdf out/widget-states.png --scale 2
           moon run --target native cmd/moonpdf -- fixtures/optional-content.pdf out/optional-content.png --scale 2
+          moon run --target native cmd/moonpdf -- fixtures/annotation-flags.pdf out/annotation-flags.png --scale 2
 
       - name: Verify PNG output and reused-resource pixels
         run: |
@@ -119,6 +120,7 @@ jobs:
               "annotation.png": (400, 400),
               "widget-states.png": (400, 400),
               "optional-content.png": (400, 400),
+              "annotation-flags.png": (400, 400),
           }
           for name, size in expected.items():
               width, height, raw, stride = read_png(Path("out") / name)
@@ -321,6 +323,14 @@ jobs:
           center = pixel(raw, stride, 200, 200)
           assert center[0] > 180 and center[1] < 60, center
           print("optional content", center)
+
+          # Hidden annotation flag: visible green widget, hidden red widget.
+          width, height, raw, stride = read_png(Path("out/annotation-flags.png"))
+          visible = pixel(raw, stride, 150, 250)
+          hidden = pixel(raw, stride, 290, 250)
+          assert visible[1] > 180 and visible[0] < 80, visible
+          assert hidden[0] > 240 and hidden[2] > 240, hidden
+          print("annotation flags", visible, hidden)
           PY
 
       - name: Upload rendered pages
