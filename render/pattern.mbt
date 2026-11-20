@@ -12,6 +12,7 @@ pub struct Pattern {
   bbox_y1 : Double
   x_step : Double
   y_step : Double
+  uncolored : Bool
 }
 
 ///|
@@ -105,25 +106,13 @@ pub fn load_pattern(page : @pdf.PdfPage, value : @pdf.PdfValue) -> Pattern? {
           bbox_y1: 0.0,
           x_step: 0.0,
           y_step: 0.0,
+          uncolored: false,
         })
       }
       None => None
     }
   } else {
     let paint_type = pattern_int(page, dict, "PaintType", 1)
-    if paint_type == 2 {
-      return Some({
-        shading: None,
-        tile: None,
-        matrix: pattern_matrix(page, dict),
-        bbox_x0: 0.0,
-        bbox_y0: 0.0,
-        bbox_x1: 0.0,
-        bbox_y1: 0.0,
-        x_step: 0.0,
-        y_step: 0.0,
-      })
-    }
     let bbox = pattern_numbers(page, dict, "BBox")
     if bbox.length() < 4 {
       return None
@@ -200,6 +189,7 @@ pub fn load_pattern(page : @pdf.PdfPage, value : @pdf.PdfValue) -> Pattern? {
       bbox_y1: by1,
       x_step,
       y_step,
+      uncolored: paint_type == 2,
     })
   }
 }
@@ -259,18 +249,29 @@ fn paint_tile(
           ty = tile.height - 1
         }
         let idx = (ty * tile.width + tx) * 3
-        canvas.set(
-          x,
-          y,
-          tile.pixels.at(idx).to_int(),
-          tile.pixels.at(idx + 1).to_int(),
-          tile.pixels.at(idx + 2).to_int(),
-        )
+        let tr = tile.pixels.at(idx).to_int()
+        let tg = tile.pixels.at(idx + 1).to_int()
+        let tb = tile.pixels.at(idx + 2).to_int()
+        if pattern.uncolored {
+          let coverage = 255 - (tr + tg + tb) / 3
+          let alpha = alpha_component(state.fill_alpha) * coverage / 255
+          canvas.set_alpha(alpha)
+          canvas.set(
+            x,
+            y,
+            color_component(state.pattern_r),
+            color_component(state.pattern_g),
+            color_component(state.pattern_b),
+          )
+        } else {
+          canvas.set(x, y, tr, tg, tb)
+        }
       }
       x = x + 1
     }
     y = y + 1
   }
+  canvas.set_alpha(alpha_component(state.fill_alpha))
   canvas.set_clip_mask(previous)
 }
 

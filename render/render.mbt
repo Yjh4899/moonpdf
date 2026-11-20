@@ -44,6 +44,9 @@ priv struct GState {
   mut stroke_alpha : Double
   mut blend_mode : Int32
   mut fill_pattern : Pattern?
+  mut pattern_r : Double
+  mut pattern_g : Double
+  mut pattern_b : Double
   mut clip_mask : Array[Byte]?
   clip : (Int32, Int32, Int32, Int32)
 }
@@ -68,6 +71,9 @@ fn GState::initial(
     stroke_alpha: 1.0,
     blend_mode: 0,
     fill_pattern: None,
+    pattern_r: 0.0,
+    pattern_g: 0.0,
+    pattern_b: 0.0,
     clip_mask,
     clip,
   }
@@ -831,15 +837,49 @@ fn render_page_inner(
         }
       "cs" | "CS" => state.fill_pattern = None
       "scn" => {
-        let name = match op.operands.get(0) {
-          Some(@pdf.Name(name)) => name
-          _ => ""
+        let count = op.operands.length()
+        let name = if count > 0 {
+          match op.operands[count - 1].as_name() {
+            Some(name) => name
+            None => ""
+          }
+        } else {
+          ""
         }
         if name == "" {
           state.fill_pattern = None
         } else {
           match lookup_resource(page, page.resources, "Pattern", name) {
-            Some(value) => state.fill_pattern = load_pattern(page, value)
+            Some(value) => {
+              let pattern = load_pattern(page, value)
+              match pattern {
+                Some(pattern) =>
+                  if pattern.uncolored {
+                    if count == 2 {
+                      match op_number(op, 0) {
+                        Some(gray) => {
+                          state.pattern_r = gray
+                          state.pattern_g = gray
+                          state.pattern_b = gray
+                        }
+                        None => ()
+                      }
+                    } else if count >= 4 {
+                      match
+                        (op_number(op, 0), op_number(op, 1), op_number(op, 2)) {
+                        (Some(r), Some(g), Some(b)) => {
+                          state.pattern_r = r
+                          state.pattern_g = g
+                          state.pattern_b = b
+                        }
+                        _ => ()
+                      }
+                    }
+                  }
+                None => ()
+              }
+              state.fill_pattern = pattern
+            }
             None => state.fill_pattern = None
           }
         }

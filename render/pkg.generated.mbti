@@ -175,6 +175,7 @@ pub struct Pattern {
   bbox_y1 : Double
   x_step : Double
   y_step : Double
+  uncolored : Bool
 }
 
 pub struct PdfFont {
