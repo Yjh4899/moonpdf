@@ -85,13 +85,14 @@ The incremental page must show the reused blue header and the new green body.
 - exact `W`/`W*` path clipping with a per-pixel mask;
 - axial/radial shadings (`sh`, types 2/3);
 - shading patterns (`PatternType 2`);
-- colored tiling patterns (`PatternType 1`).
+- colored tiling patterns (`PatternType 1`);
+- static annotation `/AP /N` appearance rendering.
 
 **Remaining**
 
 - transparency groups and isolation;
 - uncolored tiling patterns;
-- annotation appearance streams;
+- widget annotation states;
 - optional content visibility;
 - SVG output and a wasm demo.
 

@@ -407,3 +407,21 @@ small, so the recursive render cost is bounded by the cell BBox.
 
 **Consequence.** Colored tiling patterns repeat correctly under CTM and pattern
 matrices. Uncolored patterns and very large cells remain M3 work.
+
+## ADR-026: annotation appearances through a synthetic page
+
+**Decision.** For each annotation with `/AP /N` stream, create a synthetic page
+sized to the annotation `/Rect`, prefix the form content with a BBox-to-rect
+`cm`, render it, and composite the result after page content.
+
+**Alternatives.** Expand annotations into the page content stream; render
+annotation layers directly with the interpreter; ignore annotations.
+
+**Why.** Annotation appearance streams are ordinary form XObjects with their own
+resources. The synthetic page reuses the full form/text/image pipeline and keeps
+annotation placement (BBox to Rect) explicit. Rendering after content matches the
+PDF display order.
+
+**Consequence.** Static widget/stamp appearances render in the right rectangle.
+Interactive state dictionaries (`/AP /N` as a state map), annotation flags and
+optional content remain M3 work.
