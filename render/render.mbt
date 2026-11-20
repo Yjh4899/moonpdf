@@ -1167,6 +1167,7 @@ pub fn render_page(
       _ => ()
     }
   }
+  draw_annotations(page, canvas, base)
   let final_canvas = canvas.downsample(ss)
   {
     width: final_canvas.width,

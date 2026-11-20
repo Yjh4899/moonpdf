@@ -116,6 +116,7 @@ pub struct PdfPage {
   rotate : Int32
   contents : Array[Bytes]
   resources : Array[(String, PdfValue)]
+  annots : Array[PdfValue]
   objects : Array[PdfValue?]
 }
 
@@ -218,6 +219,7 @@ pub fn make_page(
   rotate : Int32,
   contents : Array[Bytes],
   resources : Array[(String, PdfValue)],
+  annots : Array[PdfValue],
   objects : Array[PdfValue?],
 ) -> PdfPage {
   {
@@ -230,6 +232,7 @@ pub fn make_page(
     rotate,
     contents,
     resources,
+    annots,
     objects,
   }
 }

@@ -557,6 +557,14 @@ fn walk_page_tree(
         raw_height
       }
       let contents = collect_contents(doc, dict_get(node, "Contents"))
+      let annots = match dict_get(node, "Annots") {
+        Some(value) =>
+          match doc.resolve(value).as_array() {
+            Some(items) => items.copy()
+            None => []
+          }
+        None => []
+      }
       let page : PdfPage = {
         width,
         height,
@@ -567,6 +575,7 @@ fn walk_page_tree(
         rotate,
         contents,
         resources,
+        annots,
         objects: doc.objects,
       }
       doc.pages.push(page)

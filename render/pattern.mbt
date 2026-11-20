@@ -183,6 +183,7 @@ pub fn load_pattern(page : @pdf.PdfPage, value : @pdf.PdfValue) -> Pattern? {
       0,
       [buf.to_bytes()],
       resources,
+      [],
       page.objects,
     )
     let tile = render_page(cell_page, RenderOptions::with_scale(1.0)) catch {

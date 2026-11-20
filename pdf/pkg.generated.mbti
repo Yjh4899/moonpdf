@@ -12,7 +12,7 @@ pub fn dict_get(Array[(String, PdfValue)], String) -> PdfValue?
 
 pub fn inline_image_stream(Array[(String, PdfValue)], Bytes) -> PdfStream
 
-pub fn make_page(Double, Double, Double, Double, Double, Double, Int32, Array[Bytes], Array[(String, PdfValue)], Array[PdfValue?]) -> PdfPage
+pub fn make_page(Double, Double, Double, Double, Double, Double, Int32, Array[Bytes], Array[(String, PdfValue)], Array[PdfValue], Array[PdfValue?]) -> PdfPage
 
 pub fn parse_content_stream(Bytes) -> Array[ContentOp] raise PdfError
 
@@ -57,6 +57,7 @@ pub struct PdfPage {
   rotate : Int32
   contents : Array[Bytes]
   resources : Array[(String, PdfValue)]
+  annots : Array[PdfValue]
   objects : Array[PdfValue?]
 }
 pub fn PdfPage::resolve(Self, PdfValue) -> PdfValue

@@ -10,6 +10,8 @@ pub fn decode_image(@pdf.PdfPage, @pdf.PdfStream) -> ImageData raise RenderError
 
 pub fn decode_jpeg(Bytes) -> ImageData raise RenderError
 
+pub fn draw_annotations(@pdf.PdfPage, Canvas, Matrix) -> Unit
+
 pub fn draw_cff_glyph(Canvas, CffFont, Int32, Matrix, Double, Int32, Int32, Int32) -> Unit
 
 pub fn draw_glyph(Canvas, TrueTypeFont, Int32, Matrix, Double, Int32, Int32, Int32) -> Unit
