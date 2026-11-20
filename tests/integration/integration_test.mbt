@@ -618,6 +618,29 @@ test "annotation appearance stream" {
 }
 
 ///|
+test "widget appearance states" {
+  let raster = match
+    @integration.rasterize(
+      @integration.fixture_bytes("fixtures/widget-states.pdf"),
+      1.0,
+    ) {
+    Some(raster) => raster
+    None => {
+      assert_true(false)
+      return
+    }
+  }
+  assert_eq(raster.width, 200)
+  assert_eq(raster.height, 200)
+  let on = (125 * raster.width + 75) * 3
+  assert_true(raster.pixels.at(on + 1).to_int() > 180)
+  assert_true(raster.pixels.at(on).to_int() < 80)
+  let off = (125 * raster.width + 145) * 3
+  assert_true(raster.pixels.at(off).to_int() > 180)
+  assert_true(raster.pixels.at(off + 1).to_int() < 80)
+}
+
+///|
 test "xref stream and object stream fixture" {
   let data = @integration.fixture_bytes("fixtures/xref-stream.pdf")
   let document = try! @pdf.parse_document(data)
