@@ -53,7 +53,7 @@ The public acceptance corpus is:
    unknown content operators follow the PDF rule for unknown operators and are
    counted in the compatibility report.
 
-## Current status (release 0.22.0)
+## Current status (release 0.23.0)
 
 | Area | Current | Gap to target |
 | --- | --- | --- |
@@ -81,7 +81,8 @@ The public acceptance corpus is:
 | axial/radial shadings (`sh`, types 2/3, function type 2) | implemented | stitching/sampled functions |
 | shading patterns (`PatternType 2`) | implemented | pattern color spaces |
 | colored tiling patterns (`PatternType 1`, PaintType 1) | implemented | uncolored (PaintType 2) patterns |
-| annotation appearance streams, optional content | partial | interactive widget states, optional content |
+| annotation appearance streams, optional content | partial | interactive flags, nested form OC |
+| optional content groups (`/OC` BDC, `/OCProperties /D`) | implemented | form-level OC filtering |
 | static annotation `/AP /N` form rendering | implemented | annotation flags and optional content |
 | widget `/AS` appearance states (`/N` dictionary) | implemented | annotation flags |
 

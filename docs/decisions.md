@@ -441,3 +441,22 @@ render in the state the PDF says they are in.
 
 **Consequence.** `/On`/`/Off` and custom state names work. Annotation flags and
 appearance-stream `/AP /R`/`/D` variants remain M3 work.
+
+## ADR-028: optional content filtered before interpretation
+
+**Decision.** Resolve the page's hidden OCG object numbers from catalog
+`/OCProperties /D` (`/BaseState`, `/ON`, `/OFF`) and remove operations inside
+hidden `/OC` BDC/EMC sections before form expansion and interpretation.
+
+**Alternatives.** Skip painters at execution time with a visibility stack;
+support only `/BaseState`; ignore optional content.
+
+**Why.** Optional content is a document presentation choice, not a different
+drawing model. Filtering the operation list is simple, keeps the interpreter
+unaware of OCG bookkeeping, and naturally supports nested marked-content
+sections. The page model carries the hidden set so every content stream uses the
+same decision.
+
+**Consequence.** Hidden layers are omitted from rendered output. Optional content
+inside Form XObjects, `/OCProperties` usage dictionaries and per-page
+configuration overrides remain next.

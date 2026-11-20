@@ -58,6 +58,7 @@ ContentOp[]
        ├─ paint (fill / stroke / fill+stroke)
        ├─ sh: axial/radial gradient over the current clip
        ├─ scn: shading-pattern or tiling-pattern fill clipped to the path
+       ├─ OC BDC/EMC: filter hidden optional-content sections
        └─ Do: Form expansion, image XObject, inline image
 
 Canvas
@@ -78,6 +79,10 @@ RenderedPage
 Annotations are rendered after page content: each `/AP /N` form is rendered into
 a synthetic page sized to its `/Rect`, then composited at the rect. Widgets with
 an `/N` state dictionary select the form named by `/AS`.
+
+Hidden optional-content groups are resolved from catalog `/OCProperties /D`
+(`/BaseState`, `/ON`, `/OFF`); operations inside a hidden `/OC` BDC/EMC section
+are removed before form expansion and interpretation.
 
 ## Cross-reference chain and revisions
 
