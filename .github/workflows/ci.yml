@@ -1,4 +1,4 @@
-﻿name: CI
+name: CI
 
 on:
   push:
@@ -303,6 +303,14 @@ jobs:
           assert red[0] > 180 and red[2] < 80, red
           assert white[0] > 240 and white[2] > 240, white
           print("tiling", blue, red, white)
+
+          # Uncolored tiling pattern: red squares on white.
+          width, height, raw, stride = read_png(Path("out/uncolored-pattern.png"))
+          red = pixel(raw, stride, 10, 390)
+          white = pixel(raw, stride, 30, 390)
+          assert red[0] > 180 and red[1] < 80, red
+          assert white[0] > 240 and white[1] > 240, white
+          print("uncolored pattern", red, white)
 
           # Annotation appearance stream: green widget rect on white.
           width, height, raw, stride = read_png(Path("out/annotation.png"))
