@@ -66,6 +66,18 @@ pub fn draw_annotations(
     if annot.length() == 0 {
       continue
     }
+    let flags = match @pdf.dict_get(annot, "F") {
+      Some(value) =>
+        match value.as_int() {
+          Some(flags) => flags
+          None => 0
+        }
+      None => 0
+    }
+    // Invisible (1), Hidden (2), NoView (32).
+    if (flags & 35) != 0 {
+      continue
+    }
     let rect = match @pdf.dict_get(annot, "Rect") {
       Some(value) =>
         match page.resolve(value).as_array() {
