@@ -57,6 +57,7 @@ jobs:
           moon run --target native cmd/moonpdf -- fixtures/tiling-pattern.pdf out/tiling-pattern.png --scale 2
           moon run --target native cmd/moonpdf -- fixtures/annotation.pdf out/annotation.png --scale 2
           moon run --target native cmd/moonpdf -- fixtures/widget-states.pdf out/widget-states.png --scale 2
+          moon run --target native cmd/moonpdf -- fixtures/optional-content.pdf out/optional-content.png --scale 2
 
       - name: Verify PNG output and reused-resource pixels
         run: |
@@ -117,6 +118,7 @@ jobs:
               "tiling-pattern.png": (400, 400),
               "annotation.png": (400, 400),
               "widget-states.png": (400, 400),
+              "optional-content.png": (400, 400),
           }
           for name, size in expected.items():
               width, height, raw, stride = read_png(Path("out") / name)
@@ -313,6 +315,12 @@ jobs:
           assert on[1] > 180 and on[0] < 80, on
           assert off[0] > 180 and off[1] < 80, off
           print("widget states", on, off)
+
+          # Hidden OCG: the green layer must be skipped, leaving red.
+          width, height, raw, stride = read_png(Path("out/optional-content.png"))
+          center = pixel(raw, stride, 200, 200)
+          assert center[0] > 180 and center[1] < 60, center
+          print("optional content", center)
           PY
 
       - name: Upload rendered pages
