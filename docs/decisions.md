@@ -572,3 +572,21 @@ nested clips avoids silently rendering the wrong region.
 
 **Consequence.** Single-clip vector pages export correctly. Intersecting clips
 and clip stacks in nested forms still use the raster fallback.
+
+## ADR-036: vector SVG text as glyph outlines
+
+**Decision.** Support text operators in the vector SVG exporter by replaying the
+text state, resolving each code to a glyph path (`tt_glyph_path`,
+`CffFont::glyph_path`, `Type1Font::glyph_path`), and emitting filled `<path>`
+elements with the same advances and kerning as the rasterizer.
+
+**Alternatives.** Emit SVG `<text>` with substituted fonts; keep raster fallback
+for all text; trace only simple Latin fonts.
+
+**Why.** Glyph outlines preserve the exact shapes and positions the rasterizer
+uses. The text state and advance logic already exist, so the exporter only needs
+to turn outlines into paths. Glyphs without outlines (spaces, standard-14
+fallback text) are skipped or trigger fallback.
+
+**Consequence.** Embedded TrueType/CFF/Type1 text exports as vector paths.
+Standard-14 text, shadings and patterns still use the raster fallback.
