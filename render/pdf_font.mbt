@@ -481,7 +481,14 @@ pub fn PdfFont::glyph_for_code(self : PdfFont, code : Int32) -> Int32 {
       Some(tt) => tt.glyph_id(code)
       None =>
         match self.cff {
-          Some(cff) => cff.glyph_id(code)
+          Some(cff) => {
+            let glyph = if cff.is_cid {
+              cff.glyph_for_cid(code)
+            } else {
+              cff.glyph_id(code)
+            }
+            glyph
+          }
           None => 0
         }
     }

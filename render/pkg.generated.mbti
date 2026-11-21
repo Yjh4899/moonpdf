@@ -100,6 +100,7 @@ pub struct CffFont {
   fd_subrs : Array[Array[Bytes]]
   fd_select : Array[Int32]
   cid_by_gid : Array[Int32]
+  sid_by_gid : Array[Int32]
   is_cid : Bool
   units : Int32
   cmap_format : Int32

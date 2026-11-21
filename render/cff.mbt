@@ -10,6 +10,7 @@ pub struct CffFont {
   fd_subrs : Array[Array[Bytes]]
   fd_select : Array[Int32]
   cid_by_gid : Array[Int32]
+  sid_by_gid : Array[Int32]
   is_cid : Bool
   units : Int32
   cmap_format : Int32
@@ -368,8 +369,27 @@ pub fn parse_cff(data : Bytes) -> CffFont raise RenderError {
   let num_glyphs = charstrings.length()
   let is_cid = cff_dict_get(top_dict, 1230) != None
   let mut cid_by_gid : Array[Int32] = Array::make(num_glyphs, 0)
+  let mut sid_by_gid : Array[Int32] = Array::make(num_glyphs, 0)
   let mut fd_select : Array[Int32] = Array::make(num_glyphs, 0)
   let mut fd_subrs : Array[Array[Bytes]] = []
+  if !is_cid {
+    match cff_dict_get(top_dict, 15) {
+      Some(values) =>
+        if values.length() > 0 {
+          let offset = values[values.length() - 1].to_int()
+          if offset <= 2 {
+            let mut gid = 1
+            while gid < num_glyphs {
+              sid_by_gid[gid] = gid
+              gid = gid + 1
+            }
+          } else {
+            sid_by_gid = cff_charset(data, base, offset, num_glyphs)
+          }
+        }
+      None => ()
+    }
+  }
   if is_cid {
     match cff_dict_get(top_dict, 15) {
       Some(values) =>
@@ -441,6 +461,7 @@ pub fn parse_cff(data : Bytes) -> CffFont raise RenderError {
     fd_subrs,
     fd_select,
     cid_by_gid,
+    sid_by_gid,
     is_cid,
     units,
     cmap_format,
@@ -467,17 +488,83 @@ pub fn CffFont::glyph_for_cid(self : CffFont, cid : Int32) -> Int32 {
 
 ///|
 pub fn CffFont::glyph_id(self : CffFont, code : Int32) -> Int32 {
-  cmap_glyph_id(
-    self.data,
-    self.cmap_format,
-    self.cmap_sub,
-    self.seg_end,
-    self.seg_start,
-    self.seg_delta,
-    self.seg_range_pos,
-    self.groups,
-    code,
-  )
+  if self.cmap_format > 0 {
+    cmap_glyph_id(
+      self.data,
+      self.cmap_format,
+      self.cmap_sub,
+      self.seg_end,
+      self.seg_start,
+      self.seg_delta,
+      self.seg_range_pos,
+      self.groups,
+      code,
+    )
+  } else {
+    let sid = cff_sid_for_code(code)
+    if sid <= 0 {
+      0
+    } else {
+      let mut gid = 1
+      let mut found = 0
+      while gid < self.sid_by_gid.length() {
+        if self.sid_by_gid[gid] == sid {
+          found = gid
+          break
+        }
+        gid = gid + 1
+      }
+      found
+    }
+  }
+}
+
+///|
+fn cff_sid_for_code(code : Int32) -> Int32 {
+  if code >= 65 && code <= 90 {
+    code - 31
+  } else if code >= 97 && code <= 122 {
+    code - 31
+  } else if code >= 48 && code <= 57 {
+    code - 31
+  } else {
+    match code {
+      32 => 1
+      33 => 2
+      34 => 3
+      35 => 4
+      36 => 5
+      37 => 6
+      38 => 7
+      39 => 8
+      40 => 9
+      41 => 10
+      42 => 11
+      43 => 12
+      44 => 13
+      45 => 14
+      46 => 15
+      47 => 16
+      58 => 27
+      59 => 28
+      60 => 29
+      61 => 30
+      62 => 31
+      63 => 32
+      64 => 33
+      91 => 60
+      92 => 61
+      93 => 62
+      94 => 63
+      95 => 64
+      96 => 65
+      123 => 92
+      124 => 93
+      125 => 94
+      126 => 95
+      _ => 0
+    }
+  }
 }
 
 ///|
