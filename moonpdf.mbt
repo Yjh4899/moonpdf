@@ -52,8 +52,16 @@ pub fn render_page_svg(
     None => raise MoonPdfError("page index out of range")
   }
   let options = @render.RenderOptions::with_scale(scale)
-  let raster = @render.render_page(page, options) catch {
+  let vector = @render.encode_svg_vector(page, options) catch {
     @render.RenderError(msg) => raise MoonPdfError(msg)
   }
-  @render.encode_svg(raster)
+  match vector {
+    Some(svg) => svg
+    None => {
+      let raster = @render.render_page(page, options) catch {
+        @render.RenderError(msg) => raise MoonPdfError(msg)
+      }
+      @render.encode_svg(raster)
+    }
+  }
 }

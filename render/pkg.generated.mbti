@@ -24,6 +24,8 @@ pub fn encode_png(RenderedPage) -> Bytes
 
 pub fn encode_svg(RenderedPage) -> Bytes
 
+pub fn encode_svg_vector(@pdf.PdfPage, RenderOptions) -> Bytes? raise RenderError
+
 pub fn filter_optional_content(@pdf.PdfPage, Array[@pdf.ContentOp]) -> Array[@pdf.ContentOp]
 
 pub fn load_pattern(@pdf.PdfPage, @pdf.PdfValue) -> Pattern?
