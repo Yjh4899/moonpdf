@@ -146,12 +146,13 @@ fn main {
       return
     }
   }
-  let pages = @lib.page_count(data) catch {
+  let document = @lib.open(data) catch {
     @lib.MoonPdfError(msg) => {
       println("error: \{msg}")
       return
     }
   }
+  let pages = document.page_count()
   let multi = all || pages_spec != ""
   let indices = if multi {
     if pages_spec != "" {
@@ -190,14 +191,14 @@ fn main {
       _ => ()
     }
     let rendered = if svg {
-      @lib.render_pages_svg(data, indices, scale) catch {
+      document.render_pages_svg(indices, scale) catch {
         @lib.MoonPdfError(msg) => {
           println("error: \{msg}")
           return
         }
       }
     } else {
-      @lib.render_pages_png(data, indices, scale) catch {
+      document.render_pages_png(indices, scale) catch {
         @lib.MoonPdfError(msg) => {
           println("error: \{msg}")
           return
@@ -224,14 +225,14 @@ fn main {
       output = "\{input}.\{extension}"
     }
     let rendered = if svg {
-      @lib.render_page_svg(data, indices[0], scale) catch {
+      document.render_svg(indices[0], scale) catch {
         @lib.MoonPdfError(msg) => {
           println("error: \{msg}")
           return
         }
       }
     } else {
-      @lib.render_page_png(data, indices[0], scale) catch {
+      document.render_png(indices[0], scale) catch {
         @lib.MoonPdfError(msg) => {
           println("error: \{msg}")
           return

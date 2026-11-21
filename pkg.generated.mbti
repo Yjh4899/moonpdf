@@ -1,7 +1,13 @@
 // Generated using `moon info`, DON'T EDIT IT
 package "Yjh4899/moonpdf"
 
+import {
+  "Yjh4899/moonpdf/pdf",
+}
+
 // Values
+pub fn open(Bytes) -> MoonPdfDocument raise MoonPdfError
+
 pub fn page_count(Bytes) -> Int32 raise MoonPdfError
 
 pub fn render_page_png(Bytes, Int32, Double) -> Bytes raise MoonPdfError
@@ -18,6 +24,14 @@ pub suberror MoonPdfError {
 }
 
 // Types and methods
+pub struct MoonPdfDocument {
+  document : @pdf.PdfDocument
+}
+pub fn MoonPdfDocument::page_count(Self) -> Int32
+pub fn MoonPdfDocument::render_pages_png(Self, Array[Int32], Double) -> Array[Bytes] raise MoonPdfError
+pub fn MoonPdfDocument::render_pages_svg(Self, Array[Int32], Double) -> Array[Bytes] raise MoonPdfError
+pub fn MoonPdfDocument::render_png(Self, Int32, Double) -> Bytes raise MoonPdfError
+pub fn MoonPdfDocument::render_svg(Self, Int32, Double) -> Bytes raise MoonPdfError
 
 // Type aliases
 
