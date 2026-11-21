@@ -331,8 +331,8 @@ fn paint(
 
 ///|
 fn next_line(text : TextState) -> Unit {
-  text.line_matrix = text.line_matrix.then(
-    Matrix::translate(0.0, -text.leading),
+  text.line_matrix = Matrix::translate(0.0, -text.leading).then(
+    text.line_matrix,
   )
   text.matrix = text.line_matrix
 }
@@ -372,12 +372,10 @@ fn show_text_font(
     if previous >= 0 {
       let adjustment = font.kern_for(previous, code)
       if adjustment != 0 {
-        text.matrix = text.matrix.then(
-          Matrix::translate(
-            adjustment.to_double() / 1000.0 * text.font_size * text.h_scale,
-            0.0,
-          ),
-        )
+        text.matrix = Matrix::translate(
+          adjustment.to_double() / 1000.0 * text.font_size * text.h_scale,
+          0.0,
+        ).then(text.matrix)
       }
     }
     let full = text.matrix.then(state.ctm)
@@ -474,8 +472,8 @@ fn show_text_font(
     if code == 32 {
       advance = advance + text.word_spacing
     }
-    text.matrix = text.matrix.then(
-      Matrix::translate(advance * text.h_scale, text.rise),
+    text.matrix = Matrix::translate(advance * text.h_scale, text.rise).then(
+      text.matrix,
     )
     previous = code
   }
@@ -513,7 +511,7 @@ fn show_text(
         bytes.length().to_double() * text.char_spacing +
         extra
       let tx = total * text.h_scale
-      text.matrix = text.matrix.then(Matrix::translate(tx, text.rise))
+      text.matrix = Matrix::translate(tx, text.rise).then(text.matrix)
     }
   }
 }
@@ -530,11 +528,11 @@ fn show_text_array(
       @pdf.Str(bytes) => show_text(canvas, state, text, bytes)
       @pdf.Int(n) => {
         let tx = -n.to_double() / 1000.0 * text.font_size * text.h_scale
-        text.matrix = text.matrix.then(Matrix::translate(tx, 0.0))
+        text.matrix = Matrix::translate(tx, 0.0).then(text.matrix)
       }
       @pdf.Real(n) => {
         let tx = -n / 1000.0 * text.font_size * text.h_scale
-        text.matrix = text.matrix.then(Matrix::translate(tx, 0.0))
+        text.matrix = Matrix::translate(tx, 0.0).then(text.matrix)
       }
       _ => ()
     }
@@ -1177,7 +1175,7 @@ fn render_page_inner(
       "Td" =>
         match (op_number(op, 0), op_number(op, 1)) {
           (Some(tx), Some(ty)) => {
-            text.line_matrix = text.line_matrix.then(Matrix::translate(tx, ty))
+            text.line_matrix = Matrix::translate(tx, ty).then(text.line_matrix)
             text.matrix = text.line_matrix
           }
           _ => ()
@@ -1186,7 +1184,7 @@ fn render_page_inner(
         match (op_number(op, 0), op_number(op, 1)) {
           (Some(tx), Some(ty)) => {
             text.leading = -ty
-            text.line_matrix = text.line_matrix.then(Matrix::translate(tx, ty))
+            text.line_matrix = Matrix::translate(tx, ty).then(text.line_matrix)
             text.matrix = text.line_matrix
           }
           _ => ()

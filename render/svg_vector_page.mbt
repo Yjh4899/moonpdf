@@ -359,7 +359,7 @@ pub fn encode_svg_vector(
       "Td" =>
         match (op_number(op, 0), op_number(op, 1)) {
           (Some(tx), Some(ty)) => {
-            text.line_matrix = text.line_matrix.then(Matrix::translate(tx, ty))
+            text.line_matrix = Matrix::translate(tx, ty).then(text.line_matrix)
             text.matrix = text.line_matrix
           }
           _ => ()
@@ -368,7 +368,7 @@ pub fn encode_svg_vector(
         match (op_number(op, 0), op_number(op, 1)) {
           (Some(tx), Some(ty)) => {
             text.leading = -ty
-            text.line_matrix = text.line_matrix.then(Matrix::translate(tx, ty))
+            text.line_matrix = Matrix::translate(tx, ty).then(text.line_matrix)
             text.matrix = text.line_matrix
           }
           _ => ()

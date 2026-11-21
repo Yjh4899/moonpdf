@@ -69,12 +69,10 @@ fn svg_show_text(
     if previous >= 0 {
       let adjustment = font.kern_for(previous, code)
       if adjustment != 0 {
-        text.matrix = text.matrix.then(
-          Matrix::translate(
-            adjustment.to_double() / 1000.0 * text.font_size * text.h_scale,
-            0.0,
-          ),
-        )
+        text.matrix = Matrix::translate(
+          adjustment.to_double() / 1000.0 * text.font_size * text.h_scale,
+          0.0,
+        ).then(text.matrix)
       }
     }
     let full = text.matrix.then(state.ctm)
@@ -92,8 +90,8 @@ fn svg_show_text(
     if code == 32 {
       advance = advance + text.word_spacing
     }
-    text.matrix = text.matrix.then(
-      Matrix::translate(advance * text.h_scale, text.rise),
+    text.matrix = Matrix::translate(advance * text.h_scale, text.rise).then(
+      text.matrix,
     )
     previous = code
   }
@@ -122,11 +120,11 @@ fn svg_show_text_array(
         }
       @pdf.Int(n) => {
         let tx = -n.to_double() / 1000.0 * text.font_size * text.h_scale
-        text.matrix = text.matrix.then(Matrix::translate(tx, 0.0))
+        text.matrix = Matrix::translate(tx, 0.0).then(text.matrix)
       }
       @pdf.Real(n) => {
         let tx = -n / 1000.0 * text.font_size * text.h_scale
-        text.matrix = text.matrix.then(Matrix::translate(tx, 0.0))
+        text.matrix = Matrix::translate(tx, 0.0).then(text.matrix)
       }
       _ => ()
     }
