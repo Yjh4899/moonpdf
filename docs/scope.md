@@ -35,7 +35,7 @@ The concrete reuse fixture is documented in
    compares page hashes in CI, catching layout regressions without a JavaScript
    toolchain.
 
-## Delivered in release 0.41.0
+## Delivered in release 0.42.0
 
 - classic xref tables, xref streams, object streams and hybrid `/XRefStm`;
 - incremental updates: `/Prev` chain, revision overlay, free entries;
@@ -80,6 +80,7 @@ The concrete reuse fixture is documented in
 - graphics-state deep copy on `q`/`Q`, fixing transform/clip/text-state leakage;
 - 13-PDF public corpus (papers, IRS forms, transparency/blend samples);
 - raw name-keyed CFF glyph mapping through charset SIDs;
+- text advances/kerning in text space, fixing scaled `Tm` layouts;
 - standard-14 ASCII kerning from the Core 14 AFM KernPairs;
 - `/Rotate` 0/90/180/270, `/CropBox`, rectangular `W`/`W*` clip;
 - fill rules, line width and round caps;

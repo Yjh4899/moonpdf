@@ -127,11 +127,12 @@ The incremental page must show the reused blue header and the new green body.
 - single-parse `MoonPdfDocument` handle;
 - 13-PDF public corpus (papers, IRS forms, transparency/blend samples);
 - graphics-state copy on `q`/`Q`, fixing transform/text-state leakage;
-- raw name-keyed CFF glyph mapping through charset SIDs.
+- raw name-keyed CFF glyph mapping through charset SIDs;
+- text advances and kerning applied in text space for scaled `Tm`.
 
 **Remaining**
 
-- extended CFF encodings and the remaining IRS/paper fidelity diffs;
+- CFF charstring/encoding fidelity for the remaining IRS form glyphs;
 - profile and optimize the slowest real-page paths;
 - wasm demo and a larger public corpus.
 

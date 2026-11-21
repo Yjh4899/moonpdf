@@ -768,3 +768,22 @@ common Latin subset.
 **Consequence.** Raw CFF text now draws real outlines for many subsets. IRS forms
 still have a remaining fidelity gap; extended encodings and full standard-string
 coverage remain next.
+
+## ADR-047: glyph advances translate in text space
+
+**Decision.** Apply text advances, kerning and `Td`/`T*` translations as
+`translate(...).then(text.matrix)` (translation first, then the text matrix), in
+both the rasterizer and the SVG text exporter.
+
+**Alternatives.** Apply the translation after the text matrix; bake advances into
+the glyph matrix; special-case identity text matrices.
+
+**Why.** PDF text matrices use column vectors, so the advance is a left
+multiplication. Applying it after a scaled `Tm` treated a half-em advance as half
+a device pixel, collapsing glyphs at their origin. Real forms commonly use
+`Tf 1` plus a scaled `Tm`, which exposed the bug.
+
+**Consequence.** Text at scaled text matrices now advances correctly. IRS forms
+still have oversized CFF glyphs in some subsets, but ordinary text layout is
+fixed; the remaining issue is CFF charstring/encoding fidelity, not advance
+arithmetic.
