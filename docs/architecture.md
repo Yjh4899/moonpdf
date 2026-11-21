@@ -75,7 +75,7 @@ RenderedPage
   │    ├─ zlib stream from moonbitlang/core/compress/zlib
   │    └─ CRC32 over chunk type + data
   └─ encode_svg
-       ├─ path-only page: vector paths as SVG
+       ├─ vector paths and images when supported
        └─ otherwise: self-contained SVG with a base64 PNG image
 ```
 

@@ -539,3 +539,20 @@ rendering correctly and makes the transition incremental.
 
 **Consequence.** Path-only pages export crisp SVG paths. Text, images, clips and
 transparency still fall back to PNG; vector text/images are next.
+
+## ADR-034: vector SVG images as embedded PNG
+
+**Decision.** When the vector exporter reaches an image XObject, decode the
+image to RGB, encode it as PNG, embed it as a base64 `<image>`, and map the PDF
+unit square through the current CTM with a y-flip.
+
+**Alternatives.** Fall back to the page raster whenever an image appears; emit
+raw image samples; support only JPEG.
+
+**Why.** An image is already a self-contained raster inside a vector page, so
+embedding it preserves vector paths around it without making the whole page a
+raster. The y-flip maps PDF image rows (top row at `y = 1`) to SVG's top-down
+image coordinates.
+
+**Consequence.** Path+image pages export vector SVGs. Images with soft masks and
+vector text still use the raster fallback.
