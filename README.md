@@ -9,7 +9,7 @@
 stream, rasterize the page, and write a PNG without a JavaScript VM, a C
 library, or a browser.
 
-Published as [`Yjh4899/moonpdf@0.37.0`](https://mooncakes.io/docs/Yjh4899/moonpdf)
+Published as [`Yjh4899/moonpdf@0.38.0`](https://mooncakes.io/docs/Yjh4899/moonpdf)
 on mooncakes.io.
 
 ## Why this exists
@@ -267,6 +267,20 @@ semantic cases are also part of CI.
 Resource guards reject pages/images above 64 megapixels and page trees deeper
 than 64 nodes, keeping malformed input from exhausting memory or the stack.
 
+### Performance
+
+[`tools/bench.py`](tools/bench.py) runs a fixed set of fixtures at scale 1/2 and
+reports median wall time:
+
+```sh
+python tools/bench.py --reps 3 --out docs/performance.md
+```
+
+The checked-in [`docs/performance.md`](docs/performance.md) records the machine,
+command, PNG sizes and per-case medians. Numbers include `moon run` startup, so
+they are for relative tracking; pass a built executable via `--cli` for
+throughput measurements.
+
 ## Roadmap
 
 | Milestone | Goal |
@@ -275,7 +289,7 @@ than 64 nodes, keeping malformed input from exhausting memory or the stack.
 | M1 (delivered) | images, inline images, Rotate/CropBox, rectangular clipping |
 | M2 (delivered) | embedded TrueType/CFF/Type1, standard-14 metrics/kerning, Type0/CIDFontType2, CID-keyed CFF, embedded and named CJK CMaps |
 | M3 (current) | alpha, blend modes, exact clipping, shadings, patterns, annotations, flags, optional content, image/ExtGState soft masks, isolated transparency groups and vector SVG paths/images/clips/text delivered; standard-14 vector text |
-| M4 (started) | corpus/differential harness, fuzz robustness, multi-page CLI, real-PDF fidelity report |
+| M4 (started) | corpus/differential harness, fuzz robustness, performance baseline, multi-page CLI, real-PDF fidelity report |
 | M4 | corpus SSIM vs MuPDF, performance pass, wasm demo |
 
 The full plan, scope boundaries and acceptance criteria are in

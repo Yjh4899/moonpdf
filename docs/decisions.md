@@ -697,3 +697,20 @@ renderer so every entry point is protected.
 
 **Consequence.** The fuzz suite's semantic cases now return controlled errors
 instead of crashing. The limits are documented in the compatibility notes.
+
+## ADR-043: benchmark the CLI before optimizing
+
+**Decision.** Add `tools/bench.py`, which renders a fixed set of fixtures at
+scale 1/2, warms up once, repeats three times and reports median wall time and
+PNG size. Commit the machine-readable baseline in `docs/performance.md`.
+
+**Alternatives.** Optimize based on intuition; measure only total test-suite
+time; skip performance until the end.
+
+**Why.** A stable benchmark makes regressions visible and gives optimization
+work a target. The default `moon run` numbers include startup, which is useful
+for CLI user experience; `--cli` accepts a built executable for render-only
+measurements.
+
+**Consequence.** The project has a reproducible performance baseline. The next
+optimization round can compare against it instead of guessing.

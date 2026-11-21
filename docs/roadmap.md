@@ -122,12 +122,13 @@ The incremental page must show the reused blue header and the new green body.
 - PFA Type1 hex eexec support;
 - multi-page CLI (`--all`, `--pages`, `--out-dir`);
 - fuzz harness (120 cases, 0 crashes/timeouts);
-- page/image size caps and page-tree depth guard.
+- page/image size caps and page-tree depth guard;
+- reproducible performance benchmark (`docs/performance.md`).
 
 **Remaining**
 
 - fix the remaining Type1/standard-14 fidelity diff in `tracemonkey`;
-- performance and memory reports;
+- profile and optimize the slowest real-page paths;
 - a larger public corpus and wasm demo.
 
 **Acceptance**

@@ -35,7 +35,7 @@ The concrete reuse fixture is documented in
    compares page hashes in CI, catching layout regressions without a JavaScript
    toolchain.
 
-## Delivered in release 0.37.0
+## Delivered in release 0.38.0
 
 - classic xref tables, xref streams, object streams and hybrid `/XRefStm`;
 - incremental updates: `/Prev` chain, revision overlay, free entries;
@@ -75,6 +75,7 @@ The concrete reuse fixture is documented in
 - PFA Type1 fonts with hexadecimal `eexec` sections;
 - multi-page CLI (`--all`, `--pages`, `--out-dir`) with a single parse;
 - fuzz harness (120 cases, 0 crashes/timeouts), page/image size caps and page-tree depth guard;
+- reproducible performance benchmark and `docs/performance.md` baseline;
 - standard-14 ASCII kerning from the Core 14 AFM KernPairs;
 - `/Rotate` 0/90/180/270, `/CropBox`, rectangular `W`/`W*` clip;
 - fill rules, line width and round caps;
@@ -114,6 +115,7 @@ The concrete reuse fixture is documented in
 | Differential fixture pages within tolerance | 33/36 | 3 reference-tool differences documented |
 | Unit + integration tests | 56 | 100+ |
 | Fuzz cases without crash/timeout | 120/120 | 500+ |
+| Benchmark suite | 9 cases, scale 1/2 | native and wasm baselines |
 | Unsupported-feature errors with a typed message | 100% | 100% |
 | Incremental-update fixtures | 1 | every `/Prev` document in corpus |
 | Visual diff vs reference renderer | pixel probes on fixtures | SSIM >= 0.95 on 98% of corpus |
