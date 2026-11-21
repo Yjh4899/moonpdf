@@ -379,7 +379,7 @@ fn load_objects(
   while num < merged.length() {
     match merged[num] {
       Some(entry) =>
-        if entry.kind == 1 {
+        if entry.kind == 1 && entry.offset > 0 {
           let (parsed_num, _, value) = parse_indirect_object(data, entry.offset)
           if parsed_num != num {
             raise PdfError(

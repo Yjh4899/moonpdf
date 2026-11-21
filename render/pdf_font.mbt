@@ -282,6 +282,13 @@ fn load_type0_font(
 }
 
 ///|
+fn parse_type1_opt(data : Bytes) -> Type1Font? {
+  Some(parse_type1(data)) catch {
+    _ => None
+  }
+}
+
+///|
 pub fn load_pdf_font(page : @pdf.PdfPage, value : @pdf.PdfValue) -> PdfFont? {
   let dict = page.resolve_dict(value)
   if dict.length() == 0 {
@@ -311,15 +318,14 @@ pub fn load_pdf_font(page : @pdf.PdfPage, value : @pdf.PdfValue) -> PdfFont? {
     Some(_) => None
     None => load_cff(page, descriptor, "FontFile3")
   }
-  let type1 = match (tt, cff) {
+  let type1 : Type1Font? = match (tt, cff) {
     (None, None) =>
       match @pdf.dict_get(descriptor, "FontFile") {
         Some(value) =>
           match page.resolve(value) {
             @pdf.Stream(stream) => {
               let data = @pdf.decode_stream(stream) catch { _ => return None }
-              let font = parse_type1(data) catch { _ => return None }
-              Some(font)
+              parse_type1_opt(data)
             }
             _ => None
           }
