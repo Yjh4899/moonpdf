@@ -1,0 +1,26 @@
+[
+  {
+    "name": "tracemonkey.pdf",
+    "url": "https://raw.githubusercontent.com/mozilla/pdf.js/master/test/pdfs/tracemonkey.pdf",
+    "category": "text, images, vectors",
+    "license": "Mozilla pdf.js test corpus (see upstream)"
+  },
+  {
+    "name": "annotation-link-text-popup.pdf",
+    "url": "https://raw.githubusercontent.com/mozilla/pdf.js/master/test/pdfs/annotation-link-text-popup.pdf",
+    "category": "annotations, links",
+    "license": "Mozilla pdf.js test corpus (see upstream)"
+  },
+  {
+    "name": "attention.pdf",
+    "url": "https://arxiv.org/pdf/1706.03762",
+    "category": "paper, fonts, figures",
+    "license": "arXiv non-exclusive distribution license"
+  },
+  {
+    "name": "dummy.pdf",
+    "url": "https://www.w3.org/WAI/ER/tests/xhtml/testfiles/resources/pdf/dummy.pdf",
+    "category": "minimal page",
+    "license": "W3C test resource"
+  }
+]
