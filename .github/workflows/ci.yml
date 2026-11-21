@@ -67,6 +67,7 @@ jobs:
           moon run --target native cmd/moonpdf -- fixtures/clip-path.pdf out/clip-path.svg --scale 2 --svg
           moon run --target native cmd/moonpdf -- fixtures/font-embedded.pdf out/font-embedded.svg --scale 2 --svg
           moon run --target native cmd/moonpdf -- fixtures/transparency-group.pdf out/transparency-group.png --scale 2
+          moon run --target native cmd/moonpdf -- fixtures/soft-mask-extgstate.pdf out/soft-mask-extgstate.png --scale 2
 
       - name: Verify PNG output and reused-resource pixels
         run: |
@@ -396,6 +397,14 @@ jobs:
           assert 100 < center[1] < 160, center
           assert 100 < center[2] < 160, center
           print("transparency group", center)
+
+          # ExtGState luminosity mask: red only on the left half.
+          width, height, raw, stride = read_png(Path("out/soft-mask-extgstate.png"))
+          left = pixel(raw, stride, 100, 200)
+          right = pixel(raw, stride, 300, 200)
+          assert left[0] > 180 and left[2] < 60, left
+          assert right[2] > 180 and right[0] < 60, right
+          print("extgstate soft mask", left, right)
           PY
 
       - name: Upload rendered pages
