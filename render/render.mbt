@@ -702,6 +702,9 @@ fn render_page_inner(
   if out_h <= 0 {
     out_h = 1
   }
+  if out_w > 16384 || out_h > 16384 || out_w * out_h > 64000000 {
+    raise RenderError("page dimensions are too large")
+  }
   let ss = if options.supersample < 1 { 1 } else { options.supersample }
   let render_w = out_w * ss
   let render_h = out_h * ss

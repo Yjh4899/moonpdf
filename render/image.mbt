@@ -181,6 +181,9 @@ pub fn decode_image(
   if width <= 0 || height <= 0 {
     raise RenderError("image has invalid dimensions")
   }
+  if width > 16384 || height > 16384 || width * height > 64000000 {
+    raise RenderError("image dimensions are too large")
+  }
   if bpc != 8 {
     raise RenderError("only 8-bit image samples are supported")
   }

@@ -485,7 +485,11 @@ fn walk_page_tree(
   node_value : PdfValue,
   inherited_resources : Array[(String, PdfValue)],
   inherited_media : Array[Double],
+  depth : Int32,
 ) -> Unit raise PdfError {
+  if depth > 64 {
+    raise PdfError("page tree is too deep")
+  }
   let node = doc.resolve_dict(node_value)
   let resources = match dict_get(node, "Resources") {
     Some(r) => doc.resolve_dict(r)
@@ -500,7 +504,7 @@ fn walk_page_tree(
       match doc.resolve(kids_value).as_array() {
         Some(kids) =>
           for kid in kids {
-            walk_page_tree(doc, kid, resources, media)
+            walk_page_tree(doc, kid, resources, media, depth + 1)
           }
         None => raise PdfError("Pages node has no Kids array")
       }
@@ -695,7 +699,7 @@ pub fn parse_document(data : Bytes) -> PdfDocument raise PdfError {
     Some(p) => p
     None => raise PdfError("catalog has no Pages")
   }
-  walk_page_tree(doc, pages_value, [], [0.0, 0.0, 612.0, 792.0])
+  walk_page_tree(doc, pages_value, [], [0.0, 0.0, 612.0, 792.0], 0)
   let oc_off = optional_content_off(doc, root)
   let mut page_index = 0
   while page_index < doc.pages.length() {
