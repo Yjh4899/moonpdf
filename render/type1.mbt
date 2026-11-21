@@ -114,10 +114,64 @@ fn t1_extract(data : Bytes) -> (Bytes, Bytes) raise RenderError {
     let clear = Bytes::from_array(
       data.exact_view(start=0, end=marker).to_array(),
     )
-    let encrypted = Bytes::from_array(
-      data.exact_view(start=marker + 5, end=data.length()).to_array(),
-    )
+    let start = t1_skip_ws(data, marker + 5)
+    let decoded = t1_hex_decode(data, start)
+    let encrypted = match decoded {
+      Some(hex) =>
+        if hex.length() >= 64 {
+          hex
+        } else {
+          Bytes::from_array(
+            data.exact_view(start~, end=data.length()).to_array(),
+          )
+        }
+      None =>
+        Bytes::from_array(data.exact_view(start~, end=data.length()).to_array())
+    }
     (clear, encrypted)
+  }
+}
+
+///|
+fn t1_hex_digit(code : Int32) -> Int32 {
+  if code >= 48 && code <= 57 {
+    code - 48
+  } else if code >= 65 && code <= 70 {
+    code - 55
+  } else if code >= 97 && code <= 102 {
+    code - 87
+  } else {
+    -1
+  }
+}
+
+///|
+fn t1_hex_decode(data : Bytes, start : Int32) -> Bytes? {
+  let out : Array[Byte] = []
+  let mut high = -1
+  let mut pos = start
+  while pos < data.length() {
+    let code = data.at(pos).to_int()
+    if t1_white(code) {
+      pos = pos + 1
+      continue
+    }
+    let digit = t1_hex_digit(code)
+    if digit < 0 {
+      break
+    }
+    if high < 0 {
+      high = digit
+    } else {
+      out.push(u8((high << 4) | digit))
+      high = -1
+    }
+    pos = pos + 1
+  }
+  if out.length() == 0 {
+    None
+  } else {
+    Some(Bytes::from_array(out))
   }
 }
 
