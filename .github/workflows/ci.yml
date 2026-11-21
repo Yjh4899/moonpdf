@@ -66,6 +66,7 @@ jobs:
           moon run --target native cmd/moonpdf -- fixtures/image-flate.pdf out/image-flate.svg --scale 1 --svg
           moon run --target native cmd/moonpdf -- fixtures/clip-path.pdf out/clip-path.svg --scale 2 --svg
           moon run --target native cmd/moonpdf -- fixtures/font-embedded.pdf out/font-embedded.svg --scale 2 --svg
+          moon run --target native cmd/moonpdf -- fixtures/transparency-group.pdf out/transparency-group.png --scale 2
 
       - name: Verify PNG output and reused-resource pixels
         run: |
@@ -387,6 +388,14 @@ jobs:
           assert "<path" in text_svg
           assert "<image" not in text_svg
           print("text svg", len(text_svg))
+
+          # Isolated transparency group: green group at 50% over blue.
+          width, height, raw, stride = read_png(Path("out/transparency-group.png"))
+          center = pixel(raw, stride, 200, 200)
+          assert center[0] < 30, center
+          assert 100 < center[1] < 160, center
+          assert 100 < center[2] < 160, center
+          print("transparency group", center)
           PY
 
       - name: Upload rendered pages
