@@ -22,5 +22,59 @@
     "url": "https://www.w3.org/WAI/ER/tests/xhtml/testfiles/resources/pdf/dummy.pdf",
     "category": "minimal page",
     "license": "W3C test resource"
+  },
+  {
+    "name": "bert.pdf",
+    "url": "https://arxiv.org/pdf/1810.04805",
+    "category": "paper, two-column text",
+    "license": "arXiv non-exclusive distribution license"
+  },
+  {
+    "name": "clip.pdf",
+    "url": "https://arxiv.org/pdf/2103.00020",
+    "category": "paper, figures and images",
+    "license": "arXiv non-exclusive distribution license"
+  },
+  {
+    "name": "gpt4.pdf",
+    "url": "https://arxiv.org/pdf/2303.08774",
+    "category": "paper, dense text",
+    "license": "arXiv non-exclusive distribution license"
+  },
+  {
+    "name": "resnet.pdf",
+    "url": "https://arxiv.org/pdf/1512.03385",
+    "category": "paper, figures and tables",
+    "license": "arXiv non-exclusive distribution license"
+  },
+  {
+    "name": "irs-w9.pdf",
+    "url": "https://www.irs.gov/pub/irs-pdf/fw9.pdf",
+    "category": "government form, annotations",
+    "license": "US government work"
+  },
+  {
+    "name": "irs-1040.pdf",
+    "url": "https://www.irs.gov/pub/irs-pdf/f1040.pdf",
+    "category": "government form, fields",
+    "license": "US government work"
+  },
+  {
+    "name": "alphatrans.pdf",
+    "url": "https://raw.githubusercontent.com/mozilla/pdf.js/master/test/pdfs/alphatrans.pdf",
+    "category": "transparency",
+    "license": "Mozilla pdf.js test corpus (see upstream)"
+  },
+  {
+    "name": "blendmode.pdf",
+    "url": "https://raw.githubusercontent.com/mozilla/pdf.js/master/test/pdfs/blendmode.pdf",
+    "category": "blend modes",
+    "license": "Mozilla pdf.js test corpus (see upstream)"
+  },
+  {
+    "name": "vertical.pdf",
+    "url": "https://raw.githubusercontent.com/mozilla/pdf.js/master/test/pdfs/vertical.pdf",
+    "category": "vertical text",
+    "license": "Mozilla pdf.js test corpus (see upstream)"
   }
 ]
