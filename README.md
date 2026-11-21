@@ -9,7 +9,7 @@
 stream, rasterize the page, and write a PNG without a JavaScript VM, a C
 library, or a browser.
 
-Published as [`Yjh4899/moonpdf@0.36.0`](https://mooncakes.io/docs/Yjh4899/moonpdf)
+Published as [`Yjh4899/moonpdf@0.37.0`](https://mooncakes.io/docs/Yjh4899/moonpdf)
 on mooncakes.io.
 
 ## Why this exists
@@ -254,6 +254,19 @@ of pixels within 8 RGB levels:
 Downloaded PDFs live in `corpus/` and are gitignored; only
 [`corpus/manifest.json`](corpus/manifest.json) and the checker are committed.
 
+### Fuzz and robustness
+
+[`tools/fuzz_pdf.py`](tools/fuzz_pdf.py) generates truncations, bit
+flips, random bytes and targeted semantic corruptions (huge page, huge image,
+recursive form, page-tree cycle), then runs the CLI with a timeout.
+
+Current run: **120 cases, 0 crashes, 0 timeouts**, 101 controlled errors and 19
+valid renders. See [`docs/fuzz-report.md`](docs/fuzz-report.md). The
+semantic cases are also part of CI.
+
+Resource guards reject pages/images above 64 megapixels and page trees deeper
+than 64 nodes, keeping malformed input from exhausting memory or the stack.
+
 ## Roadmap
 
 | Milestone | Goal |
@@ -262,7 +275,7 @@ Downloaded PDFs live in `corpus/` and are gitignored; only
 | M1 (delivered) | images, inline images, Rotate/CropBox, rectangular clipping |
 | M2 (delivered) | embedded TrueType/CFF/Type1, standard-14 metrics/kerning, Type0/CIDFontType2, CID-keyed CFF, embedded and named CJK CMaps |
 | M3 (current) | alpha, blend modes, exact clipping, shadings, patterns, annotations, flags, optional content, image/ExtGState soft masks, isolated transparency groups and vector SVG paths/images/clips/text delivered; standard-14 vector text |
-| M4 (started) | corpus/differential harness, first real-PDF fidelity report, multi-page CLI |
+| M4 (started) | corpus/differential harness, fuzz robustness, multi-page CLI, real-PDF fidelity report |
 | M4 | corpus SSIM vs MuPDF, performance pass, wasm demo |
 
 The full plan, scope boundaries and acceptance criteria are in

@@ -681,3 +681,19 @@ script. Single-page behavior stays unchanged.
 
 **Consequence.** `moonpdf file.pdf --pages 1,3-5 --out-dir out` writes predictable
 files. Page ranges are validated with clear errors; one parse serves all pages.
+
+## ADR-042: bound page, image and page-tree resources
+
+**Decision.** Reject rendered pages above 16384 px on either side or 64 megapixels,
+reject images with the same limits, and cap page-tree recursion at 64 nodes.
+
+**Alternatives.** Trust PDFs to be well-formed; rely on allocator failures;
+impose limits only in the CLI.
+
+**Why.** A malformed MediaBox or image dimension can otherwise request tens of
+gigabytes or overflow the stack. The limits are far above normal print sizes and
+turn hostile input into a typed, controlled error. They live in the parser and
+renderer so every entry point is protected.
+
+**Consequence.** The fuzz suite's semantic cases now return controlled errors
+instead of crashing. The limits are documented in the compatibility notes.

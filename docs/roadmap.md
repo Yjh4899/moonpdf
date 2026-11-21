@@ -120,13 +120,15 @@ The incremental page must show the reused blue header and the new green body.
 - fixture report: 36 PDFs, 33 within tolerance;
 - real-PDF report: 4 public PDFs, 3 within tolerance;
 - PFA Type1 hex eexec support;
-- multi-page CLI (`--all`, `--pages`, `--out-dir`).
+- multi-page CLI (`--all`, `--pages`, `--out-dir`);
+- fuzz harness (120 cases, 0 crashes/timeouts);
+- page/image size caps and page-tree depth guard.
 
 **Remaining**
 
 - fix the remaining Type1/standard-14 fidelity diff in `tracemonkey`;
-- fuzz/malformed-PDF robustness;
-- performance and memory reports.
+- performance and memory reports;
+- a larger public corpus and wasm demo.
 
 **Acceptance**
 
