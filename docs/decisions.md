@@ -750,3 +750,21 @@ bounds, hangs on real PDFs such as `blendmode.pdf`, and wrong page transforms.
 PDF graphics stack. The 13-PDF corpus renders without timeouts; `blendmode.pdf`
 went from a 240s timeout to a normal render. The fixture suite and fuzz suite
 remain green.
+
+## ADR-046: map raw CFF glyphs through charset SIDs
+
+**Decision.** For raw name-keyed CFF fonts, parse the CFF charset into a
+GID->SID table and map PDF character codes to standard CFF SIDs before selecting
+a glyph. OTF CFF fonts keep using their cmap.
+
+**Alternatives.** Treat raw CFF as unsupported; use glyph order as a guess;
+require OTF conversion.
+
+**Why.** CFF files embedded as `/FontFile3 /Type1C` often have no cmap at all.
+Their charset is the authoritative GID->name mapping. Standard PDF encodings map
+codes to the same glyph names, so a compact ASCII SID table is enough for the
+common Latin subset.
+
+**Consequence.** Raw CFF text now draws real outlines for many subsets. IRS forms
+still have a remaining fidelity gap; extended encodings and full standard-string
+coverage remain next.
