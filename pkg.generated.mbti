@@ -8,6 +8,10 @@ pub fn render_page_png(Bytes, Int32, Double) -> Bytes raise MoonPdfError
 
 pub fn render_page_svg(Bytes, Int32, Double) -> Bytes raise MoonPdfError
 
+pub fn render_pages_png(Bytes, Array[Int32], Double) -> Array[Bytes] raise MoonPdfError
+
+pub fn render_pages_svg(Bytes, Array[Int32], Double) -> Array[Bytes] raise MoonPdfError
+
 // Errors
 pub suberror MoonPdfError {
   MoonPdfError(String)
