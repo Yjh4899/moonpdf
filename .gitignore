@@ -7,3 +7,6 @@ target
 out/
 fixtures/*.png
 corpus/*.pdf
+
+__pycache__/
+*.pyc
