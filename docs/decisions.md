@@ -590,3 +590,21 @@ fallback text) are skipped or trigger fallback.
 
 **Consequence.** Embedded TrueType/CFF/Type1 text exports as vector paths.
 Standard-14 text, shadings and patterns still use the raster fallback.
+
+## ADR-037: isolated groups via white/black backdrop extraction
+
+**Decision.** Keep Form XObjects with `/Group /S /Transparency` out of flat form
+expansion. Render the group cell twice, once on white and once on black, derive
+per-pixel alpha from `white - black` and color from the black render divided by
+alpha, then composite with the group's `ca`/`CA` alpha and blend mode.
+
+**Alternatives.** Flatten groups into the page (wrong overlap/alpha); introduce a
+full RGBA canvas; rasterize the whole page and annotate groups.
+
+**Why.** The two-backdrop method recovers alpha and unpremultiplied color without
+changing the rasterizer's RGB canvas. It handles opaque and antialiased content
+and keeps the existing image/text/pattern pipeline reusable inside the group.
+
+**Consequence.** Isolated groups render with correct group alpha and internal
+overlaps. Non-isolated/knockout groups, group soft masks and blend modes that
+depend on the backdrop are approximations and remain next.

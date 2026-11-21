@@ -69,9 +69,9 @@ samples. Image-specific color transforms are part of the image milestone.
 | PatternType 1 (colored tiling pattern) | yes | cell rendered recursively and tiled in pattern space |
 | PatternType 1 (uncolored tiling pattern) | yes | stencil tile tinted by the `scn` color |
 | `BI ... ID ... EI` | yes | inline dictionary abbreviations, raw/Flate/DCT data |
-| transparency: constant alpha (`ca`/`CA` via `gs`) | partial | fill/stroke alpha; groups next |
+| transparency: constant alpha (`ca`/`CA` via `gs`) | partial | fill/stroke alpha; groups partial |
 | blend modes (`/BM` in ExtGState) | partial | Multiply/Screen/Overlay/Darken/Lighten/Dodge/Burn/HardLight/SoftLight/Difference/Exclusion |
-| transparency groups | next | isolation and group alpha are next |
+| transparency groups | partial | isolated groups via white/black backdrop extraction; non-isolated/knockout next |
 | progressive JPEG (`SOF2`) | next | baseline `SOF0`/`SOF1` only |
 | soft mask (`/SMask`) | partial | image `/SMask` alpha; ExtGState soft masks next |
 | annotation appearance streams (`/AP /N`) | partial | static forms, `/AS` states, Hidden/NoView flags |
