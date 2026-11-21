@@ -50,6 +50,8 @@ jobs:
           moon run --target native cmd/moonpdf -- fixtures/font-cid.pdf out/font-cid.png --scale 2
           moon run --target native cmd/moonpdf -- fixtures/font-type1.pdf out/font-type1.png --scale 2
           moon run --target native cmd/moonpdf -- fixtures/font-type1-pfa.pdf out/font-type1-pfa.png --scale 2
+          mkdir -p out/pages
+          moon run --target native cmd/moonpdf -- fixtures/pages.pdf --pages 1-2 --out-dir out/pages --scale 1
           moon run --target native cmd/moonpdf -- fixtures/font-cid-cff.pdf out/font-cid-cff.png --scale 2
           moon run --target native cmd/moonpdf -- fixtures/font-cid-cmap.pdf out/font-cid-cmap.png --scale 2
           moon run --target native cmd/moonpdf -- fixtures/font-named-cmap.pdf out/font-named-cmap.png --scale 2
@@ -420,6 +422,14 @@ jobs:
           assert left[0] > 180 and left[2] < 60, left
           assert right[2] > 180 and right[0] < 60, right
           print("extgstate soft mask", left, right)
+
+          # Multi-page CLI: page 1 red, page 2 blue.
+          for name, expected in (("page-001.png", 0), ("page-002.png", 2)):
+              width, height, raw, stride = read_png(Path("out/pages") / name)
+              sample = pixel(raw, stride, 50, 50)
+              assert sample[expected] > 180, (name, sample)
+              assert sample[0 if expected != 0 else 2] < 60, (name, sample)
+          print("multi-page cli ok")
           PY
 
       - name: Upload rendered pages
