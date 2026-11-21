@@ -52,6 +52,8 @@ pub fn standard14_kerning(String) -> Array[(Int32, Int32, Int32)]?
 
 pub fn standard14_widths(String) -> Array[Int32]?
 
+pub fn tt_glyph_path(TrueTypeFont, Int32, Matrix, Double) -> Path?
+
 // Errors
 pub suberror RenderError {
   RenderError(String)

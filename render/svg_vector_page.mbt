@@ -82,17 +82,27 @@ pub fn encode_svg_vector(
     clip_id: None,
   }
   let stack : Array[SvgState] = Array(capacity=8)
+  let mut text = TextState::initial()
+  let text_stack : Array[TextState] = Array(capacity=8)
   let defs = @buffer.Buffer::Buffer()
   let mut clip_seq = 0
   let mut path = Path::new()
   for op in expanded {
     match op.op {
-      "q" => stack.push(state)
-      "Q" =>
+      "q" => {
+        stack.push(state)
+        text_stack.push(text)
+      }
+      "Q" => {
         match stack.pop() {
           Some(previous) => state = previous
           None => ()
         }
+        match text_stack.pop() {
+          Some(previous) => text = previous
+          None => ()
+        }
+      }
       "cm" =>
         match
           (
@@ -301,6 +311,135 @@ pub fn encode_svg_vector(
         svg_write(body, encoded)
         svg_write(body, "\"/>\n")
       }
+      "BT" => text = TextState::initial()
+      "ET" => ()
+      "Tf" => {
+        match op_number(op, 1) {
+          Some(size) => text.font_size = size
+          None => ()
+        }
+        let name = match op.operands.get(0) {
+          Some(@pdf.Name(name)) => name
+          _ => ""
+        }
+        if name == "" {
+          text.font = None
+        } else {
+          match lookup_resource(page, page.resources, "Font", name) {
+            Some(value) => text.font = load_pdf_font(page, value)
+            None => text.font = None
+          }
+        }
+      }
+      "Tc" =>
+        match op_number(op, 0) {
+          Some(v) => text.char_spacing = v
+          None => ()
+        }
+      "Tw" =>
+        match op_number(op, 0) {
+          Some(v) => text.word_spacing = v
+          None => ()
+        }
+      "Tz" =>
+        match op_number(op, 0) {
+          Some(v) => text.h_scale = v / 100.0
+          None => ()
+        }
+      "TL" =>
+        match op_number(op, 0) {
+          Some(v) => text.leading = v
+          None => ()
+        }
+      "Ts" =>
+        match op_number(op, 0) {
+          Some(v) => text.rise = v
+          None => ()
+        }
+      "Td" =>
+        match (op_number(op, 0), op_number(op, 1)) {
+          (Some(tx), Some(ty)) => {
+            text.line_matrix = text.line_matrix.then(Matrix::translate(tx, ty))
+            text.matrix = text.line_matrix
+          }
+          _ => ()
+        }
+      "TD" =>
+        match (op_number(op, 0), op_number(op, 1)) {
+          (Some(tx), Some(ty)) => {
+            text.leading = -ty
+            text.line_matrix = text.line_matrix.then(Matrix::translate(tx, ty))
+            text.matrix = text.line_matrix
+          }
+          _ => ()
+        }
+      "Tm" =>
+        match
+          (
+            op_number(op, 0),
+            op_number(op, 1),
+            op_number(op, 2),
+            op_number(op, 3),
+            op_number(op, 4),
+            op_number(op, 5),
+          ) {
+          (Some(a), Some(b), Some(c), Some(d), Some(e), Some(f)) => {
+            let matrix = Matrix::new(a, b, c, d, e, f)
+            text.line_matrix = matrix
+            text.matrix = matrix
+          }
+          _ => ()
+        }
+      "T*" => next_line(text)
+      "Tj" =>
+        match op_string(op, 0) {
+          Some(bytes) =>
+            if !svg_show_text(body, state, text, bytes) {
+              return None
+            }
+          None => ()
+        }
+      "TJ" =>
+        match op_array(op, 0) {
+          Some(items) =>
+            if !svg_show_text_array(body, state, text, items) {
+              return None
+            }
+          None => ()
+        }
+      "'" => {
+        next_line(text)
+        match op_string(op, 0) {
+          Some(bytes) =>
+            if !svg_show_text(body, state, text, bytes) {
+              return None
+            }
+          None => ()
+        }
+      }
+      "\"" => {
+        match op_number(op, 0) {
+          Some(v) => text.word_spacing = v
+          None => ()
+        }
+        match op_number(op, 1) {
+          Some(v) => text.char_spacing = v
+          None => ()
+        }
+        next_line(text)
+        match op_string(op, 2) {
+          Some(bytes) =>
+            if !svg_show_text(body, state, text, bytes) {
+              return None
+            }
+          None => ()
+        }
+      }
+      "Tr" =>
+        match op_number(op, 0) {
+          Some(mode) => if mode != 0.0 { return None }
+          None => ()
+        }
       "W" | "W*" => {
         match state.clip_id {
           Some(_) => return None
@@ -323,7 +462,7 @@ pub fn encode_svg_vector(
           state.clip_id = Some(id)
         }
       }
-      "BT" | "Tf" | "Td" | "TJ" | "Tj" | "sh" | "BI" | "gs" => return None
+      "sh" | "BI" | "gs" => return None
       _ => return None
     }
   }

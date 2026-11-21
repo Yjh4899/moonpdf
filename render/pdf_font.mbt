@@ -569,6 +569,29 @@ fn append_contour(
 }
 
 ///|
+pub fn tt_glyph_path(
+  font : TrueTypeFont,
+  glyph : Int32,
+  matrix : Matrix,
+  size : Double,
+) -> Path? {
+  let contours = font.glyph_contours(glyph) catch { _ => return None }
+  if contours.length() == 0 {
+    return None
+  }
+  let units = font.units_per_em()
+  if units <= 0 {
+    return None
+  }
+  let scale = size / units.to_double()
+  let path = Path::new()
+  for contour in contours {
+    append_contour(path, contour, matrix, scale)
+  }
+  Some(path)
+}
+
+///|
 pub fn draw_glyph(
   canvas : Canvas,
   font : TrueTypeFont,

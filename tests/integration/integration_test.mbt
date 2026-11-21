@@ -817,6 +817,28 @@ test "vector svg clips" {
 }
 
 ///|
+test "vector svg text outlines" {
+  let doc = try! @pdf.parse_document(
+    @integration.fixture_bytes("fixtures/font-embedded.pdf"),
+  )
+  let page = match doc.page(0) {
+    Some(page) => page
+    None => {
+      assert_true(false)
+      return
+    }
+  }
+  let svg = @render.encode_svg_vector(
+    page,
+    @render.RenderOptions::with_scale(2.0),
+  )
+  match svg {
+    Some(bytes) => assert_true(bytes.length() > 1000)
+    None => assert_true(false)
+  }
+}
+
+///|
 test "xref stream and object stream fixture" {
   let data = @integration.fixture_bytes("fixtures/xref-stream.pdf")
   let document = try! @pdf.parse_document(data)
