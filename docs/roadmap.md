@@ -117,12 +117,13 @@ The incremental page must show the reused blue header and the new green body.
 **Delivered**
 
 - corpus/differential harness (`tools/corpus_check.py`);
-- fixture report: 34 PDFs, 31 within tolerance;
-- first real-PDF report: 4 public PDFs.
+- fixture report: 35 PDFs, 32 within tolerance;
+- real-PDF report: 4 public PDFs, 3 within tolerance;
+- PFA Type1 hex eexec support.
 
 **Remaining**
 
-- expand the real corpus and improve standard-14/Type1 font fidelity;
+- fix the remaining Type1/standard-14 fidelity diff in `tracemonkey`;
 - fuzz/malformed-PDF robustness;
 - performance and memory reports;
 - CLI batch/multi-page UX.

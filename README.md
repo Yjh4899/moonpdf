@@ -9,7 +9,7 @@
 stream, rasterize the page, and write a PNG without a JavaScript VM, a C
 library, or a browser.
 
-Published as [`Yjh4899/moonpdf@0.34.0`](https://mooncakes.io/docs/Yjh4899/moonpdf)
+Published as [`Yjh4899/moonpdf@0.35.0`](https://mooncakes.io/docs/Yjh4899/moonpdf)
 on mooncakes.io.
 
 ## Why this exists
@@ -38,7 +38,7 @@ real pages end to end, including incrementally saved files:
 | Clip | exact `W` / `W*` path masks, Form `BBox` |
 | Forms | Form XObjects with `/Matrix`, nested resources and `BBox` clip |
 | Images | 8-bit gray/RGB/CMYK, Flate and baseline JPEG, inline images, `/SMask` alpha |
-| Text | text state, `Td/TD/Tm/T*`, `Tj/TJ/'/"`, embedded TrueType/CFF/Type1 outlines (with Type1 `seac`), standard-14 AFM metrics and kerning, Type0/CIDFontType2, CID-keyed CFF, embedded and named CJK CMaps, bitmap fallback |
+| Text | text state, `Td/TD/Tm/T*`, `Tj/TJ/'/"`, embedded TrueType/CFF/Type1 outlines (PFB/PFA, Type1 `seac`), standard-14 AFM metrics and kerning, Type0/CIDFontType2, CID-keyed CFF, embedded and named CJK CMaps, bitmap fallback |
 | Transparency | constant `ca`/`CA` alpha, `BM` blend modes, isolated form groups and ExtGState soft masks |
 | Shading | axial/radial `sh` (types 2/3) with type 2 exponential functions |
 | Patterns | shading patterns (`PatternType 2`), colored and uncolored tiling patterns (`PatternType 1`) |
@@ -85,6 +85,10 @@ Type1 (`/FontFile`) Latin Modern Roman, including eexec and charstring
 decryption:
 
 ![Type1 font](docs/images/font-type1.png)
+
+PFA Type1 with a hexadecimal `eexec` section:
+
+![PFA Type1 font](docs/images/font-type1-pfa.png)
 
 CID-keyed CFF with Identity-H CIDs and CJK glyphs (Noto Sans CJK SC subset):
 
@@ -208,7 +212,7 @@ Design rules:
 ## Testing
 
 ```sh
-moon test                 # 55 unit and integration tests
+moon test                 # 56 unit and integration tests
 moon run cmd/moonpdf -- fixtures/text.pdf out/text.png --scale 2
 ```
 
@@ -231,13 +235,12 @@ python tools/corpus_check.py --pdf-dir corpus --download --out docs/corpus-repor
 The checked-in reports record render success, per-file time, MAE and the fraction
 of pixels within 8 RGB levels:
 
-- [`docs/corpus-report.md`](docs/corpus-report.md): 34 committed fixtures, all
-  render; 31 are within tolerance, 3 differ because the reference renderer does
+- [`docs/corpus-report.md`](docs/corpus-report.md): 35 committed fixtures, all
+  render; 32 are within tolerance, 3 differ because the reference renderer does
   not paint the relevant annotation/pattern fixtures.
 - [`docs/corpus-report-real.md`](docs/corpus-report-real.md): four downloaded
-  public PDFs, including a text-heavy paper and an annotated PDF. Two pass the
-  tolerance; the remaining two expose standard-14 fallback font fidelity as the
-  next fidelity target.
+  public PDFs. Three pass the tolerance, including the text-heavy paper; one
+  remains a tracked font-fidelity diff.
 
 Downloaded PDFs live in `corpus/` and are gitignored; only
 [`corpus/manifest.json`](corpus/manifest.json) and the checker are committed.

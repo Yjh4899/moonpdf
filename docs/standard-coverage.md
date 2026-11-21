@@ -53,7 +53,7 @@ The public acceptance corpus is:
    unknown content operators follow the PDF rule for unknown operators and are
    counted in the compatibility report.
 
-## Current status (release 0.34.0)
+## Current status (release 0.35.0)
 
 | Area | Current | Gap to target |
 | --- | --- | --- |
@@ -75,7 +75,7 @@ The public acceptance corpus is:
 | Type0 / CIDFontType2, Identity-H, `/CIDToGIDMap` | implemented | — |
 | embedded Type0 encoding CMaps (`begincidrange`/`begincidchar`) | implemented | vertical writing |
 | named Adobe CJK CMaps (`UniGB/UCS2`, `UniJIS/UCS2`, `UniKS/UCS2`, `UniCNS/UCS2`) | implemented | vertical layout |
-| embedded Type1 (`FontFile`) PFB/PFA charstrings, `seac` | implemented | CID-keyed CFF |
+| embedded Type1 (`FontFile`) PFB/PFA charstrings, PFA hex eexec, `seac` | implemented | CID-keyed CFF |
 | CID/CJK fonts | not yet | M2 |
 | constant alpha via ExtGState `ca`/`CA` | implemented | group alpha |
 | isolated transparency groups (Form `/Group`) | implemented | non-isolated/knockout groups |

@@ -88,7 +88,7 @@ samples. Image-specific color transforms are part of the image milestone.
 | `Tj`, `TJ`, `'`, `"` | yes | fallback bitmap glyphs |
 | embedded TrueType (`FontFile2`) | yes | `glyf` simple and composite outlines, cmap 4/12, hmtx advances |
 | embedded CFF (`FontFile3` Type1C, non-CID) | yes | CFF INDEX/DICT and Type 2 charstrings |
-| embedded Type1 (`FontFile`) | yes | PFB/PFA eexec, charstring decrypt, Type 1 drawing ops, `seac` accents |
+| embedded Type1 (`FontFile`) | yes | PFB/PFA eexec (binary and PFA hex), charstring decrypt, Type 1 drawing ops, `seac` accents |
 | standard 14 font metrics | yes | AFM widths for Helvetica/Times/Courier; bitmap glyphs |
 | standard-14 kerning | yes | ASCII KernPairs from the Core 14 AFMs |
 | Type0 / CIDFontType2 (`Identity-H`, `/CIDToGIDMap`) | yes | two-byte codes, `/W` and `/DW` widths |

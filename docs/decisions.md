@@ -646,3 +646,20 @@ external avoids licensing and repository-size issues.
 **Consequence.** The project now has measurable fidelity gates. The first run
 found and fixed a zero-offset xref entry and a Type1 font-loading fallback; the
 remaining real-PDF diffs are tracked as font-fidelity work.
+
+## ADR-040: accept PFA hexadecimal eexec
+
+**Decision.** In the non-PFB branch of the Type1 extractor, skip whitespace after
+the `eexec` marker, attempt to decode a hexadecimal ciphertext section, and use
+it when it is long enough; otherwise fall back to binary ciphertext.
+
+**Alternatives.** Support only PFB binary fonts; require a converter; treat PFA
+fonts as bitmap fallback.
+
+**Why.** Many older Type1 distributions (including the Nimbus fonts used in the
+real corpus) embed PFA with hex eexec. The decryption and charstring code is
+already shared; only the transport encoding differs.
+
+**Consequence.** PFA Type1 fonts now load real outlines. A committed PFA fixture
+covers the path, and the text-heavy real PDF improved from 71% to 85% pixel
+similarity.
