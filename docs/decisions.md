@@ -522,3 +522,20 @@ added without changing the public CLI or facade.
 
 **Consequence.** SVG output is currently a raster container, not vector paths.
 This is documented as partial; vector export remains M3 work.
+
+## ADR-033: vector SVG for path-only pages, raster fallback otherwise
+
+**Decision.** Add a second SVG exporter that re-interprets page content into SVG
+`<path>` elements for pages made of paths. Unsupported features (text, images,
+shadings, patterns, clips) make it return `None`; the caller then uses the
+embedded-PNG SVG container.
+
+**Alternatives.** Replace the raster container immediately; emit SVG only for
+the full feature set; keep raster-only SVG.
+
+**Why.** Path-only pages are common for diagrams and get real vector output
+without a full second drawing backend. The fallback keeps every other page
+rendering correctly and makes the transition incremental.
+
+**Consequence.** Path-only pages export crisp SVG paths. Text, images, clips and
+transparency still fall back to PNG; vector text/images are next.
