@@ -49,6 +49,7 @@ jobs:
           moon run --target native cmd/moonpdf -- fixtures/font-cff.pdf out/font-cff.png --scale 2
           moon run --target native cmd/moonpdf -- fixtures/font-cid.pdf out/font-cid.png --scale 2
           moon run --target native cmd/moonpdf -- fixtures/font-type1.pdf out/font-type1.png --scale 2
+          moon run --target native cmd/moonpdf -- fixtures/font-type1-pfa.pdf out/font-type1-pfa.png --scale 2
           moon run --target native cmd/moonpdf -- fixtures/font-cid-cff.pdf out/font-cid-cff.png --scale 2
           moon run --target native cmd/moonpdf -- fixtures/font-cid-cmap.pdf out/font-cid-cmap.png --scale 2
           moon run --target native cmd/moonpdf -- fixtures/font-named-cmap.pdf out/font-named-cmap.png --scale 2
@@ -120,6 +121,7 @@ jobs:
               "font-cff.png": (680, 300),
               "font-cid.png": (680, 300),
               "font-type1.png": (680, 300),
+              "font-type1-pfa.png": (800, 300),
               "font-cid-cff.png": (600, 300),
               "font-cid-cmap.png": (600, 300),
               "font-named-cmap.png": (600, 300),
@@ -233,6 +235,16 @@ jobs:
                       dark += 1
           assert dark > 2000, dark
           print("Type1 font dark pixels", dark)
+
+          # PFA Type1: hexadecimal eexec section.
+          width, height, raw, stride = read_png(Path("out/font-type1-pfa.png"))
+          dark = 0
+          for y in range(height):
+              for x in range(width):
+                  if pixel(raw, stride, x, y)[0] < 128:
+                      dark += 1
+          assert dark > 2000, dark
+          print("PFA Type1 dark pixels", dark)
 
           # CID-keyed CFF: CJK glyphs via Identity-H CIDs.
           width, height, raw, stride = read_png(Path("out/font-cid-cff.png"))
