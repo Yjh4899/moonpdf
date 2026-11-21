@@ -25,8 +25,8 @@ jobs:
       - name: Type check (warnings are errors)
         run: moon check --deny-warn
 
-      - name: Check corpus tool
-        run: python3 -m py_compile tools/corpus_check.py
+      - name: Check Python tools
+        run: python3 -m py_compile tools/corpus_check.py tools/bench.py tools/fuzz_pdf.py tools/fuzz_semantic.py
 
       - name: Unit and integration tests
         run: moon test --target native
