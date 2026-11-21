@@ -714,3 +714,20 @@ measurements.
 
 **Consequence.** The project has a reproducible performance baseline. The next
 optimization round can compare against it instead of guessing.
+
+## ADR-044: keep an opened document handle
+
+**Decision.** Expose `MoonPdfDocument` with `open`, `page_count`, `render_png`,
+`render_svg`, `render_pages_png` and `render_pages_svg`. The CLI opens the file
+once and renders through this handle.
+
+**Alternatives.** Reparse inside every facade call; return bytes plus page count;
+make the CLI depend directly on `pdf`/`render` packages.
+
+**Why.** The previous CLI parsed the document once for `page_count` and again for
+rendering. A handle makes the single-parse behavior explicit, keeps the parsed
+xref/page tree alive for batch work, and gives library users the same efficient
+path.
+
+**Consequence.** CLI and library callers avoid duplicate parsing. The older
+single-page facade functions remain as convenience wrappers.

@@ -35,7 +35,7 @@ The concrete reuse fixture is documented in
    compares page hashes in CI, catching layout regressions without a JavaScript
    toolchain.
 
-## Delivered in release 0.38.0
+## Delivered in release 0.39.0
 
 - classic xref tables, xref streams, object streams and hybrid `/XRefStm`;
 - incremental updates: `/Prev` chain, revision overlay, free entries;
@@ -76,6 +76,7 @@ The concrete reuse fixture is documented in
 - multi-page CLI (`--all`, `--pages`, `--out-dir`) with a single parse;
 - fuzz harness (120 cases, 0 crashes/timeouts), page/image size caps and page-tree depth guard;
 - reproducible performance benchmark and `docs/performance.md` baseline;
+- single-parse `MoonPdfDocument` handle for CLI and library batch rendering;
 - standard-14 ASCII kerning from the Core 14 AFM KernPairs;
 - `/Rotate` 0/90/180/270, `/CropBox`, rectangular `W`/`W*` clip;
 - fill rules, line width and round caps;

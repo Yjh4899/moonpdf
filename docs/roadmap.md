@@ -123,7 +123,8 @@ The incremental page must show the reused blue header and the new green body.
 - multi-page CLI (`--all`, `--pages`, `--out-dir`);
 - fuzz harness (120 cases, 0 crashes/timeouts);
 - page/image size caps and page-tree depth guard;
-- reproducible performance benchmark (`docs/performance.md`).
+- reproducible performance benchmark (`docs/performance.md`);
+- single-parse `MoonPdfDocument` handle.
 
 **Remaining**
 
