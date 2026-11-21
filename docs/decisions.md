@@ -663,3 +663,21 @@ already shared; only the transport encoding differs.
 **Consequence.** PFA Type1 fonts now load real outlines. A committed PFA fixture
 covers the path, and the text-heavy real PDF improved from 71% to 85% pixel
 similarity.
+
+## ADR-041: multi-page CLI parses once
+
+**Decision.** Add `--all`, `--pages LIST` (comma-separated pages and ranges), and
+`--out-dir` to the CLI. Multi-page requests call new `render_pages_png`/
+`render_pages_svg` facade functions that parse the document once and return one
+output per requested page. Output names are `page-NNN.png` or `page-NNN.svg`.
+
+**Alternatives.** Reuse per-page `render_page_png` (reparses the document each
+time); make the CLI a thin shell over a single-page API; require an external
+batch script.
+
+**Why.** Multi-page rendering is the normal user workflow. Parsing once avoids
+repeated xref/page-tree/font work, and stable page-number names are easy to
+script. Single-page behavior stays unchanged.
+
+**Consequence.** `moonpdf file.pdf --pages 1,3-5 --out-dir out` writes predictable
+files. Page ranges are validated with clear errors; one parse serves all pages.

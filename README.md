@@ -9,7 +9,7 @@
 stream, rasterize the page, and write a PNG without a JavaScript VM, a C
 library, or a browser.
 
-Published as [`Yjh4899/moonpdf@0.35.0`](https://mooncakes.io/docs/Yjh4899/moonpdf)
+Published as [`Yjh4899/moonpdf@0.36.0`](https://mooncakes.io/docs/Yjh4899/moonpdf)
 on mooncakes.io.
 
 ## Why this exists
@@ -173,10 +173,19 @@ backend requires MSVC Build Tools.
 The CLI:
 
 ```text
-moonpdf <input.pdf> [output.png] [--page N] [--scale S]
+moonpdf <input.pdf> [output] [--page N | --all | --pages LIST]
+        [--out-dir DIR] [--scale S] [--svg]
 ```
 
-`--scale 1.0` means 72 dpi; `--scale 2` produces a 144 dpi image.
+`--scale 1.0` means 72 dpi; `--scale 2` produces a 144 dpi image. `--pages`
+accepts comma-separated pages and ranges:
+
+```sh
+moonpdf report.pdf --pages 1,3-5 --out-dir out --scale 2
+moonpdf report.pdf --all --out-dir out --svg
+```
+
+Batch output is named `page-001.png`, `page-002.svg`, ... inside `--out-dir`.
 
 ## Architecture
 
@@ -235,8 +244,8 @@ python tools/corpus_check.py --pdf-dir corpus --download --out docs/corpus-repor
 The checked-in reports record render success, per-file time, MAE and the fraction
 of pixels within 8 RGB levels:
 
-- [`docs/corpus-report.md`](docs/corpus-report.md): 35 committed fixtures, all
-  render; 32 are within tolerance, 3 differ because the reference renderer does
+- [`docs/corpus-report.md`](docs/corpus-report.md): 36 committed fixtures, all
+  render; 33 are within tolerance, 3 differ because the reference renderer does
   not paint the relevant annotation/pattern fixtures.
 - [`docs/corpus-report-real.md`](docs/corpus-report-real.md): four downloaded
   public PDFs. Three pass the tolerance, including the text-heavy paper; one
@@ -253,7 +262,7 @@ Downloaded PDFs live in `corpus/` and are gitignored; only
 | M1 (delivered) | images, inline images, Rotate/CropBox, rectangular clipping |
 | M2 (delivered) | embedded TrueType/CFF/Type1, standard-14 metrics/kerning, Type0/CIDFontType2, CID-keyed CFF, embedded and named CJK CMaps |
 | M3 (current) | alpha, blend modes, exact clipping, shadings, patterns, annotations, flags, optional content, image/ExtGState soft masks, isolated transparency groups and vector SVG paths/images/clips/text delivered; standard-14 vector text |
-| M4 (started) | corpus/differential harness and first real-PDF fidelity report |
+| M4 (started) | corpus/differential harness, first real-PDF fidelity report, multi-page CLI |
 | M4 | corpus SSIM vs MuPDF, performance pass, wasm demo |
 
 The full plan, scope boundaries and acceptance criteria are in
