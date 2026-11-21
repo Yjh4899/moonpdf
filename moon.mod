@@ -3,7 +3,7 @@
 
 name = "Yjh4899/moonpdf"
 
-version = "0.28.0"
+version = "0.29.0"
 
 readme = "README.mbt.md"
 
