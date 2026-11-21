@@ -91,13 +91,14 @@ The incremental page must show the reused blue header and the new green body.
 - hidden optional content groups (`/OC` BDC);
 - annotation Hidden/NoView/Invisible flags;
 - uncolored tiling patterns (`PaintType 2`);
-- image soft masks (`/SMask`).
+- image soft masks (`/SMask`);
+- SVG container output with embedded PNG.
 
 **Remaining**
 
 - transparency groups and isolation;
 - ExtGState soft masks;
-- SVG output and a wasm demo.
+- vector SVG output and a wasm demo.
 
 **Acceptance**
 

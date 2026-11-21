@@ -9,7 +9,7 @@
 stream, rasterize the page, and write a PNG without a JavaScript VM, a C
 library, or a browser.
 
-Published as [`Yjh4899/moonpdf@0.26.0`](https://mooncakes.io/docs/Yjh4899/moonpdf)
+Published as [`Yjh4899/moonpdf@0.27.0`](https://mooncakes.io/docs/Yjh4899/moonpdf)
 on mooncakes.io.
 
 ## Why this exists
@@ -44,7 +44,7 @@ real pages end to end, including incrementally saved files:
 | Patterns | shading patterns (`PatternType 2`), colored and uncolored tiling patterns (`PatternType 1`) |
 | Annotations | static `/AP /N` forms, widget `/AS` states and Hidden/NoView flags |
 | Optional content | hidden OCGs from `/OCProperties /D` and `/OC` BDC |
-| Output | RGB PNG with zlib compression |
+| Output | RGB PNG with zlib compression; SVG container with embedded PNG (`--svg`) |
 
 The target is ISO 32000-1:2008 page rendering. See
 [`docs/standard-coverage.md`](docs/standard-coverage.md) for the clause-level
@@ -199,7 +199,7 @@ Design rules:
 ## Testing
 
 ```sh
-moon test                 # 48 unit and integration tests
+moon test                 # 49 unit and integration tests
 moon run cmd/moonpdf -- fixtures/text.pdf out/text.png --scale 2
 ```
 
@@ -216,7 +216,7 @@ that CI can reproduce every render.
 | M0 (delivered) | file structure, filters, incremental updates, vector graphics |
 | M1 (delivered) | images, inline images, Rotate/CropBox, rectangular clipping |
 | M2 (delivered) | embedded TrueType/CFF/Type1, standard-14 metrics/kerning, Type0/CIDFontType2, CID-keyed CFF, embedded and named CJK CMaps |
-| M3 (current) | alpha, blend modes, exact clipping, shadings, patterns, annotations, flags, optional content and image soft masks delivered; isolation groups, SVG |
+| M3 (current) | alpha, blend modes, exact clipping, shadings, patterns, annotations, flags, optional content, image soft masks and SVG container output delivered; isolation groups, vector SVG |
 | M4 | corpus SSIM vs MuPDF, performance pass, wasm demo |
 
 The full plan, scope boundaries and acceptance criteria are in

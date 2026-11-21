@@ -506,3 +506,19 @@ it at draw time composes with the existing `ca`/`CM` alpha and blend modes.
 
 **Consequence.** Image soft masks render with correct fade/transparency. ExtGState
 soft masks and `/Matte` color correction remain next.
+
+## ADR-032: SVG container with embedded PNG first
+
+**Decision.** `encode_svg` writes a self-contained SVG whose `<image>` element
+references a base64 PNG of the rendered page. Add a `--svg` CLI switch.
+
+**Alternatives.** Wait for a full vector exporter; emit SVG paths directly in the
+rasterizer; omit SVG until M4.
+
+**Why.** A self-contained SVG is useful immediately: it has exact page
+dimensions, scales in SVG viewers, and preserves every feature the rasterizer
+already supports. A vector exporter needs a second drawing backend and can be
+added without changing the public CLI or facade.
+
+**Consequence.** SVG output is currently a raster container, not vector paths.
+This is documented as partial; vector export remains M3 work.
