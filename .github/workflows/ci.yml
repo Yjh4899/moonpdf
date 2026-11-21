@@ -31,6 +31,9 @@ jobs:
       - name: Unit and integration tests
         run: moon test --target native
 
+      - name: Fuzz semantic cases
+        run: python3 tools/fuzz_pdf.py --semantic-only --cases 10 --timeout 30 --out out/fuzz-report.md
+
       - name: Render fixtures
         run: |
           mkdir -p out
