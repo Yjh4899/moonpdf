@@ -839,6 +839,29 @@ test "vector svg text outlines" {
 }
 
 ///|
+test "isolated transparency group" {
+  let raster = match
+    @integration.rasterize(
+      @integration.fixture_bytes("fixtures/transparency-group.pdf"),
+      1.0,
+    ) {
+    Some(raster) => raster
+    None => {
+      assert_true(false)
+      return
+    }
+  }
+  assert_eq(raster.width, 200)
+  assert_eq(raster.height, 200)
+  let center = (100 * raster.width + 100) * 3
+  assert_true(raster.pixels.at(center).to_int() < 30)
+  assert_true(raster.pixels.at(center + 1).to_int() > 100)
+  assert_true(raster.pixels.at(center + 1).to_int() < 160)
+  assert_true(raster.pixels.at(center + 2).to_int() > 100)
+  assert_true(raster.pixels.at(center + 2).to_int() < 160)
+}
+
+///|
 test "xref stream and object stream fixture" {
   let data = @integration.fixture_bytes("fixtures/xref-stream.pdf")
   let document = try! @pdf.parse_document(data)
