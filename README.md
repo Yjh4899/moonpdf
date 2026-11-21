@@ -9,7 +9,7 @@
 stream, rasterize the page, and write a PNG without a JavaScript VM, a C
 library, or a browser.
 
-Published as [`Yjh4899/moonpdf@0.39.0`](https://mooncakes.io/docs/Yjh4899/moonpdf)
+Published as [`Yjh4899/moonpdf@0.40.0`](https://mooncakes.io/docs/Yjh4899/moonpdf)
 on mooncakes.io.
 
 ## Why this exists
@@ -247,9 +247,10 @@ of pixels within 8 RGB levels:
 - [`docs/corpus-report.md`](docs/corpus-report.md): 36 committed fixtures, all
   render; 33 are within tolerance, 3 differ because the reference renderer does
   not paint the relevant annotation/pattern fixtures.
-- [`docs/corpus-report-real.md`](docs/corpus-report-real.md): four downloaded
-  public PDFs. Three pass the tolerance, including the text-heavy paper; one
-  remains a tracked font-fidelity diff.
+- [`docs/corpus-report-real.md`](docs/corpus-report-real.md): 13 downloaded
+  public PDFs (papers, government forms, transparency/blend samples). Three pass
+  the pixel tolerance and ten are tracked fidelity gaps; all render without
+  crash or timeout.
 
 Downloaded PDFs live in `corpus/` and are gitignored; only
 [`corpus/manifest.json`](corpus/manifest.json) and the checker are committed.
@@ -289,7 +290,7 @@ throughput measurements.
 | M1 (delivered) | images, inline images, Rotate/CropBox, rectangular clipping |
 | M2 (delivered) | embedded TrueType/CFF/Type1, standard-14 metrics/kerning, Type0/CIDFontType2, CID-keyed CFF, embedded and named CJK CMaps |
 | M3 (current) | alpha, blend modes, exact clipping, shadings, patterns, annotations, flags, optional content, image/ExtGState soft masks, isolated transparency groups and vector SVG paths/images/clips/text delivered; standard-14 vector text |
-| M4 (started) | corpus/differential harness, fuzz robustness, performance baseline, single-parse document handle, multi-page CLI, real-PDF fidelity report |
+| M4 (started) | corpus/differential harness, fuzz robustness, performance baseline, single-parse document handle, multi-page CLI, 13-PDF real corpus, graphics-state copy fix |
 | M4 | corpus SSIM vs MuPDF, performance pass, wasm demo |
 
 The full plan, scope boundaries and acceptance criteria are in

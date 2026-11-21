@@ -124,13 +124,15 @@ The incremental page must show the reused blue header and the new green body.
 - fuzz harness (120 cases, 0 crashes/timeouts);
 - page/image size caps and page-tree depth guard;
 - reproducible performance benchmark (`docs/performance.md`);
-- single-parse `MoonPdfDocument` handle.
+- single-parse `MoonPdfDocument` handle;
+- 13-PDF public corpus (papers, IRS forms, transparency/blend samples);
+- graphics-state copy on `q`/`Q`, fixing transform/text-state leakage.
 
 **Remaining**
 
-- fix the remaining Type1/standard-14 fidelity diff in `tracemonkey`;
+- CFF/Type1 fidelity for the remaining IRS/paper diffs;
 - profile and optimize the slowest real-page paths;
-- a larger public corpus and wasm demo.
+- wasm demo and a larger public corpus.
 
 **Acceptance**
 

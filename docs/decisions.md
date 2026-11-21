@@ -731,3 +731,22 @@ path.
 
 **Consequence.** CLI and library callers avoid duplicate parsing. The older
 single-page facade functions remain as convenience wrappers.
+
+## ADR-045: deep-copy graphics state on `q`
+
+**Decision.** Add explicit `GState::copy` and `TextState::copy` methods and push
+snapshots on `q`; `Q` restores both. The SVG exporter does the same for its own
+state.
+
+**Alternatives.** Rely on value semantics; store only the CTM on the stack; reset
+selected fields manually.
+
+**Why.** MoonBit structs are references, so pushing `state` onto the stack kept
+aliasing the live object. Repeated `q ... cm ... Q` sequences accumulated the
+matrix (and leaked clip/text state), producing exponentially growing image
+bounds, hangs on real PDFs such as `blendmode.pdf`, and wrong page transforms.
+
+**Consequence.** Transform, clip, alpha, blend and text state now behave like the
+PDF graphics stack. The 13-PDF corpus renders without timeouts; `blendmode.pdf`
+went from a 240s timeout to a normal render. The fixture suite and fuzz suite
+remain green.
