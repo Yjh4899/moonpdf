@@ -14,7 +14,7 @@ The completion target is **ISO 32000-1:2008 (PDF 1.7) page rendering**. The
 target is the rendering-relevant portion of the standard as a whole, not a
 private subset; current gaps are tracked as milestone work, not as scope
 exclusions. See [`standard-coverage.md`](standard-coverage.md) for the clause
-map, the public corpus and the SSIM/no-crash acceptance gate.
+| Visual diff vs reference renderer | pixel probes on fixtures | SSIM >= 0.95 on 98% of corpus |
 
 Incremental updates (`/Prev` chains, xref streams, object streams, hybrid
 `/XRefStm`) are explicitly **in scope** and are implemented in this release.
@@ -35,7 +35,7 @@ The concrete reuse fixture is documented in
    compares page hashes in CI, catching layout regressions without a JavaScript
    toolchain.
 
-## Delivered in release 0.33.0
+## Delivered in release 0.34.0
 
 - classic xref tables, xref streams, object streams and hybrid `/XRefStm`;
 - incremental updates: `/Prev` chain, revision overlay, free entries;
@@ -71,6 +71,7 @@ The concrete reuse fixture is documented in
 - vector SVG text outlines for embedded TrueType/CFF/Type1 fonts;
 - isolated Form transparency groups (`/Group /S /Transparency`);
 - ExtGState soft masks (`/SMask`, Luminosity and Alpha);
+- corpus/differential harness with PyMuPDF comparison and checked-in reports;
 - standard-14 ASCII kerning from the Core 14 AFM KernPairs;
 - `/Rotate` 0/90/180/270, `/CropBox`, rectangular `W`/`W*` clip;
 - fill rules, line width and round caps;
@@ -100,14 +101,15 @@ The concrete reuse fixture is documented in
 - JavaScript execution, 3D annotations, portfolios and embedded files.
 - OCR, layout analysis and semantic document understanding.
 - Bit-exact pixel parity with a specific renderer; the target is the
-  clause-level coverage plus the corpus SSIM gate.
+| Visual diff vs reference renderer | pixel probes on fixtures | SSIM >= 0.95 on 98% of corpus |
 
 ## Success metrics
 
 | Metric | Current | Target |
 | --- | --- | --- |
 | Fixture pages rendered end to end | 34/34 | public corpus |
+| Differential fixture pages within tolerance | 31/34 | 3 reference-tool differences documented |
 | Unit + integration tests | 55 | 100+ |
 | Unsupported-feature errors with a typed message | 100% | 100% |
 | Incremental-update fixtures | 1 | every `/Prev` document in corpus |
-| Visual diff vs reference renderer | pixel probes on fixtures | SSIM 鈮?0.95 on 98% of corpus |
+| Visual diff vs reference renderer | pixel probes on fixtures | SSIM >= 0.95 on 98% of corpus |

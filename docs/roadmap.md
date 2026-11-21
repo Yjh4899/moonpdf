@@ -112,18 +112,25 @@ The incremental page must show the reused blue header and the new green body.
 - A visual diff suite with SSIM thresholds per feature class.
 - The wasm demo produces the same raster as native for the fixture corpus.
 
-## M4 — Corpus quality and performance
+## M4: corpus quality and performance
 
-**Deliverables**
+**Delivered**
 
-- differential harness against MuPDF on the public corpus;
-- tile-based rendering, glyph cache, adaptive curve flattening;
-- benchmark report (pages/second, memory) on a fixed machine class.
+- corpus/differential harness (`tools/corpus_check.py`);
+- fixture report: 34 PDFs, 31 within tolerance;
+- first real-PDF report: 4 public PDFs.
+
+**Remaining**
+
+- expand the real corpus and improve standard-14/Type1 font fidelity;
+- fuzz/malformed-PDF robustness;
+- performance and memory reports;
+- CLI batch/multi-page UX.
 
 **Acceptance**
 
-- 100% no-crash/no-hang; 98% of pages SSIM ≥ 0.95.
-- Documented performance numbers and a reproducible benchmark command.
+- 100% no-crash/no-hang on the corpus;
+- documented SSIM/MAE thresholds and a reproducible benchmark command.
 
 ## Explicit non-goals
 

@@ -628,3 +628,21 @@ through the same interpreter.
 **Consequence.** Luminosity/Alpha soft masks work for vector and image content.
 `/TR` transfer functions, non-isolated groups and mask backdrop details remain
 next.
+
+## ADR-039: differential corpus before more feature work
+
+**Decision.** Add a reusable corpus checker that renders a directory of PDFs,
+optionally compares against PyMuPDF, and writes Markdown/JSON reports. Keep
+fixture and real-PDF reports in `docs/`, and keep downloaded PDFs out of git.
+
+**Alternatives.** Continue adding features without measurement; rely only on
+hand-written pixel probes; commit third-party PDFs.
+
+**Why.** Hand-written fixtures prove specific features but not real-world
+robustness. A differential report exposes parser failures, font fidelity gaps and
+timing regressions before they become acceptance surprises. Keeping corpus files
+external avoids licensing and repository-size issues.
+
+**Consequence.** The project now has measurable fidelity gates. The first run
+found and fixed a zero-offset xref entry and a Type1 font-loading fallback; the
+remaining real-PDF diffs are tracked as font-fidelity work.
