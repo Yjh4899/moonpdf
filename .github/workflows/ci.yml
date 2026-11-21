@@ -62,6 +62,7 @@ jobs:
           moon run --target native cmd/moonpdf -- fixtures/annotation-flags.pdf out/annotation-flags.png --scale 2
           moon run --target native cmd/moonpdf -- fixtures/soft-mask.pdf out/soft-mask.png --scale 2
           moon run --target native cmd/moonpdf -- fixtures/shapes.pdf out/shapes.svg --scale 2 --svg
+          moon run --target native cmd/moonpdf -- fixtures/vector-paths.pdf out/vector-paths.svg --scale 2 --svg
 
       - name: Verify PNG output and reused-resource pixels
         run: |
@@ -359,6 +360,12 @@ jobs:
           assert 'width="600"' in svg
           assert "data:image/png;base64," in svg
           print("svg", len(svg))
+
+          # Vector SVG for a path-only page: paths, no embedded image.
+          vector = Path("out/vector-paths.svg").read_text(encoding="utf-8")
+          assert "<path" in vector
+          assert "<image" not in vector
+          print("vector svg", len(vector))
           PY
 
       - name: Upload rendered pages
