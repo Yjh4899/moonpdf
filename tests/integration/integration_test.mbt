@@ -729,6 +729,25 @@ test "image soft mask" {
 }
 
 ///|
+test "svg container output" {
+  let raster = match
+    @integration.rasterize(
+      @integration.fixture_bytes("fixtures/shapes.pdf"),
+      2.0,
+    ) {
+    Some(raster) => raster
+    None => {
+      assert_true(false)
+      return
+    }
+  }
+  let svg = @render.encode_svg(raster)
+  assert_true(svg.length() > 1000)
+  assert_eq(svg.at(0).to_int(), 60)
+  assert_true(svg.at(svg.length() - 1).to_int() == 10)
+}
+
+///|
 test "xref stream and object stream fixture" {
   let data = @integration.fixture_bytes("fixtures/xref-stream.pdf")
   let document = try! @pdf.parse_document(data)
