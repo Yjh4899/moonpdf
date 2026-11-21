@@ -1,4 +1,4 @@
-﻿name: CI
+name: CI
 
 on:
   push:
@@ -61,6 +61,7 @@ jobs:
           moon run --target native cmd/moonpdf -- fixtures/optional-content.pdf out/optional-content.png --scale 2
           moon run --target native cmd/moonpdf -- fixtures/annotation-flags.pdf out/annotation-flags.png --scale 2
           moon run --target native cmd/moonpdf -- fixtures/soft-mask.pdf out/soft-mask.png --scale 2
+          moon run --target native cmd/moonpdf -- fixtures/shapes.pdf out/shapes.svg --scale 2 --svg
 
       - name: Verify PNG output and reused-resource pixels
         run: |
@@ -351,6 +352,13 @@ jobs:
           assert left[0] > 180 and left[2] < 80, left
           assert right[2] > 180 and right[0] < 80, right
           print("soft mask", left, right)
+
+          # SVG container: dimensions and an embedded base64 PNG.
+          svg = Path("out/shapes.svg").read_text(encoding="utf-8")
+          assert svg.startswith("<svg")
+          assert 'width="600"' in svg
+          assert "data:image/png;base64," in svg
+          print("svg", len(svg))
           PY
 
       - name: Upload rendered pages
