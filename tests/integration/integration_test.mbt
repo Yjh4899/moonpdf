@@ -706,6 +706,29 @@ test "uncolored tiling pattern" {
 }
 
 ///|
+test "image soft mask" {
+  let raster = match
+    @integration.rasterize(
+      @integration.fixture_bytes("fixtures/soft-mask.pdf"),
+      1.0,
+    ) {
+    Some(raster) => raster
+    None => {
+      assert_true(false)
+      return
+    }
+  }
+  assert_eq(raster.width, 200)
+  assert_eq(raster.height, 200)
+  let left = (100 * raster.width + 60) * 3
+  assert_true(raster.pixels.at(left).to_int() > 180)
+  assert_true(raster.pixels.at(left + 2).to_int() < 80)
+  let right = (100 * raster.width + 140) * 3
+  assert_true(raster.pixels.at(right + 2).to_int() > 180)
+  assert_true(raster.pixels.at(right).to_int() < 80)
+}
+
+///|
 test "xref stream and object stream fixture" {
   let data = @integration.fixture_bytes("fixtures/xref-stream.pdf")
   let document = try! @pdf.parse_document(data)
