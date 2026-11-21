@@ -24,6 +24,7 @@ pub struct ImageData {
   height : Int32
   components : Int32
   data : Bytes
+  alpha : Array[Byte]?
 }
 
 ///|
@@ -113,6 +114,51 @@ fn invert_samples(data : Bytes) -> Bytes {
 }
 
 ///|
+fn decode_soft_mask(
+  page : @pdf.PdfPage,
+  stream : @pdf.PdfStream,
+  width : Int32,
+  height : Int32,
+) -> Array[Byte]? {
+  let mask_stream = match @pdf.dict_get(stream.dict, "SMask") {
+    Some(value) =>
+      match page.resolve(value) {
+        @pdf.Stream(mask) => mask
+        _ => return None
+      }
+    None => return None
+  }
+  let mask_width = match dict_value_int(page, mask_stream.dict, "Width") {
+    Some(n) => n
+    None => width
+  }
+  let mask_height = match dict_value_int(page, mask_stream.dict, "Height") {
+    Some(n) => n
+    None => height
+  }
+  if mask_width <= 0 || mask_height <= 0 {
+    return None
+  }
+  let data = @pdf.decode_stream(mask_stream) catch { _ => return None }
+  if data.length() < mask_width * mask_height {
+    return None
+  }
+  let alpha : Array[Byte] = Array::make(width * height, u8(255))
+  let mut y = 0
+  while y < height {
+    let mut x = 0
+    while x < width {
+      let mx = x * mask_width / width
+      let my = y * mask_height / height
+      alpha[y * width + x] = data.at(my * mask_width + mx)
+      x = x + 1
+    }
+    y = y + 1
+  }
+  Some(alpha)
+}
+
+///|
 /// Decode an image XObject into 8-bit samples. Flate/ASCII/LZW images are
 /// decoded by the PDF filter layer; baseline DCT (JPEG) goes through the
 /// built-in decoder.
@@ -151,11 +197,13 @@ pub fn decode_image(
     if components != 3 && components != 1 {
       raise RenderError("JPEG image must be gray or RGB")
     }
+    let alpha = decode_soft_mask(page, stream, jpeg.width, jpeg.height)
     return {
       width: jpeg.width,
       height: jpeg.height,
       components: 3,
       data: jpeg.data,
+      alpha,
     }
   } else if filters.length() == 1 && filters[0] == "JPXDecode" {
     raise RenderError("JPXDecode is not supported yet")
@@ -193,7 +241,8 @@ pub fn decode_image(
       }
     None => ()
   }
-  { width, height, components, data, }
+  let alpha = decode_soft_mask(page, stream, width, height)
+  { width, height, components, data, alpha, }
 }
 
 ///|
@@ -241,6 +290,30 @@ fn sample_rgb(image : ImageData, x : Int32, y : Int32) -> (Int32, Int32, Int32) 
 }
 
 ///|
+fn sample_alpha(image : ImageData, x : Int32, y : Int32) -> Int32 {
+  match image.alpha {
+    Some(alpha) => {
+      let mut px = x
+      let mut py = y
+      if px < 0 {
+        px = 0
+      }
+      if py < 0 {
+        py = 0
+      }
+      if px >= image.width {
+        px = image.width - 1
+      }
+      if py >= image.height {
+        py = image.height - 1
+      }
+      alpha[py * image.width + px].to_int()
+    }
+    None => 255
+  }
+}
+
+///|
 /// Paint an image into the unit square, transformed by the current CTM. The
 /// sampler is nearest-neighbour; bilinear sampling is a later refinement.
 fn draw_image(canvas : Canvas, state : GState, image : ImageData) -> Unit {
@@ -265,10 +338,13 @@ fn draw_image(canvas : Canvas, state : GState, image : ImageData) -> Unit {
         let col = (p.x * (image.width - 1).to_double()).to_int()
         let row = ((1.0 - p.y) * (image.height - 1).to_double()).to_int()
         let (r, g, b) = sample_rgb(image, col, row)
+        let alpha = sample_alpha(image, col, row)
+        canvas.set_alpha(alpha_component(state.fill_alpha) * alpha / 255)
         canvas.set(x, y, r, g, b)
       }
       x = x + 1
     }
     y = y + 1
   }
+  canvas.set_alpha(alpha_component(state.fill_alpha))
 }

@@ -461,7 +461,7 @@ fn decode_scan(
     }
     y = y + 1
   }
-  { width, height, components: 3, data: Bytes::from_array(out), }
+  { width, height, components: 3, data: Bytes::from_array(out), alpha: None, }
 }
 
 ///|

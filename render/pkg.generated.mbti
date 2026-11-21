@@ -116,6 +116,7 @@ pub struct ImageData {
   height : Int32
   components : Int32
   data : Bytes
+  alpha : Array[Byte]?
 }
 
 pub struct Matrix {
