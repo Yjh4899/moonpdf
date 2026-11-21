@@ -94,13 +94,14 @@ The incremental page must show the reused blue header and the new green body.
 - image soft masks (`/SMask`);
 - SVG container output with embedded PNG;
 - vector SVG for path-only pages;
-- vector SVG images.
+- vector SVG images;
+- vector SVG clips.
 
 **Remaining**
 
 - transparency groups and isolation;
 - ExtGState soft masks;
-- vector text and clips in SVG;
+- vector text and shadings in SVG;
 - wasm demo.
 
 **Acceptance**

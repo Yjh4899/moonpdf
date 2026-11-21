@@ -105,7 +105,7 @@ samples. Image-specific color transforms are part of the image milestone.
 | arbitrary scale / DPI | yes |
 | 2× supersampling | yes, fixed |
 | grayscale / alpha PNG | next |
-| SVG | partial | vector paths and images; PNG fallback for text/shadings/clips |
+| SVG | partial | vector paths/images/clips; PNG fallback for text/shadings/patterns |
 
 ## Failure behavior
 

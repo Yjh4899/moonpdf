@@ -556,3 +556,19 @@ image coordinates.
 
 **Consequence.** Path+image pages export vector SVGs. Images with soft masks and
 vector text still use the raster fallback.
+
+## ADR-035: single clip path in vector SVG
+
+**Decision.** On `W`/`W*`, emit a `<clipPath>` containing the current path's
+device-space outline and attach it to subsequent painted paths. A second clip
+while one is active falls back to the raster container.
+
+**Alternatives.** Rasterize clipped pages; ignore clipping in SVG; build a full
+intersection boolean between clip outlines.
+
+**Why.** Most diagrams use one clip region. A single `<clipPath>` is exact, keeps
+the vector output, and requires no polygon boolean operations. Falling back on
+nested clips avoids silently rendering the wrong region.
+
+**Consequence.** Single-clip vector pages export correctly. Intersecting clips
+and clip stacks in nested forms still use the raster fallback.
