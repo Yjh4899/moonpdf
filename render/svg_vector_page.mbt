@@ -260,17 +260,46 @@ pub fn encode_svg_vector(
       }
       "n" => path = Path::new()
       "J" | "j" | "d" | "i" | "ri" => ()
-      "W"
-      | "W*"
-      | "BT"
-      | "Tf"
-      | "Td"
-      | "TJ"
-      | "Tj"
-      | "Do"
-      | "sh"
-      | "BI"
-      | "gs" => return None
+      "Do" => {
+        let name = match op.operands.get(0) {
+          Some(value) =>
+            match value.as_name() {
+              Some(name) => name
+              None => ""
+            }
+          None => ""
+        }
+        let stream = match
+          lookup_resource(page, page.resources, "XObject", name) {
+          Some(@pdf.Stream(stream)) => stream
+          _ => return None
+        }
+        let is_image = match @pdf.dict_get(stream.dict, "Subtype") {
+          Some(value) =>
+            match value.as_name() {
+              Some(name) => name == "Image"
+              None => false
+            }
+          None => false
+        }
+        if !is_image {
+          return None
+        }
+        let image = decode_image(page, stream) catch { _ => return None }
+        if image.alpha is Some(_) {
+          return None
+        }
+        let encoded = base64_encode(svg_image_png(image))
+        let m = state.ctm
+        svg_write(
+          body,
+          "<image x=\"0\" y=\"0\" width=\"1\" height=\"1\" preserveAspectRatio=\"none\" transform=\"matrix(\{m.a},\{m.b},\{-m.c},\{-m.d},\{m.c + m.e},\{m.d + m.f})\" href=\"data:image/png;base64,",
+        )
+        svg_write(body, encoded)
+        svg_write(body, "\"/>\n")
+      }
+      "W" | "W*" | "BT" | "Tf" | "Td" | "TJ" | "Tj" | "sh" | "BI" | "gs" =>
+        return None
       _ => return None
     }
   }

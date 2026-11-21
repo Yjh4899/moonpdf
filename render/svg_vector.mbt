@@ -149,3 +149,26 @@ fn svg_apply_cmyk(
     stroke,
   )
 }
+
+///|
+fn svg_image_png(image : ImageData) -> Bytes {
+  let pixels : Array[Byte] = Array::make(image.width * image.height * 3, u8(0))
+  let mut y = 0
+  while y < image.height {
+    let mut x = 0
+    while x < image.width {
+      let (r, g, b) = sample_rgb(image, x, y)
+      let idx = (y * image.width + x) * 3
+      pixels[idx] = u8(clamp_byte(r))
+      pixels[idx + 1] = u8(clamp_byte(g))
+      pixels[idx + 2] = u8(clamp_byte(b))
+      x = x + 1
+    }
+    y = y + 1
+  }
+  encode_png({
+    width: image.width,
+    height: image.height,
+    pixels: Bytes::from_array(pixels),
+  })
+}

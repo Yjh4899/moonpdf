@@ -179,7 +179,7 @@ test "truetype cmap and glyph outlines" {
   assert_true(glyph > 0)
   let contours = try! font.glyph_contours(glyph)
   assert_true(contours.length() > 0)
-  let accented = font.glyph_id(233) // '茅' is usually a composite glyph
+  let accented = font.glyph_id(233) // '鑼? is usually a composite glyph
   assert_true(accented > 0)
   let accented_contours = try! font.glyph_contours(accented)
   assert_true(accented_contours.length() >= 2)
@@ -768,6 +768,28 @@ test "vector svg for path-only pages" {
       assert_true(bytes.length() > 200)
       assert_eq(bytes.at(0).to_int(), 60)
     }
+    None => assert_true(false)
+  }
+}
+
+///|
+test "vector svg embeds images" {
+  let doc = try! @pdf.parse_document(
+    @integration.fixture_bytes("fixtures/image-flate.pdf"),
+  )
+  let page = match doc.page(0) {
+    Some(page) => page
+    None => {
+      assert_true(false)
+      return
+    }
+  }
+  let svg = @render.encode_svg_vector(
+    page,
+    @render.RenderOptions::with_scale(1.0),
+  )
+  match svg {
+    Some(bytes) => assert_true(bytes.length() > 200)
     None => assert_true(false)
   }
 }
