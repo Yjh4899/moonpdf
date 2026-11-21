@@ -63,6 +63,7 @@ jobs:
           moon run --target native cmd/moonpdf -- fixtures/soft-mask.pdf out/soft-mask.png --scale 2
           moon run --target native cmd/moonpdf -- fixtures/shapes.pdf out/shapes.svg --scale 2 --svg
           moon run --target native cmd/moonpdf -- fixtures/vector-paths.pdf out/vector-paths.svg --scale 2 --svg
+          moon run --target native cmd/moonpdf -- fixtures/image-flate.pdf out/image-flate.svg --scale 1 --svg
 
       - name: Verify PNG output and reused-resource pixels
         run: |
@@ -366,6 +367,12 @@ jobs:
           assert "<path" in vector
           assert "<image" not in vector
           print("vector svg", len(vector))
+
+          # Vector SVG image: an embedded PNG image element.
+          image_svg = Path("out/image-flate.svg").read_text(encoding="utf-8")
+          assert "<image" in image_svg
+          assert "<path" not in image_svg
+          print("image svg", len(image_svg))
           PY
 
       - name: Upload rendered pages
