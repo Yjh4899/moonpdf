@@ -79,8 +79,11 @@ pub fn encode_svg_vector(
     stroke_g: 0,
     stroke_b: 0,
     line_width: 1.0,
+    clip_id: None,
   }
   let stack : Array[SvgState] = Array(capacity=8)
+  let defs = @buffer.Buffer::Buffer()
+  let mut clip_seq = 0
   let mut path = Path::new()
   for op in expanded {
     match op.op {
@@ -298,8 +301,29 @@ pub fn encode_svg_vector(
         svg_write(body, encoded)
         svg_write(body, "\"/>\n")
       }
-      "W" | "W*" | "BT" | "Tf" | "Td" | "TJ" | "Tj" | "sh" | "BI" | "gs" =>
-        return None
+      "W" | "W*" => {
+        match state.clip_id {
+          Some(_) => return None
+          None => ()
+        }
+        let (subpaths, closed) = path.finish()
+        let data = svg_path_data(subpaths, closed)
+        if data.length() > 0 {
+          let id = "clip\{clip_seq}"
+          clip_seq = clip_seq + 1
+          svg_write(defs, "<clipPath id=\"")
+          svg_write(defs, id)
+          svg_write(defs, "\"><path d=\"")
+          svg_write(defs, data)
+          svg_write(defs, "\"")
+          if op.op == "W*" {
+            svg_write(defs, " clip-rule=\"evenodd\"")
+          }
+          svg_write(defs, "/></clipPath>\n")
+          state.clip_id = Some(id)
+        }
+      }
+      "BT" | "Tf" | "Td" | "TJ" | "Tj" | "sh" | "BI" | "gs" => return None
       _ => return None
     }
   }
@@ -312,6 +336,11 @@ pub fn encode_svg_vector(
     svg,
     "<rect width=\"\{out_w}\" height=\"\{out_h}\" fill=\"rgb(\{options.bg_r},\{options.bg_g},\{options.bg_b})\"/>\n",
   )
+  if defs.to_bytes().length() > 0 {
+    svg_write(svg, "<defs>\n")
+    svg.write_bytes(defs.to_bytes())
+    svg_write(svg, "</defs>\n")
+  }
   svg.write_bytes(body.to_bytes())
   svg_write(svg, "</svg>\n")
   Some(svg.to_bytes())

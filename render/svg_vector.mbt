@@ -11,6 +11,7 @@ priv struct SvgState {
   mut stroke_g : Int32
   mut stroke_b : Int32
   mut line_width : Double
+  mut clip_id : String?
 }
 
 ///|
@@ -76,6 +77,14 @@ fn svg_paint(
   svg_write(body, "<path d=\"")
   svg_write(body, data)
   svg_write(body, "\"")
+  match state.clip_id {
+    Some(id) => {
+      svg_write(body, " clip-path=\"url(#")
+      svg_write(body, id)
+      svg_write(body, ")\"")
+    }
+    None => ()
+  }
   if fill {
     svg_write(body, " fill=\"")
     svg_write(body, svg_color(state.fill_r, state.fill_g, state.fill_b))
