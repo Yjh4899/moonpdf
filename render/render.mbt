@@ -82,6 +82,31 @@ fn GState::initial(
 }
 
 ///|
+fn GState::copy(self : GState) -> GState {
+  {
+    ctm: self.ctm,
+    fill_r: self.fill_r,
+    fill_g: self.fill_g,
+    fill_b: self.fill_b,
+    stroke_r: self.stroke_r,
+    stroke_g: self.stroke_g,
+    stroke_b: self.stroke_b,
+    line_width: self.line_width,
+    round_cap: self.round_cap,
+    fill_alpha: self.fill_alpha,
+    stroke_alpha: self.stroke_alpha,
+    blend_mode: self.blend_mode,
+    fill_pattern: self.fill_pattern,
+    pattern_r: self.pattern_r,
+    pattern_g: self.pattern_g,
+    pattern_b: self.pattern_b,
+    clip_mask: self.clip_mask,
+    soft_mask: self.soft_mask,
+    clip: self.clip,
+  }
+}
+
+///|
 priv struct TextState {
   mut matrix : Matrix
   mut line_matrix : Matrix
@@ -92,6 +117,21 @@ priv struct TextState {
   mut leading : Double
   mut rise : Double
   mut font : PdfFont?
+}
+
+///|
+fn TextState::copy(self : TextState) -> TextState {
+  {
+    matrix: self.matrix,
+    line_matrix: self.line_matrix,
+    font_size: self.font_size,
+    char_spacing: self.char_spacing,
+    word_spacing: self.word_spacing,
+    h_scale: self.h_scale,
+    leading: self.leading,
+    rise: self.rise,
+    font: self.font,
+  }
 }
 
 ///|
@@ -762,12 +802,16 @@ fn render_page_inner(
   let expanded = expand_forms(page, page.resources, filtered, 0)
   let mut state = GState::initial(base, canvas.clip_rect(), canvas.clip_mask())
   let stack : Array[GState] = Array(capacity=8)
+  let text_stack : Array[TextState] = Array(capacity=8)
   let mut text = TextState::initial()
   let mut path = Path::new()
   for op in expanded {
     match op.op {
-      "q" => stack.push(state)
-      "Q" =>
+      "q" => {
+        stack.push(state.copy())
+        text_stack.push(text.copy())
+      }
+      "Q" => {
         match stack.pop() {
           Some(previous) => {
             state = previous
@@ -778,6 +822,11 @@ fn render_page_inner(
           }
           None => ()
         }
+        match text_stack.pop() {
+          Some(previous) => text = previous
+          None => ()
+        }
+      }
       "gs" => {
         let name = match op.operands.get(0) {
           Some(@pdf.Name(name)) => name
