@@ -13,6 +13,7 @@ pub struct Canvas {
   mut alpha : Int32
   mut blend_mode : Int32
   mut clip_mask : Array[Byte]?
+  mut soft_mask : Array[Byte]?
 }
 
 ///|
@@ -51,6 +52,7 @@ pub fn Canvas::new(
     alpha: 255,
     blend_mode: 0,
     clip_mask: None,
+    soft_mask: None,
   }
   let mut i = 0
   while i < width * height {
@@ -166,6 +168,10 @@ pub fn Canvas::set(
     Some(mask) => if mask[y * self.width + x].to_int() == 0 { return }
     None => ()
   }
+  let mask_alpha = match self.soft_mask {
+    Some(mask) => mask[y * self.width + x].to_int()
+    None => 255
+  }
   let idx = (y * self.width + x) * 3
   let dr = self.data[idx].to_int()
   let dg = self.data[idx + 1].to_int()
@@ -185,7 +191,7 @@ pub fn Canvas::set(
   } else {
     blend_channel(self.blend_mode, db, b)
   }
-  let a = self.alpha
+  let a = self.alpha * mask_alpha / 255
   if a >= 255 {
     self.data[idx] = u8(sr)
     self.data[idx + 1] = u8(sg)
@@ -624,4 +630,14 @@ pub fn Canvas::clip_mask(self : Canvas) -> Array[Byte]? {
 ///|
 pub fn Canvas::set_clip_mask(self : Canvas, mask : Array[Byte]?) -> Unit {
   self.clip_mask = mask
+}
+
+///|
+pub fn Canvas::soft_mask(self : Canvas) -> Array[Byte]? {
+  self.soft_mask
+}
+
+///|
+pub fn Canvas::set_soft_mask(self : Canvas, mask : Array[Byte]?) -> Unit {
+  self.soft_mask = mask
 }

@@ -71,6 +71,7 @@ pub struct Canvas {
   mut alpha : Int32
   mut blend_mode : Int32
   mut clip_mask : Array[Byte]?
+  mut soft_mask : Array[Byte]?
 }
 pub fn Canvas::clip_mask(Self) -> Array[Byte]?
 pub fn Canvas::clip_polygons(Self, Array[Array[Point]], Bool) -> Unit
@@ -85,6 +86,8 @@ pub fn Canvas::set_alpha(Self, Int32) -> Unit
 pub fn Canvas::set_blend(Self, Int32) -> Unit
 pub fn Canvas::set_clip(Self, Int32, Int32, Int32, Int32) -> Unit
 pub fn Canvas::set_clip_mask(Self, Array[Byte]?) -> Unit
+pub fn Canvas::set_soft_mask(Self, Array[Byte]?) -> Unit
+pub fn Canvas::soft_mask(Self) -> Array[Byte]?
 pub fn Canvas::stroke_polyline(Self, Array[Point], Bool, Double, Bool, Int32, Int32, Int32) -> Unit
 pub fn Canvas::to_rgb_bytes(Self) -> Bytes
 pub fn Canvas::width(Self) -> Int32

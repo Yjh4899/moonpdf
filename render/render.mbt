@@ -48,6 +48,7 @@ priv struct GState {
   mut pattern_g : Double
   mut pattern_b : Double
   mut clip_mask : Array[Byte]?
+  mut soft_mask : Array[Byte]?
   clip : (Int32, Int32, Int32, Int32)
 }
 
@@ -75,6 +76,7 @@ fn GState::initial(
     pattern_g: 0.0,
     pattern_b: 0.0,
     clip_mask,
+    soft_mask: None,
     clip,
   }
 }
@@ -769,6 +771,7 @@ fn render_page_inner(
             let (cx0, cy0, cx1, cy1) = previous.clip
             canvas.reset_clip(cx0, cy0, cx1, cy1)
             canvas.set_clip_mask(previous.clip_mask)
+            canvas.set_soft_mask(previous.soft_mask)
           }
           None => ()
         }
@@ -809,6 +812,24 @@ fn render_page_inner(
                     }
                   }
                 _ => ()
+              }
+              match @pdf.dict_get(dict, "SMask") {
+                Some(value) =>
+                  match page.resolve(value) {
+                    @pdf.Dict(mask_dict) => {
+                      let mask = render_soft_mask(
+                        page, mask_dict, canvas, state, depth,
+                      )
+                      state.soft_mask = mask
+                      canvas.set_soft_mask(mask)
+                    }
+                    @pdf.Name("None") => {
+                      state.soft_mask = None
+                      canvas.set_soft_mask(None)
+                    }
+                    _ => ()
+                  }
+                None => ()
               }
             }
             None => ()

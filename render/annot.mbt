@@ -59,6 +59,7 @@ pub fn draw_annotations(
   }
   canvas.reset_clip(0, 0, canvas.width, canvas.height)
   canvas.set_clip_mask(None)
+  canvas.set_soft_mask(None)
   canvas.set_alpha(255)
   canvas.set_blend(0)
   for item in page.annots {
