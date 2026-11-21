@@ -608,3 +608,23 @@ and keeps the existing image/text/pattern pipeline reusable inside the group.
 **Consequence.** Isolated groups render with correct group alpha and internal
 overlaps. Non-isolated/knockout groups, group soft masks and blend modes that
 depend on the backdrop are approximations and remain next.
+
+## ADR-038: ExtGState soft masks as a page-sized coverage plane
+
+**Decision.** When `gs` sets an `/SMask`, render the mask form through a
+synthetic page and store its coverage in a page-sized byte plane on the canvas.
+Luminosity masks use the rendered luminance; Alpha masks use the white/black
+alpha extraction. `Canvas::set` multiplies every source alpha by this plane, and
+`q`/`Q` restore the previous plane.
+
+**Alternatives.** Apply masks only to selected drawing calls; render a masked
+layer then composite; ignore ExtGState soft masks.
+
+**Why.** A canvas-level coverage plane automatically applies to paths, text,
+images, patterns and nested forms without touching each paint site. It composes
+with the existing constant alpha and clip mask, and the mask form is rendered
+through the same interpreter.
+
+**Consequence.** Luminosity/Alpha soft masks work for vector and image content.
+`/TR` transfer functions, non-isolated groups and mask backdrop details remain
+next.

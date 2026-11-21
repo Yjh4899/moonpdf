@@ -9,7 +9,7 @@
 stream, rasterize the page, and write a PNG without a JavaScript VM, a C
 library, or a browser.
 
-Published as [`Yjh4899/moonpdf@0.32.0`](https://mooncakes.io/docs/Yjh4899/moonpdf)
+Published as [`Yjh4899/moonpdf@0.33.0`](https://mooncakes.io/docs/Yjh4899/moonpdf)
 on mooncakes.io.
 
 ## Why this exists
@@ -39,7 +39,7 @@ real pages end to end, including incrementally saved files:
 | Forms | Form XObjects with `/Matrix`, nested resources and `BBox` clip |
 | Images | 8-bit gray/RGB/CMYK, Flate and baseline JPEG, inline images, `/SMask` alpha |
 | Text | text state, `Td/TD/Tm/T*`, `Tj/TJ/'/"`, embedded TrueType/CFF/Type1 outlines (with Type1 `seac`), standard-14 AFM metrics and kerning, Type0/CIDFontType2, CID-keyed CFF, embedded and named CJK CMaps, bitmap fallback |
-| Transparency | constant `ca`/`CA` alpha, `BM` blend modes and isolated Form transparency groups |
+| Transparency | constant `ca`/`CA` alpha, `BM` blend modes, isolated form groups and ExtGState soft masks |
 | Shading | axial/radial `sh` (types 2/3) with type 2 exponential functions |
 | Patterns | shading patterns (`PatternType 2`), colored and uncolored tiling patterns (`PatternType 1`) |
 | Annotations | static `/AP /N` forms, widget `/AS` states and Hidden/NoView flags |
@@ -146,6 +146,11 @@ Isolated transparency group at 50% group alpha over a blue page:
 
 ![Transparency group](docs/images/transparency-group.png)
 
+ExtGState luminosity soft mask: the red fill is visible only on the white half of
+the mask, leaving blue on the right.
+
+![ExtGState soft mask](docs/images/soft-mask-extgstate.png)
+
 ## Quick start
 
 Requirements: the MoonBit toolchain (`moon 0.1.20261102` or newer). Node.js is
@@ -203,7 +208,7 @@ Design rules:
 ## Testing
 
 ```sh
-moon test                 # 54 unit and integration tests
+moon test                 # 55 unit and integration tests
 moon run cmd/moonpdf -- fixtures/text.pdf out/text.png --scale 2
 ```
 
@@ -220,7 +225,7 @@ that CI can reproduce every render.
 | M0 (delivered) | file structure, filters, incremental updates, vector graphics |
 | M1 (delivered) | images, inline images, Rotate/CropBox, rectangular clipping |
 | M2 (delivered) | embedded TrueType/CFF/Type1, standard-14 metrics/kerning, Type0/CIDFontType2, CID-keyed CFF, embedded and named CJK CMaps |
-| M3 (current) | alpha, blend modes, exact clipping, shadings, patterns, annotations, flags, optional content, image soft masks, isolated transparency groups and vector SVG paths/images/clips/text delivered; ExtGState soft mask, standard-14 vector text |
+| M3 (current) | alpha, blend modes, exact clipping, shadings, patterns, annotations, flags, optional content, image/ExtGState soft masks, isolated transparency groups and vector SVG paths/images/clips/text delivered; standard-14 vector text |
 | M4 | corpus SSIM vs MuPDF, performance pass, wasm demo |
 
 The full plan, scope boundaries and acceptance criteria are in

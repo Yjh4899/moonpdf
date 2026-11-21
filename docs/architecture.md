@@ -21,7 +21,7 @@ The architecture optimizes for four properties:
 | Package | Responsibility | Key files |
 | --- | --- | --- |
 | `pdf/` | syntax, object model, xref chain, filters, page tree, content operators | `types.mbt`, `parse.mbt`, `document.mbt`, `content.mbt`, `filter.mbt` |
-| `render/` | graphics state, paths, scanline raster, text/fonts, forms, images, PNG/SVG | `geometry.mbt`, `path.mbt`, `canvas.mbt`, `font.mbt`, `pdf_font.mbt`, `truetype.mbt`, `cff.mbt`, `image.mbt`, `jpeg.mbt`, `shading.mbt`, `pattern.mbt`, `annot.mbt`, `group.mbt`, `svg.mbt`, `svg_vector.mbt`, `render.mbt`, `png.mbt` |
+| `render/` | graphics state, paths, scanline raster, text/fonts, forms, images, PNG/SVG | `geometry.mbt`, `path.mbt`, `canvas.mbt`, `font.mbt`, `pdf_font.mbt`, `truetype.mbt`, `cff.mbt`, `image.mbt`, `jpeg.mbt`, `shading.mbt`, `pattern.mbt`, `annot.mbt`, `group.mbt`, `soft_mask.mbt`, `svg.mbt`, `svg_vector.mbt`, `render.mbt`, `png.mbt` |
 | root | small facade: `page_count`, `render_page_png` | `moonpdf.mbt` |
 | `cmd/moonpdf/` | argument parsing and file I/O | `main.mbt` |
 | `tests/integration/` | end-to-end fixtures: incremental update, xref stream, pixel probes | `lib.mbt`, `integration_test.mbt` |
@@ -87,6 +87,11 @@ They are rendered into a cell twice, on white and black backdrops; the
 white-minus-black difference recovers per-pixel alpha and the black render
 recovers the unpremultiplied color, which is then composited with the group
 alpha.
+
+ExtGState `/SMask` dictionaries build a page-sized coverage plane: a Luminosity
+mask uses the rendered luminance, while an Alpha mask uses the white/black alpha
+extraction. The canvas multiplies every subsequent source pixel by this plane
+until the graphics state is restored.
 
 Annotations are rendered after page content: each `/AP /N` form is rendered into
 a synthetic page sized to its `/Rect`, then composited at the rect. Widgets with

@@ -97,12 +97,13 @@ The incremental page must show the reused blue header and the new green body.
 - vector SVG images;
 - vector SVG clips;
 - vector SVG text outlines for embedded fonts;
-- isolated Form transparency groups.
+- isolated Form transparency groups;
+- ExtGState soft masks.
 
 **Remaining**
 
 - non-isolated/knockout transparency groups;
-- ExtGState soft masks;
+- soft-mask transfer functions (`/TR`);
 - vector shadings/patterns and standard-14 text in SVG;
 - wasm demo.
 

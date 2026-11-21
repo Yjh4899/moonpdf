@@ -73,7 +73,7 @@ samples. Image-specific color transforms are part of the image milestone.
 | blend modes (`/BM` in ExtGState) | partial | Multiply/Screen/Overlay/Darken/Lighten/Dodge/Burn/HardLight/SoftLight/Difference/Exclusion |
 | transparency groups | partial | isolated groups via white/black backdrop extraction; non-isolated/knockout next |
 | progressive JPEG (`SOF2`) | next | baseline `SOF0`/`SOF1` only |
-| soft mask (`/SMask`) | partial | image `/SMask` alpha; ExtGState soft masks next |
+| soft mask (`/SMask`) | partial | image `/SMask` alpha and ExtGState Luminosity/Alpha masks; transfer functions next |
 | annotation appearance streams (`/AP /N`) | partial | static forms, `/AS` states, Hidden/NoView flags |
 | optional content (`/OC` BDC, `/OCProperties /D`) | partial | page content; form content filtering next |
 
