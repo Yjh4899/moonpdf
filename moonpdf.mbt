@@ -36,3 +36,24 @@ pub fn render_page_png(
   }
   @render.encode_png(raster)
 }
+
+///|
+/// Render one page as a self-contained SVG with an embedded PNG image.
+pub fn render_page_svg(
+  data : Bytes,
+  page_index : Int32,
+  scale : Double,
+) -> Bytes raise MoonPdfError {
+  let document = @pdf.parse_document(data) catch {
+    @pdf.PdfError(msg) => raise MoonPdfError(msg)
+  }
+  let page = match document.page(page_index) {
+    Some(p) => p
+    None => raise MoonPdfError("page index out of range")
+  }
+  let options = @render.RenderOptions::with_scale(scale)
+  let raster = @render.render_page(page, options) catch {
+    @render.RenderError(msg) => raise MoonPdfError(msg)
+  }
+  @render.encode_svg(raster)
+}

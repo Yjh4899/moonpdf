@@ -3,11 +3,14 @@ fn usage() -> Unit {
   println("MoonPDF - a pure-MoonBit PDF page renderer")
   println("")
   println("Usage:")
-  println("  moonpdf <input.pdf> [output.png] [--page N] [--scale S]")
+  println(
+    "  moonpdf <input.pdf> [output.png|output.svg] [--page N] [--scale S] [--svg]",
+  )
   println("")
   println("Options:")
   println("  --page N   1-based page number (default: 1)")
   println("  --scale S  output scale, 1.0 = 72 dpi (default: 1.0)")
+  println("  --svg      write an SVG container with an embedded PNG")
 }
 
 ///|
@@ -39,6 +42,7 @@ fn main {
   let mut output = ""
   let mut page = 1
   let mut scale = 1.0
+  let mut svg = false
   let mut i = 2
   while i < args.length() {
     let arg = args[i]
@@ -48,6 +52,9 @@ fn main {
     } else if arg == "--scale" && i + 1 < args.length() {
       scale = parse_double_arg(args[i + 1], 1.0)
       i = i + 2
+    } else if arg == "--svg" {
+      svg = true
+      i = i + 1
     } else if output == "" {
       output = arg
       i = i + 1
@@ -56,7 +63,7 @@ fn main {
     }
   }
   if output == "" {
-    output = "\{input}.png"
+    output = if svg { "\{input}.svg" } else { "\{input}.png" }
   }
   if page < 1 {
     page = 1
@@ -79,19 +86,28 @@ fn main {
     )
     return
   }
-  let png = @lib.render_page_png(data, page - 1, scale) catch {
-    @lib.MoonPdfError(msg) => {
-      println("error: \{msg}")
-      return
+  let rendered = if svg {
+    @lib.render_page_svg(data, page - 1, scale) catch {
+      @lib.MoonPdfError(msg) => {
+        println("error: \{msg}")
+        return
+      }
+    }
+  } else {
+    @lib.render_page_png(data, page - 1, scale) catch {
+      @lib.MoonPdfError(msg) => {
+        println("error: \{msg}")
+        return
+      }
     }
   }
-  @fs.write_bytes_to_file(output, png) catch {
+  @fs.write_bytes_to_file(output, rendered) catch {
     _ => {
       println("error: cannot write \{output}")
       return
     }
   }
   println(
-    "rendered page \{page}/\{pages} at scale \{scale} -> \{output} (\{png.length()} bytes)",
+    "rendered page \{page}/\{pages} at scale \{scale} -> \{output} (\{rendered.length()} bytes)",
   )
 }
