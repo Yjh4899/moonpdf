@@ -582,6 +582,10 @@ fn expand_forms(
             None => None
           }
           if subtype == Some("Form") {
+            if group_is_transparency(page, stream.dict) {
+              out.push(op)
+              continue
+            }
             let data = @pdf.decode_stream(stream) catch {
               _ => raise RenderError("failed to decode Form XObject \{name}")
             }
@@ -1201,7 +1205,13 @@ fn render_page_inner(
                     Some(value) => value.as_name()
                     None => None
                   }
-                  if subtype == Some("Image") {
+                  if subtype == Some("Form") {
+                    if group_is_transparency(page, stream.dict) {
+                      render_transparency_group(
+                        page, stream, canvas, state, depth,
+                      )
+                    }
+                  } else if subtype == Some("Image") {
                     let image = decode_image(page, stream)
                     canvas.set_alpha(255)
                     canvas.set_blend(state.blend_mode)
