@@ -90,11 +90,13 @@ The incremental page must show the reused blue header and the new green body.
 - widget `/AS` state dictionaries;
 - hidden optional content groups (`/OC` BDC);
 - annotation Hidden/NoView/Invisible flags;
-- uncolored tiling patterns (`PaintType 2`).
+- uncolored tiling patterns (`PaintType 2`);
+- image soft masks (`/SMask`).
 
 **Remaining**
 
 - transparency groups and isolation;
+- ExtGState soft masks;
 - SVG output and a wasm demo.
 
 **Acceptance**

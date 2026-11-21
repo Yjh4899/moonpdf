@@ -35,7 +35,7 @@ The concrete reuse fixture is documented in
    compares page hashes in CI, catching layout regressions without a JavaScript
    toolchain.
 
-## Delivered in release 0.25.0
+## Delivered in release 0.26.0
 
 - classic xref tables, xref streams, object streams and hybrid `/XRefStm`;
 - incremental updates: `/Prev` chain, revision overlay, free entries;
@@ -63,6 +63,7 @@ The concrete reuse fixture is documented in
 - hidden optional content groups from `/OCProperties /D` (`/OC` BDC);
 - annotation Hidden/NoView/Invisible flags (`/F`);
 - uncolored tiling patterns (`PaintType 2`) tinted by the `scn` color;
+- image soft masks (`/SMask`) with resampled 8-bit alpha;
 - standard-14 ASCII kerning from the Core 14 AFM KernPairs;
 - `/Rotate` 0/90/180/270, `/CropBox`, rectangular `W`/`W*` clip;
 - fill rules, line width and round caps;
@@ -98,8 +99,8 @@ The concrete reuse fixture is documented in
 
 | Metric | Current | Target |
 | --- | --- | --- |
-| Fixture pages rendered end to end | 30/30 | public corpus |
-| Unit + integration tests | 47 | 100+ |
+| Fixture pages rendered end to end | 31/31 | public corpus |
+| Unit + integration tests | 48 | 100+ |
 | Unsupported-feature errors with a typed message | 100% | 100% |
 | Incremental-update fixtures | 1 | every `/Prev` document in corpus |
 | Visual diff vs reference renderer | pixel probes on fixtures | SSIM 鈮?0.95 on 98% of corpus |

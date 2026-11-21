@@ -53,7 +53,7 @@ The public acceptance corpus is:
    unknown content operators follow the PDF rule for unknown operators and are
    counted in the compatibility report.
 
-## Current status (release 0.25.0)
+## Current status (release 0.26.0)
 
 | Area | Current | Gap to target |
 | --- | --- | --- |
@@ -64,7 +64,8 @@ The public acceptance corpus is:
 | paths, fill/stroke, RGB/gray/CMYK | implemented | dash/miter details |
 | exact path clipping (`W`/`W*`) | implemented | clip stack depth is bounded by memory |
 | Form XObjects | implemented (expansion, matrix, nested resources, `BBox` clip) | — |
-| images: Flate/gray/RGB/CMYK, baseline DCT, inline images | implemented | progressive DCT, soft masks, 1/2/4-bit samples |
+| images: Flate/gray/RGB/CMYK, baseline DCT, inline images | implemented | progressive DCT, 1/2/4-bit samples |
+| image soft masks (`/SMask`) | implemented | ExtGState soft masks |
 | embedded TrueType (`FontFile2`), cmap/hmtx/simple+composite glyf outlines | implemented | — |
 | standard-14 metrics (Helvetica/Times/Courier AFM widths) | implemented | Symbol/ZapfDingbats |
 | standard-14 ASCII kerning (AFM KernPairs) | implemented | — |

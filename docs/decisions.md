@@ -491,3 +491,18 @@ Opacity from antialiased tile edges is preserved as alpha.
 
 **Consequence.** Uncolored tiling patterns work with RGB/solid fill colors.
 Pattern color spaces and per-fill caching remain refinements.
+
+## ADR-031: image soft masks as an alpha plane
+
+**Decision.** Decode an image XObject's `/SMask` stream as 8-bit gray, resample
+it to the image dimensions, and apply it per sample via the canvas alpha.
+
+**Alternatives.** Ignore `/SMask`; pre-composite the mask into RGBA image data;
+support only `/Mask` color-key transparency.
+
+**Why.** `/SMask` carries the alpha plane separately from color. Storing it as
+an alpha array keeps image decoding and color conversion unchanged, and applying
+it at draw time composes with the existing `ca`/`CM` alpha and blend modes.
+
+**Consequence.** Image soft masks render with correct fade/transparency. ExtGState
+soft masks and `/Matte` color correction remain next.

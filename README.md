@@ -9,7 +9,7 @@
 stream, rasterize the page, and write a PNG without a JavaScript VM, a C
 library, or a browser.
 
-Published as [`Yjh4899/moonpdf@0.25.0`](https://mooncakes.io/docs/Yjh4899/moonpdf)
+Published as [`Yjh4899/moonpdf@0.26.0`](https://mooncakes.io/docs/Yjh4899/moonpdf)
 on mooncakes.io.
 
 ## Why this exists
@@ -37,7 +37,7 @@ real pages end to end, including incrementally saved files:
 | Content | `q/Q/cm`, paths (`m l c v y re h`), fill/stroke, RGB/gray/CMYK, line width/cap |
 | Clip | exact `W` / `W*` path masks, Form `BBox` |
 | Forms | Form XObjects with `/Matrix`, nested resources and `BBox` clip |
-| Images | 8-bit gray/RGB/CMYK, Flate and baseline JPEG, inline images |
+| Images | 8-bit gray/RGB/CMYK, Flate and baseline JPEG, inline images, `/SMask` alpha |
 | Text | text state, `Td/TD/Tm/T*`, `Tj/TJ/'/"`, embedded TrueType/CFF/Type1 outlines (with Type1 `seac`), standard-14 AFM metrics and kerning, Type0/CIDFontType2, CID-keyed CFF, embedded and named CJK CMaps, bitmap fallback |
 | Transparency | constant `ca`/`CA` alpha and `BM` blend modes via ExtGState `gs`; isolation groups are next |
 | Shading | axial/radial `sh` (types 2/3) with type 2 exponential functions |
@@ -137,6 +137,11 @@ Annotation flag `/F 2` (Hidden): the red widget is skipped, the green one stays.
 
 ![Annotation flags](docs/images/annotation-flags.png)
 
+Image `/SMask` alpha: opaque red on the left, fading into the blue page on the
+right.
+
+![Image soft mask](docs/images/soft-mask.png)
+
 ## Quick start
 
 Requirements: the MoonBit toolchain (`moon 0.1.20261102` or newer). Node.js is
@@ -194,7 +199,7 @@ Design rules:
 ## Testing
 
 ```sh
-moon test                 # 47 unit and integration tests
+moon test                 # 48 unit and integration tests
 moon run cmd/moonpdf -- fixtures/text.pdf out/text.png --scale 2
 ```
 
@@ -211,7 +216,7 @@ that CI can reproduce every render.
 | M0 (delivered) | file structure, filters, incremental updates, vector graphics |
 | M1 (delivered) | images, inline images, Rotate/CropBox, rectangular clipping |
 | M2 (delivered) | embedded TrueType/CFF/Type1, standard-14 metrics/kerning, Type0/CIDFontType2, CID-keyed CFF, embedded and named CJK CMaps |
-| M3 (current) | alpha, blend modes, exact clipping, shadings, patterns, annotations, flags and optional content delivered; isolation groups, SVG |
+| M3 (current) | alpha, blend modes, exact clipping, shadings, patterns, annotations, flags, optional content and image soft masks delivered; isolation groups, SVG |
 | M4 | corpus SSIM vs MuPDF, performance pass, wasm demo |
 
 The full plan, scope boundaries and acceptance criteria are in

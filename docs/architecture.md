@@ -76,6 +76,9 @@ RenderedPage
        └─ CRC32 over chunk type + data
 ```
 
+Image XObjects decode their `/SMask` stream into an 8-bit alpha plane (nearest
+resampling to the image size) and apply it per sample when drawing.
+
 Annotations are rendered after page content: each `/AP /N` form is rendered into
 a synthetic page sized to its `/Rect`, then composited at the rect. Widgets with
 an `/N` state dictionary select the form named by `/AS`; annotations with the
