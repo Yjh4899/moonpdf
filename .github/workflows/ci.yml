@@ -64,6 +64,7 @@ jobs:
           moon run --target native cmd/moonpdf -- fixtures/shapes.pdf out/shapes.svg --scale 2 --svg
           moon run --target native cmd/moonpdf -- fixtures/vector-paths.pdf out/vector-paths.svg --scale 2 --svg
           moon run --target native cmd/moonpdf -- fixtures/image-flate.pdf out/image-flate.svg --scale 1 --svg
+          moon run --target native cmd/moonpdf -- fixtures/clip-path.pdf out/clip-path.svg --scale 2 --svg
 
       - name: Verify PNG output and reused-resource pixels
         run: |
@@ -373,6 +374,12 @@ jobs:
           assert "<image" in image_svg
           assert "<path" not in image_svg
           print("image svg", len(image_svg))
+
+          # Vector clip: a clipPath element, no embedded image.
+          clip_svg = Path("out/clip-path.svg").read_text(encoding="utf-8")
+          assert "<clipPath" in clip_svg
+          assert "<image" not in clip_svg
+          print("clip svg", len(clip_svg))
           PY
 
       - name: Upload rendered pages
