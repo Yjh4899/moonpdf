@@ -1,13 +1,13 @@
-# Acceptance audit — MoonPDF 0.43.0
+# Acceptance audit — MoonPDF 0.43.1
 
-This is the release checklist for the 0.43.0 acceptance pass. It records what was
+This is the release checklist for the 0.43.1 acceptance pass. It records what was
 verified, on which environment, and what remains a known gap.
 
 ## Release identity
 
 - GitHub repository: `Yjh4899/moonpdf`
 - mooncakes package: `Yjh4899/moonpdf`
-- Version: `0.43.0`
+- Version: `0.43.1`
 - License: Apache-2.0; bundled OpenSans subset is SIL OFL 1.1.
 - Readme: `README.md` (English), `README.zh.md` (Chinese), `README.mbt.md`
   (package-facing summary).
@@ -93,7 +93,7 @@ conservative; the library path is faster.
 3. Some reference blend/image color details remain below the 0.90 threshold.
 4. Encrypted PDFs, linearization and full ICC color management are out of
    scope for this release.
-5. wasm browser demo is not part of 0.43.0; the core is wasm-gc compatible.
+5. wasm browser demo is not part of 0.43.1; the core is wasm-gc compatible.
 
 ## Release checklist
 
