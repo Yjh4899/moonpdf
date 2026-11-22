@@ -911,10 +911,12 @@ stroke is applied only to Type1 glyphs and remains sub-pixel.
 **Decision.** Sample image XObjects with bilinear interpolation over the four
 nearest source texels instead of nearest-neighbour.
 
-**Alternatives.** Keep nearest-neighbour; implement bicubic.
+**Alternatives.** Keep nearest-neighbour; use bicubic (Catmull-Rom) instead.
 
 **Why.** The reference renderer smooths scaled images. Nearest-neighbour left
-hard pixel steps in the blend-mode sample and in scaled figure images.
+hard pixel steps in the blend-mode sample and in scaled figure images. A
+Catmull-Rom bicubic pass was also implemented and measured: it reduced
+`blendmode.pdf` closeness from 87.4% to 87.1%, so bilinear was kept.
 
 **Consequence.** `blendmode.pdf` improved from 84.5% to 87.4%, `alphatrans.pdf`
 to 98.2%, and the fixture report to 34/39 within tolerance.
