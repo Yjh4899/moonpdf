@@ -11,6 +11,9 @@ library, or a browser.
 
 Published as [`Yjh4899/moonpdf@0.44.0`](https://mooncakes.io/docs/Yjh4899/moonpdf)
 
+中文一页项目说明：[`docs/项目说明-一页.md`](docs/项目说明-一页.md)。完整申报书：
+[`docs/申报书.md`](docs/申报书.md)。
+
 Run the examples in [`examples/README.md`](examples/README.md). Release notes:
 [`docs/release-0.44.0.md`](docs/release-0.44.0.md).
 

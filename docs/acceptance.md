@@ -109,3 +109,5 @@ conservative; the library path is faster.
 - [x] Fixture corpus re-run after final changes
 - [x] CI green on pushed commit
 - [x] mooncakes package page returns HTTP 200
+- [x] release tag `v0.44.0` pushed
+- [x] one-page project statement committed

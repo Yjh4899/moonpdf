@@ -10,8 +10,8 @@ MoonPDF 用纯 MoonBit 补齐 MoonBit 生态缺少的“PDF 页面 → 像素”
 
 | 验收条 | 仓库证据 |
 | --- | --- |
-| MoonBit 为主 | `pdf/`、`render/`、`cmd/` 全部 MoonBit；约 98.7k 行、244 个 `.mbt`、2.89 MB 源码 |
-| 仓库公开、提交连续 | GitHub `Yjh4899/moonpdf`；227 次提交，连续开发；issue/PR/更新记录可见 |
+| MoonBit 为主 | `pdf/`、`render/`、`cmd/` 全部 MoonBit；约 98.9k 行、245 个 `.mbt`、2.89 MB 源码 |
+| 仓库公开、提交连续 | GitHub `Yjh4899/moonpdf`；0.44.0 发布时 228 次提交，连续开发；issue/PR/更新记录可见 |
 | 能够运行 | `README.md` 三条命令可跑；`examples/README.md`、`demo/index.html`；77 个测试；CI 全绿 |
 | 本期工作有效 | xref/对象流、增量更新、字体、图像、透明度、clipping、shading、pattern、annotation、SVG 等均为本期实现；见 `docs/scope.md` |
 | 开源合规 | Apache-2.0；PDF 规范引用；内置 OpenSans 子集为 SIL OFL 1.1，`fixtures/fonts/OFL.txt` |
