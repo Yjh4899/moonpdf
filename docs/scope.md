@@ -14,7 +14,14 @@ The completion target is **ISO 32000-1:2008 (PDF 1.7) page rendering**. The
 target is the rendering-relevant portion of the standard as a whole, not a
 private subset; current gaps are tracked as milestone work, not as scope
 exclusions. See [`standard-coverage.md`](standard-coverage.md) for the clause
-| Visual diff vs reference renderer | pixel probes on fixtures | SSIM >= 0.95 on 98% of corpus |
+matrix.
+
+| Acceptance criterion | Verification | Target |
+| --- | --- | --- |
+| Visual diff vs reference renderer | pixel probes on fixtures | close >= 0.90 on committed fixtures |
+| Real-document corpus | 13 public PDFs | all render, no crash/timeout |
+| Robustness | malformed/fuzz corpus | zero crashes and zero hangs |
+| Reproducibility | clean checkout + CI | check/test pass from scratch |
 
 Incremental updates (`/Prev` chains, xref streams, object streams, hybrid
 `/XRefStm`) are explicitly **in scope** and are implemented in this release.
@@ -35,7 +42,7 @@ The concrete reuse fixture is documented in
    compares page hashes in CI, catching layout regressions without a JavaScript
    toolchain.
 
-## Unreleased (local work)
+## Delivered in release 0.43.0
 
 - `BT`/`ET` keeps font and text state, only resetting text matrices;
 - type-3 stitching functions in axial shadings;

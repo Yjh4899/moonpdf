@@ -9,7 +9,7 @@
 stream, rasterize the page, and write a PNG without a JavaScript VM, a C
 library, or a browser.
 
-Published as [`Yjh4899/moonpdf@0.42.0`](https://mooncakes.io/docs/Yjh4899/moonpdf)
+Published as [`Yjh4899/moonpdf@0.43.0`](https://mooncakes.io/docs/Yjh4899/moonpdf)
 on mooncakes.io.
 
 ## Why this exists
@@ -221,7 +221,7 @@ Design rules:
 ## Testing
 
 ```sh
-moon test                 # 56 unit and integration tests
+moon test                 # 61 unit and integration tests
 moon run cmd/moonpdf -- fixtures/text.pdf out/text.png --scale 2
 ```
 
@@ -248,8 +248,8 @@ of pixels within 8 RGB levels:
   render; 34 are within tolerance, 5 differ (reference edge cases and the
   standard-14 fallback tradeoff).
 - [`docs/corpus-report-real.md`](docs/corpus-report-real.md): 13 downloaded
-  public PDFs (papers, government forms, transparency/blend samples). Three pass
-  the pixel tolerance and ten are tracked fidelity gaps; all render without
+  public PDFs (papers, government forms, transparency/blend samples). Five pass
+  the pixel tolerance and eight are tracked fidelity gaps; all render without
   crash or timeout.
 
 Downloaded PDFs live in `corpus/` and are gitignored; only
@@ -294,7 +294,9 @@ throughput measurements.
 | M4 | corpus SSIM vs MuPDF, performance pass, wasm demo |
 
 The full plan, scope boundaries and acceptance criteria are in
-[`docs/scope.md`](docs/scope.md) and [`docs/roadmap.md`](docs/roadmap.md).
+[`docs/scope.md`](docs/scope.md) and [`docs/roadmap.md`](docs/roadmap.md). The
+release audit and verification matrix are in
+[`docs/acceptance.md`](docs/acceptance.md).
 
 ## References and license
 
