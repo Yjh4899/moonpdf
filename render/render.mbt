@@ -243,6 +243,29 @@ fn set_stroke(state : GState, r : Int32, g : Int32, b : Int32) -> Unit {
 }
 
 ///|
+fn apply_scn_color(state : GState, op : @pdf.ContentOp, stroke : Bool) -> Unit {
+  let count = op.operands.length()
+  if count == 1 {
+    match op_number(op, 0) {
+      Some(gray) => apply_gray(state, gray, stroke)
+      None => ()
+    }
+  } else if count == 3 {
+    match (op_number(op, 0), op_number(op, 1), op_number(op, 2)) {
+      (Some(r), Some(g), Some(b)) => apply_rgb(state, r, g, b, stroke)
+      _ => ()
+    }
+  } else if count == 4 {
+    match
+      (op_number(op, 0), op_number(op, 1), op_number(op, 2), op_number(op, 3)) {
+      (Some(c), Some(m), Some(y), Some(k)) =>
+        apply_cmyk(state, c, m, y, k, stroke)
+      _ => ()
+    }
+  }
+}
+
+///|
 fn apply_gray(state : GState, value : Double, stroke : Bool) -> Unit {
   let c = color_component(value)
   if stroke {
@@ -384,7 +407,7 @@ fn show_text_font(
     }
     let full = text.matrix.then(state.ctm)
     let glyph = font.glyph_for_code(code)
-    let drawn = if glyph > 0 {
+    let mut drawn = if glyph > 0 {
       match font.tt {
         Some(tt) => {
           draw_glyph(
@@ -438,6 +461,28 @@ fn show_text_font(
           }
         }
         None => false
+      }
+    }
+    let standard_only = font.standard
+    if !drawn && standard_only {
+      match fallback_truetype() {
+        Some(fallback) => {
+          let fallback_glyph = fallback.glyph_id(code)
+          if fallback_glyph > 0 {
+            draw_glyph(
+              canvas,
+              fallback,
+              fallback_glyph,
+              full,
+              text.font_size,
+              state.fill_r,
+              state.fill_g,
+              state.fill_b,
+            )
+            drawn = true
+          }
+        }
+        None => ()
       }
     }
     if !drawn {
@@ -927,6 +972,7 @@ fn render_page_inner(
         }
         if name == "" {
           state.fill_pattern = None
+          apply_scn_color(state, op, false)
         } else {
           match lookup_resource(page, page.resources, "Pattern", name) {
             Some(value) => {
@@ -963,7 +1009,18 @@ fn render_page_inner(
           }
         }
       }
-      "SCN" => state.fill_pattern = None
+      "SCN" => {
+        state.fill_pattern = None
+        let count = op.operands.length()
+        let has_name = if count > 0 {
+          op.operands[count - 1].as_name() is Some(_)
+        } else {
+          false
+        }
+        if !has_name {
+          apply_scn_color(state, op, true)
+        }
+      }
       "g" =>
         match op_number(op, 0) {
           Some(v) => apply_gray(state, v, false)

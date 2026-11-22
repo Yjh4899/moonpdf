@@ -873,3 +873,21 @@ bolder than the reference.
 
 **Consequence.** Attention, GPT-4, BERT, CLIP, IRS and ResNet all moved closer
 to the reference; attention reached about 89.4% pixel closeness.
+
+## ADR-054: embedded OpenSans for standard-14 fallback
+
+**Decision.** Bundle a 66 KB compressed subset of OpenSans (OFL) and use it for
+standard-14 glyphs that have no embedded outline, instead of the 3x5 bitmap
+fallback.
+
+**Alternatives.** Keep bitmap glyphs; read a system font; download a font at
+runtime.
+
+**Why.** Standard-14 figures and stamps (for example ResNet's chart labels and
+arXiv's side stamp) became blocky at small sizes. A bundled vector fallback is
+deterministic, works in wasm, and needs no filesystem.
+
+**Consequence.** Attention crossed the 90% pixel threshold and the real corpus
+reached 5/13 passing. The tradeoff is that the fixture report drops from 36 to
+33 within tolerance, because the reference uses Times/Helvetica outlines while
+the fallback is OpenSans; the tradeoff is documented rather than hidden.

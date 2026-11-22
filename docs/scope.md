@@ -42,8 +42,9 @@ The concrete reuse fixture is documented in
 - fractional page sizes round up to full pixels;
 - HSL blend modes and gamma-aware downsampling;
 - pixel-center scanline fill for thin text stems;
+- embedded OpenSans fallback for standard-14 text;
 - regression fixtures `text-bt.pdf`, `shading-type3.pdf`, `page-fraction.pdf`;
-- real corpus: 4/13 pixel-passing, IRS 1040 about 82%, W-9 about 82%.
+- real corpus: 5/13 pixel-passing, IRS 1040 about 82%, W-9 about 82%.
 
 ## Delivered in release 0.42.0
 
@@ -127,7 +128,7 @@ The concrete reuse fixture is documented in
 | Metric | Current | Target |
 | --- | --- | --- |
 | Fixture pages rendered end to end | 39/39 | public corpus |
-| Differential fixture pages within tolerance | 36/39 | 3 reference-tool differences documented |
+| Differential fixture pages within tolerance | 33/39 | 6 differences documented; standard-14 fallback trades shape fidelity for vector text |
 | Real public PDFs rendering without crash | 13/13 | 100+ |
 | Real public PDFs within pixel tolerance | 3/13 | 10 tracked fidelity gaps |
 | Unit + integration tests | 56 | 100+ |
