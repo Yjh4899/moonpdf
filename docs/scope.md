@@ -44,8 +44,9 @@ The concrete reuse fixture is documented in
 - pixel-center scanline fill for thin text stems;
 - embedded OpenSans fallback for standard-14 text;
 - sub-pixel contour stroke for Type1 stem weight;
+- bilinear image sampling for scaled XObjects;
 - regression fixtures `text-bt.pdf`, `shading-type3.pdf`, `page-fraction.pdf`;
-- real corpus: 5/13 pixel-passing, attention 90.2%, IRS 1040 about 82%, W-9 about 82%.
+- real corpus: 5/13 pixel-passing, attention 90.2%, blendmode 87.4%, IRS 1040 about 82%, W-9 about 82%.
 
 ## Delivered in release 0.42.0
 
@@ -129,7 +130,7 @@ The concrete reuse fixture is documented in
 | Metric | Current | Target |
 | --- | --- | --- |
 | Fixture pages rendered end to end | 39/39 | public corpus |
-| Differential fixture pages within tolerance | 33/39 | 6 differences documented; standard-14 fallback trades shape fidelity for vector text |
+| Differential fixture pages within tolerance | 34/39 | 5 differences documented; standard-14 fallback trades shape fidelity for vector text |
 | Real public PDFs rendering without crash | 13/13 | 100+ |
 | Real public PDFs within pixel tolerance | 3/13 | 10 tracked fidelity gaps |
 | Unit + integration tests | 56 | 100+ |

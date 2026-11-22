@@ -319,6 +319,47 @@ fn sample_alpha(image : ImageData, x : Int32, y : Int32) -> Int32 {
 ///|
 /// Paint an image into the unit square, transformed by the current CTM. The
 /// sampler is nearest-neighbour; bilinear sampling is a later refinement.
+
+///|
+fn sample_rgb_bilinear(
+  image : ImageData,
+  u : Double,
+  v : Double,
+) -> (Int32, Int32, Int32) {
+  let x0 = @math.floor(u).to_int()
+  let y0 = @math.floor(v).to_int()
+  let fx = u - x0.to_double()
+  let fy = v - y0.to_double()
+  let (r00, g00, b00) = sample_rgb(image, x0, y0)
+  let (r10, g10, b10) = sample_rgb(image, x0 + 1, y0)
+  let (r01, g01, b01) = sample_rgb(image, x0, y0 + 1)
+  let (r11, g11, b11) = sample_rgb(image, x0 + 1, y0 + 1)
+  let blend = fn(a : Int32, b : Int32, c : Int32, d : Int32) -> Int32 {
+    let top = a.to_double() * (1.0 - fx) + b.to_double() * fx
+    let bottom = c.to_double() * (1.0 - fx) + d.to_double() * fx
+    (top * (1.0 - fy) + bottom * fy).to_int()
+  }
+  (
+    blend(r00, r10, r01, r11),
+    blend(g00, g10, g01, g11),
+    blend(b00, b10, b01, b11),
+  )
+}
+
+///|
+fn sample_alpha_bilinear(image : ImageData, u : Double, v : Double) -> Int32 {
+  let x0 = @math.floor(u).to_int()
+  let y0 = @math.floor(v).to_int()
+  let fx = u - x0.to_double()
+  let fy = v - y0.to_double()
+  let top = sample_alpha(image, x0, y0).to_double() * (1.0 - fx) +
+    sample_alpha(image, x0 + 1, y0).to_double() * fx
+  let bottom = sample_alpha(image, x0, y0 + 1).to_double() * (1.0 - fx) +
+    sample_alpha(image, x0 + 1, y0 + 1).to_double() * fx
+  (top * (1.0 - fy) + bottom * fy).to_int()
+}
+
+///|
 fn draw_image(canvas : Canvas, state : GState, image : ImageData) -> Unit {
   let inverse = match state.ctm.invert() {
     Some(m) => m
@@ -338,10 +379,10 @@ fn draw_image(canvas : Canvas, state : GState, image : ImageData) -> Unit {
     while x <= x1 {
       let p = inverse.apply(x.to_double() + 0.5, y.to_double() + 0.5)
       if p.x >= 0.0 && p.x <= 1.0 && p.y >= 0.0 && p.y <= 1.0 {
-        let col = (p.x * (image.width - 1).to_double()).to_int()
-        let row = ((1.0 - p.y) * (image.height - 1).to_double()).to_int()
-        let (r, g, b) = sample_rgb(image, col, row)
-        let alpha = sample_alpha(image, col, row)
+        let u = p.x * (image.width - 1).to_double()
+        let v = (1.0 - p.y) * (image.height - 1).to_double()
+        let (r, g, b) = sample_rgb_bilinear(image, u, v)
+        let alpha = sample_alpha_bilinear(image, u, v)
         canvas.set_alpha(alpha_component(state.fill_alpha) * alpha / 255)
         canvas.set(x, y, r, g, b)
       }

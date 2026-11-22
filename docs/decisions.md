@@ -905,3 +905,16 @@ stem weight without changing advances or glyph positions.
 
 **Consequence.** Attention rose to about 90.2% and clip/gpt4 moved closer; the
 stroke is applied only to Type1 glyphs and remains sub-pixel.
+
+## ADR-056: bilinear image sampling
+
+**Decision.** Sample image XObjects with bilinear interpolation over the four
+nearest source texels instead of nearest-neighbour.
+
+**Alternatives.** Keep nearest-neighbour; implement bicubic.
+
+**Why.** The reference renderer smooths scaled images. Nearest-neighbour left
+hard pixel steps in the blend-mode sample and in scaled figure images.
+
+**Consequence.** `blendmode.pdf` improved from 84.5% to 87.4%, `alphatrans.pdf`
+to 98.2%, and the fixture report to 34/39 within tolerance.
