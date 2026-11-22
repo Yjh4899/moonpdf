@@ -1,13 +1,13 @@
-# Acceptance audit — MoonPDF 0.43.1
+# Acceptance audit — MoonPDF 0.44.0
 
-This is the release checklist for the 0.43.1 acceptance pass. It records what was
+This is the release checklist for the 0.44.0 acceptance pass. It records what was
 verified, on which environment, and what remains a known gap.
 
 ## Release identity
 
 - GitHub repository: `Yjh4899/moonpdf`
 - mooncakes package: `Yjh4899/moonpdf`
-- Version: `0.43.1`
+- Version: `0.44.0`
 - License: Apache-2.0; bundled OpenSans subset is SIL OFL 1.1.
 - Readme: `README.md` (English), `README.zh.md` (Chinese), `README.mbt.md`
   (package-facing summary).
@@ -26,13 +26,15 @@ verified, on which environment, and what remains a known gap.
 | Interface freshness | `moon info` | no stale `.mbti` |
 | Formatting | `moon fmt` | clean |
 | Warnings as errors | `moon check --deny-warn` | pass |
-| Unit/integration tests | `moon test` | **61 passed, 0 failed** |
+| Unit/integration tests | `moon test` | **77 passed, 0 failed** |
 | Committed fixture corpus | `python tools/corpus_check.py --pdf-dir fixtures ...` | **39 render, 34 within tolerance, 0 fail** |
 | Real public corpus | `python tools/corpus_check.py --pdf-dir corpus ...` | **13 render, 5 within tolerance, 0 fail, 0 timeout** |
 | Malformed PDFs | `python tools/fuzz_pdf.py` | **120 cases, 0 crashes, 0 timeouts** |
 | CLI smoke | `moon run cmd/moonpdf -- fixtures/text.pdf out/text.png` | PNG produced |
 | Multi-page CLI | `--all` / `--pages` | covered by CI |
 | SVG output | `--svg` | raster container fallback verified |
+| Visual gallery | `demo/index.html` asset/link check | 15 images, no missing links |
+| Proposal evidence | `docs/proposal-material.md` | six criteria + tradeoffs mapped |
 
 ## Real-document corpus
 
@@ -93,7 +95,7 @@ conservative; the library path is faster.
 3. Some reference blend/image color details remain below the 0.90 threshold.
 4. Encrypted PDFs, linearization and full ICC color management are out of
    scope for this release.
-5. wasm browser demo is not part of 0.43.1; the core is wasm-gc compatible.
+5. wasm browser demo is not part of 0.44.0; the core is wasm-gc compatible.
 
 ## Release checklist
 
@@ -101,7 +103,8 @@ conservative; the library path is faster.
 - [x] Changelog/decisions updated
 - [x] `moon info` / `moon fmt`
 - [x] `moon check --deny-warn`
-- [x] `moon test` (61)
+- [x] `moon test` (77)
+- [x] demo gallery and proposal evidence checked
 - [x] Real corpus re-run after final changes
 - [x] Fixture corpus re-run after final changes
 - [x] CI green on pushed commit

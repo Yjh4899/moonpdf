@@ -29,6 +29,9 @@ moon run cmd/moonpdf -- fixtures/pages.pdf --pages 1,3-5 --out-dir out/selected
 
 All images are generated from committed fixtures by the current renderer.
 
+For a self-contained visual showcase, open [`demo/index.html`](../demo/index.html)
+or serve `demo/` with `python -m http.server`.
+
 ## Real-document checks
 
 ```powershell

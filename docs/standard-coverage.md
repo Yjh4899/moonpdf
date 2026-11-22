@@ -53,7 +53,7 @@ The public acceptance corpus is:
    unknown content operators follow the PDF rule for unknown operators and are
    counted in the compatibility report.
 
-## Current status (release 0.43.1)
+## Current status (release 0.44.0)
 
 | Area | Current | Gap to target |
 | --- | --- | --- |

@@ -54,7 +54,7 @@ image sampling.
 
 ## Verification
 
-- 61 unit/integration tests, `moon check --deny-warn` clean.
+- 77 unit/integration tests, `moon check --deny-warn` clean.
 - 39 committed fixtures: 39 render, 34 within pixel tolerance, 0 fail.
 - 13 public real PDFs: 13 render, 5 within tolerance, 0 crash/timeout.
 - 120 malformed PDFs: 0 crashes, 0 timeouts.

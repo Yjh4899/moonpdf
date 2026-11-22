@@ -9,10 +9,13 @@
 stream, rasterize the page, and write a PNG without a JavaScript VM, a C
 library, or a browser.
 
-Published as [`Yjh4899/moonpdf@0.43.1`](https://mooncakes.io/docs/Yjh4899/moonpdf)
+Published as [`Yjh4899/moonpdf@0.44.0`](https://mooncakes.io/docs/Yjh4899/moonpdf)
 
 Run the examples in [`examples/README.md`](examples/README.md). Release notes:
-[`docs/release-0.43.1.md`](docs/release-0.43.1.md).
+[`docs/release-0.44.0.md`](docs/release-0.44.0.md).
+
+Visual gallery: open [`demo/index.html`](demo/index.html) directly or serve
+`demo/` locally.
 on mooncakes.io.
 
 ## Why this exists
@@ -224,7 +227,7 @@ Design rules:
 ## Testing
 
 ```sh
-moon test                 # 61 unit and integration tests
+moon test                 # 77 unit and integration tests
 moon run cmd/moonpdf -- fixtures/text.pdf out/text.png --scale 2
 ```
 
@@ -299,7 +302,9 @@ throughput measurements.
 The full plan, scope boundaries and acceptance criteria are in
 [`docs/scope.md`](docs/scope.md) and [`docs/roadmap.md`](docs/roadmap.md). The
 release audit and verification matrix are in
-[`docs/acceptance.md`](docs/acceptance.md).
+[`docs/acceptance.md`](docs/acceptance.md). Proposal evidence and technical
+tradeoffs are collected in
+[`docs/proposal-material.md`](docs/proposal-material.md).
 
 ## References and license
 

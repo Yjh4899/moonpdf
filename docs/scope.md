@@ -42,6 +42,13 @@ The concrete reuse fixture is documented in
    compares page hashes in CI, catching layout regressions without a JavaScript
    toolchain.
 
+## Delivered in release 0.44.0
+
+- static demo gallery with real-PDF and fixture comparisons;
+- 16 additional boundary tests (77 total);
+- proposal evidence table and technical-tradeoff notes;
+- release/acceptance documentation refresh.
+
 ## Delivered in release 0.43.0
 
 - `BT`/`ET` keeps font and text state, only resetting text matrices;
