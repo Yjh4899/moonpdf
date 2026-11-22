@@ -10,6 +10,9 @@ stream, rasterize the page, and write a PNG without a JavaScript VM, a C
 library, or a browser.
 
 Published as [`Yjh4899/moonpdf@0.43.0`](https://mooncakes.io/docs/Yjh4899/moonpdf)
+
+Run the examples in [`examples/README.md`](examples/README.md). Release notes:
+[`docs/release-0.43.0.md`](docs/release-0.43.0.md).
 on mooncakes.io.
 
 ## Why this exists
