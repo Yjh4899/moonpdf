@@ -414,8 +414,8 @@ fn fill_span(
   if x1 <= x0 {
     return
   }
-  let mut start = x0.to_int()
-  let mut stop = x1.to_int()
+  let mut start = @math.ceil(x0 - 0.5).to_int()
+  let mut stop = @math.ceil(x1 - 0.5).to_int() - 1
   if start < 0 {
     start = 0
   }
@@ -469,11 +469,11 @@ pub fn Canvas::fill_polygons(
   if ymin > ymax {
     return
   }
-  let mut y0 = ymin.to_int()
+  let mut y0 = @math.ceil(ymin - 0.5).to_int()
   if y0 < 0 {
     y0 = 0
   }
-  let mut y1 = ymax.to_int() + 1
+  let mut y1 = @math.ceil(ymax - 0.5).to_int()
   if y1 > self.height {
     y1 = self.height
   }
@@ -702,11 +702,11 @@ fn rasterize_mask(
   if ymin > ymax {
     return mask
   }
-  let mut y0 = ymin.to_int()
+  let mut y0 = @math.ceil(ymin - 0.5).to_int()
   if y0 < 0 {
     y0 = 0
   }
-  let mut y1 = ymax.to_int() + 1
+  let mut y1 = @math.ceil(ymax - 0.5).to_int()
   if y1 > height {
     y1 = height
   }

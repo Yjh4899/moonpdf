@@ -41,6 +41,7 @@ The concrete reuse fixture is documented in
 - type-3 stitching functions in axial shadings;
 - fractional page sizes round up to full pixels;
 - HSL blend modes and gamma-aware downsampling;
+- pixel-center scanline fill for thin text stems;
 - regression fixtures `text-bt.pdf`, `shading-type3.pdf`, `page-fraction.pdf`;
 - real corpus: 4/13 pixel-passing, IRS 1040 about 82%, W-9 about 82%.
 

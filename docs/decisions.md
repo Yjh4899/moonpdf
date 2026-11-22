@@ -858,3 +858,18 @@ text-heavy page; 4x supersampling alone was slower and no better.
 
 **Consequence.** Real-corpus closeness improved across attention, BERT, CLIP,
 GPT-4, IRS and ResNet, at a small render-time cost.
+
+## ADR-053: fill spans by pixel-center coverage
+
+**Decision.** Convert a scanline span `[x0, x1)` to pixels whose centers lie in
+the span: `start = ceil(x0 - 0.5)`, `stop = ceil(x1 - 0.5) - 1`.
+
+**Alternatives.** Floor the endpoints and fill inclusively; expand by a quarter
+pixel.
+
+**Why.** The old inclusive floor fill added a boundary pixel at both ends. For
+10pt serif text with sub-pixel stems, that made every glyph about one pixel
+bolder than the reference.
+
+**Consequence.** Attention, GPT-4, BERT, CLIP, IRS and ResNet all moved closer
+to the reference; attention reached about 89.4% pixel closeness.

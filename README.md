@@ -290,7 +290,7 @@ throughput measurements.
 | M1 (delivered) | images, inline images, Rotate/CropBox, rectangular clipping |
 | M2 (delivered) | embedded TrueType/CFF/Type1, standard-14 metrics/kerning, Type0/CIDFontType2, CID-keyed CFF, embedded and named CJK CMaps |
 | M3 (current) | alpha, blend modes, exact clipping, shadings, patterns, annotations, flags, optional content, image/ExtGState soft masks, isolated transparency groups and vector SVG paths/images/clips/text delivered; standard-14 vector text |
-| M4 (started) | corpus/differential harness, fuzz robustness, performance baseline, single-parse document handle, multi-page CLI, 13-PDF real corpus, graphics-state copy fix, text-advance fix, raw CFF SID mapping, BT/ET font persistence, stitching shadings, full-pixel page rounding, HSL blend modes, gamma-aware downsampling |
+| M4 (started) | corpus/differential harness, fuzz robustness, performance baseline, single-parse document handle, multi-page CLI, 13-PDF real corpus, graphics-state copy fix, text-advance fix, raw CFF SID mapping, BT/ET font persistence, stitching shadings, full-pixel page rounding, HSL blend modes, gamma-aware downsampling, pixel-center fill |
 | M4 | corpus SSIM vs MuPDF, performance pass, wasm demo |
 
 The full plan, scope boundaries and acceptance criteria are in
