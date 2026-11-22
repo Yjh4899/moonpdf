@@ -832,3 +832,29 @@ the right/bottom edge.
 
 **Consequence.** W-9 pixel closeness improved from 75% to 81%; the behavior is
 covered by `page-fraction.pdf`.
+
+## ADR-051: implement non-separable blend modes
+
+**Decision.** Implement `Hue`, `Saturation`, `Color` and `Luminosity` using the
+PDF/W3C `SetLum`/`SetSat`/`ClipColor` formulas on normalized RGB.
+
+**Alternatives.** Map these modes to Normal; approximate them per channel.
+
+**Why.** The PDF.js blend sample uses all four. Mapping them to Normal made the
+last four rows identical to the unblended image.
+
+**Consequence.** The four non-separable rows now show the expected color blends.
+
+## ADR-052: gamma-aware supersample downsampling
+
+**Decision.** Average supersamples in approximate linear light (gamma 2.2), then
+encode the result back to sRGB bytes.
+
+**Alternatives.** Average sRGB bytes directly; increase supersampling to 4x.
+
+**Why.** Direct byte averaging made antialiased text edges too dark and thick
+compared with the reference renderer. Gamma-aware averaging improved every
+text-heavy page; 4x supersampling alone was slower and no better.
+
+**Consequence.** Real-corpus closeness improved across attention, BERT, CLIP,
+GPT-4, IRS and ResNet, at a small render-time cost.

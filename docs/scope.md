@@ -40,8 +40,9 @@ The concrete reuse fixture is documented in
 - `BT`/`ET` keeps font and text state, only resetting text matrices;
 - type-3 stitching functions in axial shadings;
 - fractional page sizes round up to full pixels;
+- HSL blend modes and gamma-aware downsampling;
 - regression fixtures `text-bt.pdf`, `shading-type3.pdf`, `page-fraction.pdf`;
-- real corpus: 4/13 pixel-passing, IRS 1040 about 80%, W-9 about 81%.
+- real corpus: 4/13 pixel-passing, IRS 1040 about 82%, W-9 about 82%.
 
 ## Delivered in release 0.42.0
 

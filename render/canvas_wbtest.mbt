@@ -14,13 +14,13 @@ test "fill polygon and read pixels" {
 }
 
 ///|
-test "downsample averages pixels" {
+test "gamma-aware downsample averages pixels" {
   let canvas = Canvas::new(2, 2, 255, 255, 255)
   canvas.set(0, 0, 0, 0, 0)
   let small = canvas.downsample(2)
   assert_eq(small.width, 1)
   assert_eq(small.height, 1)
-  assert_eq(small.data[0].to_int(), 191)
+  assert_eq(small.data[0].to_int(), 223)
 }
 
 ///|
@@ -31,4 +31,11 @@ test "stroke leaves pixels on both sides" {
   assert_eq(canvas.data[(10 * 20 + 10) * 3].to_int(), 0)
   assert_eq(canvas.data[(8 * 20 + 10) * 3].to_int(), 0)
   assert_eq(canvas.data[(2 * 20 + 10) * 3].to_int(), 255)
+}
+
+///|
+test "HSL color blend keeps the source hue" {
+  let (r, _g, b) = blend_hsl(14, 255, 0, 0, 0, 0, 255)
+  assert_true(b > 200)
+  assert_true(r < b)
 }

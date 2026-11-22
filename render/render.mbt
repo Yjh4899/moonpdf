@@ -163,6 +163,10 @@ fn blend_mode_from_name(name : String) -> Int32 {
     "SoftLight" => 9
     "Difference" => 10
     "Exclusion" => 11
+    "Hue" => 12
+    "Saturation" => 13
+    "Color" => 14
+    "Luminosity" => 15
     _ => 0
   }
 }

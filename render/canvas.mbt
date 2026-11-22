@@ -75,6 +75,164 @@ pub fn Canvas::height(self : Canvas) -> Int32 {
 }
 
 ///|
+fn blend_lum(r : Double, g : Double, b : Double) -> Double {
+  0.3 * r + 0.59 * g + 0.11 * b
+}
+
+///|
+fn blend_clip_color(
+  r : Double,
+  g : Double,
+  b : Double,
+) -> (Double, Double, Double) {
+  let l = blend_lum(r, g, b)
+  let n = if r < g { if r < b { r } else { b } } else if g < b { g } else { b }
+  let x = if r > g { if r > b { r } else { b } } else if g > b { g } else { b }
+  let fix = fn(c : Double) -> Double {
+    let v = if n < 0.0 {
+      l + (c - l) * l / (l - n)
+    } else if x > 1.0 {
+      l + (c - l) * (1.0 - l) / (x - l)
+    } else {
+      c
+    }
+    if v < 0.0 {
+      0.0
+    } else if v > 1.0 {
+      1.0
+    } else {
+      v
+    }
+  }
+  (fix(r), fix(g), fix(b))
+}
+
+///|
+fn blend_set_lum(
+  r : Double,
+  g : Double,
+  b : Double,
+  l : Double,
+) -> (Double, Double, Double) {
+  let d = l - blend_lum(r, g, b)
+  blend_clip_color(r + d, g + d, b + d)
+}
+
+///|
+fn blend_set_sat(
+  r : Double,
+  g : Double,
+  b : Double,
+  s : Double,
+) -> (Double, Double, Double) {
+  let mn = if r < g { if r < b { r } else { b } } else if g < b { g } else { b }
+  let mx = if r > g { if r > b { r } else { b } } else if g > b { g } else { b }
+  if mx <= mn {
+    return (0.0, 0.0, 0.0)
+  }
+  let scale = fn(c : Double) -> Double {
+    if c <= mn {
+      0.0
+    } else if c >= mx {
+      s
+    } else {
+      (c - mn) * s / (mx - mn)
+    }
+  }
+  (scale(r), scale(g), scale(b))
+}
+
+///|
+fn blend_hsl(
+  mode : Int32,
+  dr : Int32,
+  dg : Int32,
+  db : Int32,
+  sr : Int32,
+  sg : Int32,
+  sb : Int32,
+) -> (Int32, Int32, Int32) {
+  let br = dr.to_double() / 255.0
+  let bg = dg.to_double() / 255.0
+  let bb = db.to_double() / 255.0
+  let fr = sr.to_double() / 255.0
+  let fg = sg.to_double() / 255.0
+  let fb = sb.to_double() / 255.0
+  let sat_b = {
+    let mn = if br < bg {
+      if br < bb {
+        br
+      } else {
+        bb
+      }
+    } else if bg < bb {
+      bg
+    } else {
+      bb
+    }
+    let mx = if br > bg {
+      if br > bb {
+        br
+      } else {
+        bb
+      }
+    } else if bg > bb {
+      bg
+    } else {
+      bb
+    }
+    mx - mn
+  }
+  let sat_s = {
+    let mn = if fr < fg {
+      if fr < fb {
+        fr
+      } else {
+        fb
+      }
+    } else if fg < fb {
+      fg
+    } else {
+      fb
+    }
+    let mx = if fr > fg {
+      if fr > fb {
+        fr
+      } else {
+        fb
+      }
+    } else if fg > fb {
+      fg
+    } else {
+      fb
+    }
+    mx - mn
+  }
+  let (r, g, b) = if mode == 12 {
+    let (hr, hg, hb) = blend_set_sat(fr, fg, fb, sat_b)
+    blend_set_lum(hr, hg, hb, blend_lum(br, bg, bb))
+  } else if mode == 13 {
+    let (hr, hg, hb) = blend_set_sat(br, bg, bb, sat_s)
+    blend_set_lum(hr, hg, hb, blend_lum(br, bg, bb))
+  } else if mode == 14 {
+    blend_set_lum(fr, fg, fb, blend_lum(br, bg, bb))
+  } else {
+    blend_set_lum(br, bg, bb, blend_lum(fr, fg, fb))
+  }
+  let convert = fn(v : Double) -> Int32 {
+    let n = (v * 255.0).to_int()
+    if n < 0 {
+      0
+    } else if n > 255 {
+      255
+    } else {
+      n
+    }
+  }
+  (convert(r), convert(g), convert(b))
+}
+
+///|
 fn blend_channel(mode : Int32, backdrop : Int32, source : Int32) -> Int32 {
   let d = clamp_byte(backdrop)
   let s = clamp_byte(source)
@@ -176,20 +334,16 @@ pub fn Canvas::set(
   let dr = self.data[idx].to_int()
   let dg = self.data[idx + 1].to_int()
   let db = self.data[idx + 2].to_int()
-  let sr = if self.blend_mode == 0 {
-    clamp_byte(r)
+  let (sr, sg, sb) = if self.blend_mode >= 12 {
+    blend_hsl(self.blend_mode, dr, dg, db, r, g, b)
+  } else if self.blend_mode == 0 {
+    (clamp_byte(r), clamp_byte(g), clamp_byte(b))
   } else {
-    blend_channel(self.blend_mode, dr, r)
-  }
-  let sg = if self.blend_mode == 0 {
-    clamp_byte(g)
-  } else {
-    blend_channel(self.blend_mode, dg, g)
-  }
-  let sb = if self.blend_mode == 0 {
-    clamp_byte(b)
-  } else {
-    blend_channel(self.blend_mode, db, b)
+    (
+      blend_channel(self.blend_mode, dr, r),
+      blend_channel(self.blend_mode, dg, g),
+      blend_channel(self.blend_mode, db, b),
+    )
   }
   let a = self.alpha * mask_alpha / 255
   if a >= 255 {
@@ -465,15 +619,21 @@ pub fn Canvas::downsample(self : Canvas, factor : Int32) -> Canvas {
           let px = x * factor + sx
           let py = y * factor + sy
           let idx = (py * self.width + px) * 3
-          rs = rs + self.data[idx].to_int()
-          gs = gs + self.data[idx + 1].to_int()
-          bs = bs + self.data[idx + 2].to_int()
+          rs = rs +
+            (@math.pow(self.data[idx].to_double() / 255.0, 2.2) * 255.0).to_int()
+          gs = gs +
+            (@math.pow(self.data[idx + 1].to_double() / 255.0, 2.2) * 255.0).to_int()
+          bs = bs +
+            (@math.pow(self.data[idx + 2].to_double() / 255.0, 2.2) * 255.0).to_int()
           sx = sx + 1
         }
         sy = sy + 1
       }
       let count = factor * factor
-      out.set(x, y, rs / count, gs / count, bs / count)
+      let r = (@math.pow((rs / count).to_double() / 255.0, 1.0 / 2.2) * 255.0).to_int()
+      let g = (@math.pow((gs / count).to_double() / 255.0, 1.0 / 2.2) * 255.0).to_int()
+      let b = (@math.pow((bs / count).to_double() / 255.0, 1.0 / 2.2) * 255.0).to_int()
+      out.set(x, y, r, g, b)
       x = x + 1
     }
     y = y + 1
