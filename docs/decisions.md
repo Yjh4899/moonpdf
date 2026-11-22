@@ -804,3 +804,31 @@ at scaled text matrices.
 **Consequence.** IRS 1040 pixel closeness improved from about 33% to about 80%,
 and IRS W-9 from about 39% to about 75%. A regression fixture (`text-bt.pdf`)
 sets `Tf` outside two `BT`/`ET` pairs and checks both runs paint.
+
+## ADR-049: support stitching functions in axial shadings
+
+**Decision.** When a shading's function is a type-3 stitching function, unwrap
+its sub-functions; for a single sub-function use that type-2 ramp directly.
+
+**Alternatives.** Treat unsupported function types as a gray ramp; flatten all
+shadings to images.
+
+**Why.** The PDF.js transparency sample uses a type-3 wrapper around one type-2
+function. Falling back to a default black-to-white ramp turned the intended
+red-to-blue gradient gray.
+
+**Consequence.** `alphatrans.pdf` pixel closeness rose from 87% to 97% and the
+real corpus moved from 3 to 4 pixel-passing PDFs.
+
+## ADR-050: round fractional page sizes up
+
+**Decision.** Compute raster dimensions with `ceil(page_size * scale)`.
+
+**Alternatives.** Truncate the floating-point size; round to nearest.
+
+**Why.** IRS W-9 has a 611.99 x 791.99 MediaBox. Truncation produced a
+611x791 raster, shifting every reference comparison by one pixel and clipping
+the right/bottom edge.
+
+**Consequence.** W-9 pixel closeness improved from 75% to 81%; the behavior is
+covered by `page-fraction.pdf`.

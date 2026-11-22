@@ -65,6 +65,36 @@ fn shading_extend(
 }
 
 ///|
+fn shading_type2(
+  page : @pdf.PdfPage,
+  function_dict : Array[(String, @pdf.PdfValue)],
+) -> (Array[Double], Array[Double], Double) {
+  let c0 = shading_numbers(page, function_dict, "C0")
+  let c1 = shading_numbers(page, function_dict, "C1")
+  let mut exponent = 1.0
+  match @pdf.dict_get(function_dict, "N") {
+    Some(value) =>
+      match value.as_number() {
+        Some(n) => exponent = n
+        None => ()
+      }
+    None => ()
+  }
+  (c0, c1, exponent)
+}
+
+///|
+fn shading_function_dict(
+  page : @pdf.PdfPage,
+  value : @pdf.PdfValue,
+) -> Array[(String, @pdf.PdfValue)]? {
+  match page.resolve(value) {
+    @pdf.Dict(dict) => Some(dict)
+    _ => None
+  }
+}
+
+///|
 pub fn load_shading(page : @pdf.PdfPage, value : @pdf.PdfValue) -> Shading? {
   let dict = page.resolve_dict(value)
   if dict.length() == 0 {
@@ -105,12 +135,26 @@ pub fn load_shading(page : @pdf.PdfPage, value : @pdf.PdfValue) -> Shading? {
             None => None
           }
           if function_type == Some(2) {
-            c0 = shading_numbers(page, function_dict, "C0")
-            c1 = shading_numbers(page, function_dict, "C1")
-            match @pdf.dict_get(function_dict, "N") {
-              Some(value) =>
-                match value.as_number() {
-                  Some(n) => exponent = n
+            let (a, b, n) = shading_type2(page, function_dict)
+            c0 = a
+            c1 = b
+            exponent = n
+          } else if function_type == Some(3) {
+            match @pdf.dict_get(function_dict, "Functions") {
+              Some(functions) =>
+                match page.resolve(functions).as_array() {
+                  Some(items) =>
+                    if items.length() > 0 {
+                      match shading_function_dict(page, items[0]) {
+                        Some(sub) => {
+                          let (a, b, n) = shading_type2(page, sub)
+                          c0 = a
+                          c1 = b
+                          exponent = n
+                        }
+                        None => ()
+                      }
+                    }
                   None => ()
                 }
               None => ()

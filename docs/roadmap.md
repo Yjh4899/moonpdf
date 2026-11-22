@@ -117,7 +117,7 @@ The incremental page must show the reused blue header and the new green body.
 **Delivered**
 
 - corpus/differential harness (`tools/corpus_check.py`);
-- fixture report: 37 PDFs, 34 within tolerance;
+- fixture report: 39 PDFs, 36 within tolerance;
 - real-PDF report: 4 public PDFs, 3 within tolerance;
 - PFA Type1 hex eexec support;
 - multi-page CLI (`--all`, `--pages`, `--out-dir`);

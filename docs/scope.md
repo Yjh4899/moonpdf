@@ -38,8 +38,10 @@ The concrete reuse fixture is documented in
 ## Unreleased (local work)
 
 - `BT`/`ET` keeps font and text state, only resetting text matrices;
-- regression fixture `fixtures/text-bt.pdf` and integration test;
-- IRS 1040 pixel closeness improved to about 80%, W-9 to about 75%.
+- type-3 stitching functions in axial shadings;
+- fractional page sizes round up to full pixels;
+- regression fixtures `text-bt.pdf`, `shading-type3.pdf`, `page-fraction.pdf`;
+- real corpus: 4/13 pixel-passing, IRS 1040 about 80%, W-9 about 81%.
 
 ## Delivered in release 0.42.0
 
@@ -122,8 +124,8 @@ The concrete reuse fixture is documented in
 
 | Metric | Current | Target |
 | --- | --- | --- |
-| Fixture pages rendered end to end | 37/37 | public corpus |
-| Differential fixture pages within tolerance | 34/37 | 3 reference-tool differences documented |
+| Fixture pages rendered end to end | 39/39 | public corpus |
+| Differential fixture pages within tolerance | 36/39 | 3 reference-tool differences documented |
 | Real public PDFs rendering without crash | 13/13 | 100+ |
 | Real public PDFs within pixel tolerance | 3/13 | 10 tracked fidelity gaps |
 | Unit + integration tests | 56 | 100+ |

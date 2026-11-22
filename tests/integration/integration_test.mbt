@@ -952,3 +952,46 @@ test "font state persists across BT and ET" {
   // Both text runs must paint even though Tf is set outside BT.
   assert_true(dark > 500)
 }
+
+///|
+test "stitching function axial shading keeps RGB endpoints" {
+  let raster = match
+    @integration.rasterize(
+      @integration.fixture_bytes("fixtures/shading-type3.pdf"),
+      1.0,
+    ) {
+    Some(raster) => raster
+    None => {
+      assert_true(false)
+      return
+    }
+  }
+  assert_eq(raster.width, 200)
+  assert_eq(raster.height, 100)
+  let left = (50 * raster.width + 10) * 3
+  let mid = (50 * raster.width + 100) * 3
+  let right = (50 * raster.width + 190) * 3
+  assert_true(raster.pixels.at(left).to_int() > 140) // red
+  assert_true(raster.pixels.at(right + 2).to_int() > 140) // blue
+  assert_true(raster.pixels.at(mid).to_int() > 60) // red + blue mix
+  assert_true(raster.pixels.at(mid + 2).to_int() > 60)
+}
+
+///|
+test "fractional MediaBox rounds up to full page pixels" {
+  let raster = match
+    @integration.rasterize(
+      @integration.fixture_bytes("fixtures/page-fraction.pdf"),
+      1.0,
+    ) {
+    Some(raster) => raster
+    None => {
+      assert_true(false)
+      return
+    }
+  }
+  assert_eq(raster.width, 201)
+  assert_eq(raster.height, 101)
+  let center = (50 * raster.width + 100) * 3
+  assert_true(raster.pixels.at(center).to_int() > 150)
+}

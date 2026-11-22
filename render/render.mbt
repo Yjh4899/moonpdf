@@ -732,8 +732,8 @@ fn render_page_inner(
   let ops = @pdf.parse_content_stream(buf.to_bytes()) catch {
     @pdf.PdfError(msg) => raise RenderError("content stream: \{msg}")
   }
-  let mut out_w = (page.width * options.scale).to_int()
-  let mut out_h = (page.height * options.scale).to_int()
+  let mut out_w = @math.ceil(page.width * options.scale).to_int()
+  let mut out_h = @math.ceil(page.height * options.scale).to_int()
   if out_w <= 0 {
     out_w = 1
   }
