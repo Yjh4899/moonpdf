@@ -35,6 +35,12 @@ The concrete reuse fixture is documented in
    compares page hashes in CI, catching layout regressions without a JavaScript
    toolchain.
 
+## Unreleased (local work)
+
+- `BT`/`ET` keeps font and text state, only resetting text matrices;
+- regression fixture `fixtures/text-bt.pdf` and integration test;
+- IRS 1040 pixel closeness improved to about 80%, W-9 to about 75%.
+
 ## Delivered in release 0.42.0
 
 - classic xref tables, xref streams, object streams and hybrid `/XRefStm`;
@@ -116,8 +122,8 @@ The concrete reuse fixture is documented in
 
 | Metric | Current | Target |
 | --- | --- | --- |
-| Fixture pages rendered end to end | 36/36 | public corpus |
-| Differential fixture pages within tolerance | 33/36 | 3 reference-tool differences documented |
+| Fixture pages rendered end to end | 37/37 | public corpus |
+| Differential fixture pages within tolerance | 34/37 | 3 reference-tool differences documented |
 | Real public PDFs rendering without crash | 13/13 | 100+ |
 | Real public PDFs within pixel tolerance | 3/13 | 10 tracked fidelity gaps |
 | Unit + integration tests | 56 | 100+ |

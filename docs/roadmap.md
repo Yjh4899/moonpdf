@@ -117,7 +117,7 @@ The incremental page must show the reused blue header and the new green body.
 **Delivered**
 
 - corpus/differential harness (`tools/corpus_check.py`);
-- fixture report: 36 PDFs, 33 within tolerance;
+- fixture report: 37 PDFs, 34 within tolerance;
 - real-PDF report: 4 public PDFs, 3 within tolerance;
 - PFA Type1 hex eexec support;
 - multi-page CLI (`--all`, `--pages`, `--out-dir`);
@@ -128,7 +128,8 @@ The incremental page must show the reused blue header and the new green body.
 - 13-PDF public corpus (papers, IRS forms, transparency/blend samples);
 - graphics-state copy on `q`/`Q`, fixing transform/text-state leakage;
 - raw name-keyed CFF glyph mapping through charset SIDs;
-- text advances and kerning applied in text space for scaled `Tm`.
+- text advances and kerning applied in text space for scaled `Tm`;
+- `BT`/`ET` preserving font and text state while resetting matrices.
 
 **Remaining**
 

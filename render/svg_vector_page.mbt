@@ -311,7 +311,10 @@ pub fn encode_svg_vector(
         svg_write(body, encoded)
         svg_write(body, "\"/>\n")
       }
-      "BT" => text = TextState::initial()
+      "BT" => {
+        text.matrix = Matrix::identity()
+        text.line_matrix = Matrix::identity()
+      }
       "ET" => ()
       "Tf" => {
         match op_number(op, 1) {

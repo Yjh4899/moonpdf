@@ -39,6 +39,7 @@ jobs:
           mkdir -p out
           moon run --target native cmd/moonpdf -- fixtures/shapes.pdf out/shapes.png --scale 2
           moon run --target native cmd/moonpdf -- fixtures/text.pdf out/text.png --scale 2
+          moon run --target native cmd/moonpdf -- fixtures/text-bt.pdf out/text-bt.png --scale 2
           moon run --target native cmd/moonpdf -- fixtures/demo.pdf out/demo.png --scale 2
           moon run --target native cmd/moonpdf -- fixtures/incremental.pdf out/incremental.png --scale 2
           moon run --target native cmd/moonpdf -- fixtures/incremental-full.pdf out/incremental-full.png --scale 2

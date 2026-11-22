@@ -1127,7 +1127,10 @@ fn render_page_inner(
         path = Path::new()
       }
       "n" => path = Path::new()
-      "BT" => text = TextState::initial()
+      "BT" => {
+        text.matrix = Matrix::identity()
+        text.line_matrix = Matrix::identity()
+      }
       "ET" => ()
       "Tf" => {
         match op_number(op, 1) {

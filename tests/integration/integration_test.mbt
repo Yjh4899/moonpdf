@@ -927,3 +927,28 @@ test "xref stream and object stream fixture" {
   let blue = (100 * raster.width + 100) * 3
   assert_true(raster.pixels.at(blue + 2).to_int() > 150)
 }
+
+///|
+test "font state persists across BT and ET" {
+  let raster = match
+    @integration.rasterize(
+      @integration.fixture_bytes("fixtures/text-bt.pdf"),
+      1.0,
+    ) {
+    Some(raster) => raster
+    None => {
+      assert_true(false)
+      return
+    }
+  }
+  assert_eq(raster.width, 200)
+  assert_eq(raster.height, 100)
+  let mut dark = 0
+  for i in 0..<raster.pixels.length() {
+    if raster.pixels.at(i).to_int() < 96 {
+      dark = dark + 1
+    }
+  }
+  // Both text runs must paint even though Tf is set outside BT.
+  assert_true(dark > 500)
+}

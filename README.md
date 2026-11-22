@@ -244,7 +244,7 @@ python tools/corpus_check.py --pdf-dir corpus --download --out docs/corpus-repor
 The checked-in reports record render success, per-file time, MAE and the fraction
 of pixels within 8 RGB levels:
 
-- [`docs/corpus-report.md`](docs/corpus-report.md): 36 committed fixtures, all
+- [`docs/corpus-report.md`](docs/corpus-report.md): 37 committed fixtures, all
   render; 33 are within tolerance, 3 differ because the reference renderer does
   not paint the relevant annotation/pattern fixtures.
 - [`docs/corpus-report-real.md`](docs/corpus-report-real.md): 13 downloaded
@@ -290,7 +290,7 @@ throughput measurements.
 | M1 (delivered) | images, inline images, Rotate/CropBox, rectangular clipping |
 | M2 (delivered) | embedded TrueType/CFF/Type1, standard-14 metrics/kerning, Type0/CIDFontType2, CID-keyed CFF, embedded and named CJK CMaps |
 | M3 (current) | alpha, blend modes, exact clipping, shadings, patterns, annotations, flags, optional content, image/ExtGState soft masks, isolated transparency groups and vector SVG paths/images/clips/text delivered; standard-14 vector text |
-| M4 (started) | corpus/differential harness, fuzz robustness, performance baseline, single-parse document handle, multi-page CLI, 13-PDF real corpus, graphics-state copy fix, text-advance fix, raw CFF SID mapping |
+| M4 (started) | corpus/differential harness, fuzz robustness, performance baseline, single-parse document handle, multi-page CLI, 13-PDF real corpus, graphics-state copy fix, text-advance fix, raw CFF SID mapping, BT/ET font persistence |
 | M4 | corpus SSIM vs MuPDF, performance pass, wasm demo |
 
 The full plan, scope boundaries and acceptance criteria are in

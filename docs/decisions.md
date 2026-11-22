@@ -787,3 +787,20 @@ a device pixel, collapsing glyphs at their origin. Real forms commonly use
 still have oversized CFF glyphs in some subsets, but ordinary text layout is
 fixed; the remaining issue is CFF charstring/encoding fidelity, not advance
 arithmetic.
+
+## ADR-048: `BT` resets text matrices but keeps font state
+
+**Decision.** `BT` resets only `text.matrix` and `text.line_matrix`; it does not
+reset the current font, font size, spacing or rendering mode.
+
+**Alternatives.** Reset the whole `TextState` at every `BT`; require every text
+object to repeat `Tf`; carry a separate font stack.
+
+**Why.** PDF text state is part of the graphics state and survives `BT`/`ET`.
+Real forms set `Tf` once and then open several text objects. Resetting the font
+made those runs fall back to the bitmap font, which produced large black blocks
+at scaled text matrices.
+
+**Consequence.** IRS 1040 pixel closeness improved from about 33% to about 80%,
+and IRS W-9 from about 39% to about 75%. A regression fixture (`text-bt.pdf`)
+sets `Tf` outside two `BT`/`ET` pairs and checks both runs paint.
