@@ -669,6 +669,11 @@ pub fn draw_type1_glyph(
     Some(path) => {
       let (subpaths, _) = path.finish()
       canvas.fill_polygons(subpaths, false, r, g, b)
+      for points in subpaths {
+        if points.length() >= 2 {
+          canvas.stroke_polyline(points, true, 0.25, false, r, g, b)
+        }
+      }
     }
     None => ()
   }

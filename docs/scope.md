@@ -43,8 +43,9 @@ The concrete reuse fixture is documented in
 - HSL blend modes and gamma-aware downsampling;
 - pixel-center scanline fill for thin text stems;
 - embedded OpenSans fallback for standard-14 text;
+- sub-pixel contour stroke for Type1 stem weight;
 - regression fixtures `text-bt.pdf`, `shading-type3.pdf`, `page-fraction.pdf`;
-- real corpus: 5/13 pixel-passing, IRS 1040 about 82%, W-9 about 82%.
+- real corpus: 5/13 pixel-passing, attention 90.2%, IRS 1040 about 82%, W-9 about 82%.
 
 ## Delivered in release 0.42.0
 

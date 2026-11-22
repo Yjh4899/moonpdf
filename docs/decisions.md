@@ -891,3 +891,17 @@ deterministic, works in wasm, and needs no filesystem.
 reached 5/13 passing. The tradeoff is that the fixture report drops from 36 to
 33 within tolerance, because the reference uses Times/Helvetica outlines while
 the fallback is OpenSans; the tradeoff is documented rather than hidden.
+
+## ADR-055: a light stroke for Type1 glyphs
+
+**Decision.** After filling a Type1 glyph, also stroke its contours with a
+0.25-device-pixel line width.
+
+**Alternatives.** Leave pure fills; synthesize bold by scaling; rely on gamma.
+
+**Why.** The embedded Nimbus Type1 outlines are slightly thinner than the
+reference renderer at 10pt. A quarter-pixel contour stroke restores the missing
+stem weight without changing advances or glyph positions.
+
+**Consequence.** Attention rose to about 90.2% and clip/gpt4 moved closer; the
+stroke is applied only to Type1 glyphs and remains sub-pixel.
